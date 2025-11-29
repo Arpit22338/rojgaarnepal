@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Profile {
   id: string;
@@ -66,10 +67,12 @@ export default function ProfilePage() {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           {session?.user?.image && (
-            <img 
+            <Image 
               src={session.user.image} 
               alt="Profile" 
-              className="w-16 h-16 rounded-full object-cover border"
+              width={64}
+              height={64}
+              className="rounded-full object-cover border"
             />
           )}
           <h1 className="text-2xl font-bold">My Profile</h1>

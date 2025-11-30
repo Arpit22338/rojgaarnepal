@@ -2,16 +2,23 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X, User, LogOut, MessageSquare } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Navbar() {
+  const pathname = usePathname();
   const { data: session } = useSession();
   // Cast user to include role to satisfy editor type checking
   const user = session?.user as { name?: string | null; email?: string | null; role?: string } | undefined;
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  const getLinkClass = (path: string) => {
+    const isActive = path === "/" ? pathname === "/" : pathname.startsWith(path);
+    return `${isActive ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-600"} text-lg transition-colors`;
+  };
 
   useEffect(() => {
     if (session) {
@@ -48,40 +55,40 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-600 hover:text-blue-600">
+            <Link href="/" className={getLinkClass("/")}>
               Home
             </Link>
-            <Link href="/jobs" className="text-gray-600 hover:text-blue-600">
+            <Link href="/jobs" className={getLinkClass("/jobs")}>
               Find Jobs
             </Link>
-            <Link href="/talent" className="text-gray-600 hover:text-blue-600">
+            <Link href="/talent" className={getLinkClass("/talent")}>
               Find Talent
             </Link>
-            <Link href="/courses" className="text-gray-600 hover:text-blue-600">
+            <Link href="/courses" className={getLinkClass("/courses")}>
               Skill Courses
             </Link>
             {user?.role === "JOBSEEKER" && (
               <>
-                <Link href="/talent/new" className="text-gray-600 hover:text-blue-600">
+                <Link href="/talent/new" className={getLinkClass("/talent/new")}>
                   Share My Talent
                 </Link>
-                <Link href="/my-applications" className="text-gray-600 hover:text-blue-600">
+                <Link href="/my-applications" className={getLinkClass("/my-applications")}>
                   My Applications
                 </Link>
               </>
             )}
             {(user?.role === "EMPLOYER" || user?.role === "ADMIN") && (
               <>
-                <Link href="/employer/jobs/new" className="text-gray-600 hover:text-blue-600">
+                <Link href="/employer/jobs/new" className={getLinkClass("/employer/jobs/new")}>
                   Post a Job
                 </Link>
-                <Link href="/employer/dashboard" className="text-gray-600 hover:text-blue-600">
+                <Link href="/employer/dashboard" className={getLinkClass("/employer/dashboard")}>
                   Dashboard
                 </Link>
               </>
             )}
             {user?.role === "ADMIN" && (
-              <Link href="/admin/dashboard" className="text-gray-600 hover:text-blue-600">
+              <Link href="/admin/dashboard" className={getLinkClass("/admin/dashboard")}>
                 Admin
               </Link>
             )}

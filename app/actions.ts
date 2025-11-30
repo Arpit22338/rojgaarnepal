@@ -105,6 +105,16 @@ export async function applyForJob(jobId: string, employerId: string) {
     },
   });
 
+  // Create Notification for Employer
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (prisma as any).notification.create({
+    data: {
+      userId: employerId,
+      content: `New application for ${jobTitle}`,
+      link: `/employer/jobs/${jobId}/applications`,
+    },
+  });
+
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/my-applications");
   return { success: true, message: "Application submitted successfully!" };
@@ -224,4 +234,157 @@ export async function deleteMessage(messageId: string) {
   
   // We can't easily revalidate the specific chat page from here since we don't know the other user's ID easily without fetching more data,
   // but the client-side polling in ChatPage will pick up the change.
+}
+
+export async function createAnswer(questionId: string, content: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const question = await prisma.question.findUnique({
+    where: { id: questionId },
+    include: { job: true },
+  });
+
+  if (!question) {
+    throw new Error("Question not found");
+  }
+
+  // Allow anyone to reply? User said "others can reply to anyone of their choice".
+  // So yes, any authenticated user can reply.
+  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (prisma as any).answer.create({
+    data: {
+      content,
+      questionId,
+      userId: session.user.id,
+    },
+  });
+
+  // Notify the question author
+  if (question.userId !== session.user.id) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (prisma as any).notification.create({
+      data: {
+        userId: question.userId,
+        content: `Someone replied to your question on ${question.job.title}`,
+        link: `/jobs/${question.jobId}`,
+      },
+    });
+  }
+
+  revalidatePath(`/jobs/${question.jobId}`);
+}
+
+export async function deleteAnswer(answerId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const answer = await (prisma as any).answer.findUnique({
+    where: { id: answerId },
+  });
+
+  if (!answer) {
+    throw new Error("Answer not found");
+  }
+
+  // Allow deletion if author or admin
+  if (answer.userId !== session.user.id && session.user.role !== "ADMIN") {
+    throw new Error("Unauthorized");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (prisma as any).answer.delete({
+    where: { id: answerId },
+  });
+
+  // We need to find the job ID to revalidate
+  const question = await prisma.question.findUnique({
+    where: { id: answer.questionId },
+  });
+  
+  if (question) {
+    revalidatePath(`/jobs/${question.jobId}`);
+  }
+}
+
+export async function getNotifications() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return [];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (prisma as any).notification.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+}
+
+export async function markNotificationAsRead(notificationId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const notification = await (prisma as any).notification.findUnique({
+    where: { id: notificationId },
+  });
+
+  if (!notification || notification.userId !== session.user.id) {
+    throw new Error("Unauthorized");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (prisma as any).notification.update({
+    where: { id: notificationId },
+    data: { isRead: true },
+  });
+  
+  revalidatePath("/"); // Revalidate everywhere? Or just let client state handle it.
+}
+
+export async function markAllNotificationsAsRead() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (prisma as any).notification.updateMany({
+    where: { userId: session.user.id, isRead: false },
+    data: { isRead: true },
+  });
+}
+
+export async function deleteTalentPost(postId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const post = await prisma.talentPost.findUnique({
+    where: { id: postId },
+  });
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  if (post.userId !== session.user.id && session.user.role !== "ADMIN") {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.talentPost.delete({
+    where: { id: postId },
+  });
+
+  revalidatePath("/talent");
 }

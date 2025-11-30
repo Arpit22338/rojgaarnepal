@@ -4,8 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { applyForJob, deleteQuestion } from "@/app/actions";
-import { Trash2 } from "lucide-react";
+import { applyForJob, deleteQuestion, createAnswer, deleteAnswer } from "@/app/actions";
+import { Trash2, MessageCircle } from "lucide-react";
 
 interface Props {
   params: Promise<{
@@ -16,7 +16,8 @@ interface Props {
 export default async function JobDetailsPage({ params }: Props) {
   const { jobId } = await params;
   const session = await getServerSession(authOptions);
-  const job = await prisma.job.findUnique({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const job: any = await prisma.job.findUnique({
     where: { id: jobId },
     include: {
       employer: {
@@ -27,13 +28,22 @@ export default async function JobDetailsPage({ params }: Props) {
       questions: {
         include: {
           user: true,
+          answers: {
+            include: {
+              user: true,
+            },
+            orderBy: {
+              createdAt: "asc",
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
         },
       },
     },
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
 
   if (!job) {
     notFound();
@@ -133,7 +143,8 @@ export default async function JobDetailsPage({ params }: Props) {
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4">Required Skills</h2>
             <div className="flex flex-wrap gap-2">
-              {job.requiredSkills.split(",").map((skill, index) => (
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {job.requiredSkills.split(",").map((skill: any, index: number) => (
                 <span key={index} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
                   {skill.trim()}
                 </span>
@@ -181,7 +192,8 @@ export default async function JobDetailsPage({ params }: Props) {
             {job.questions.length === 0 ? (
               <p className="text-gray-500 italic">No questions yet. Be the first to ask!</p>
             ) : (
-              job.questions.map((q) => (
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              job.questions.map((q: any) => (
                 <div key={q.id} className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-start gap-3 mb-2">
                     <Link href={`/profile/${q.userId}`} className="flex-shrink-0">
@@ -222,38 +234,64 @@ export default async function JobDetailsPage({ params }: Props) {
                     </div>
                   </div>
                   
-                  {q.answer ? (
-                    <div className="bg-white p-3 rounded border-l-4 border-green-500 ml-14 mt-2">
-                      <p className="text-sm font-semibold text-green-700 mb-1">Employer Answer:</p>
-                      <p className="text-gray-700">{q.answer}</p>
-                    </div>
-                  ) : (
-                    session?.user.id === job.employerId && (
+                  {/* Answers Section */}
+                  <div className="ml-14 space-y-3 mt-2">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {q.answers.map((answer: any) => (
+                      <div key={answer.id} className="bg-white p-3 rounded border border-gray-200">
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-sm text-gray-900">
+                              {answer.user.name}
+                              {answer.userId === job.employerId && (
+                                <span className="ml-2 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
+                                  Employer
+                                </span>
+                              )}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {answer.createdAt.toLocaleDateString()}
+                            </span>
+                          </div>
+                          {(session?.user.id === answer.userId || session?.user.role === "ADMIN") && (
+                            <form action={async () => {
+                              "use server";
+                              await deleteAnswer(answer.id);
+                            }}>
+                              <button type="submit" className="text-red-500 hover:text-red-700 p-1">
+                                <Trash2 size={12} />
+                              </button>
+                            </form>
+                          )}
+                        </div>
+                        <p className="text-gray-700 text-sm">{answer.content}</p>
+                      </div>
+                    ))}
+
+                    {/* Reply Form */}
+                    {session && (
                       <form action={async (formData) => {
                         "use server";
-                        const answer = formData.get("answer");
-                        if (!answer) return;
-                        
-                        await prisma.question.update({
-                          where: { id: q.id },
-                          data: { answer: answer as string },
-                        });
-                      }} className="ml-4 mt-2">
+                        const content = formData.get("content");
+                        if (!content) return;
+                        await createAnswer(q.id, content as string);
+                      }} className="mt-2">
                         <div className="flex gap-2">
                           <input
-                            name="answer"
+                            name="content"
                             type="text"
                             placeholder="Reply to this question..."
-                            className="flex-1 border rounded px-3 py-1 text-sm"
+                            className="flex-1 border rounded px-3 py-1 text-sm focus:outline-none focus:border-blue-500"
                             required
                           />
-                          <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                          <button type="submit" className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-200 flex items-center gap-1">
+                            <MessageCircle size={14} />
                             Reply
                           </button>
                         </div>
                       </form>
-                    )
-                  )}
+                    )}
+                  </div>
                 </div>
               ))
             )}

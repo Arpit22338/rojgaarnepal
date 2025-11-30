@@ -35,6 +35,8 @@ model User {
   talentPost       TalentPost?
   
   questions        Question[]
+  answers          Answer[]
+  notifications    Notification[]
   givenTrusts      Trust[]   @relation("GivenTrusts")
   receivedTrusts   Trust[]   @relation("ReceivedTrusts")
 }
@@ -106,13 +108,35 @@ model Job {
 model Question {
   id        String   @id @default(cuid())
   content   String
-  answer    String?
+  // answer    String? // Deprecated in favor of Answer model
   jobId     String
   job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  answers   Answer[]
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  content    String
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
 }
 
 model Trust {

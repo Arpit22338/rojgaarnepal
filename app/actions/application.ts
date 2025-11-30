@@ -33,6 +33,16 @@ export async function updateApplicationStatus(applicationId: string, status: "AC
       data: { status },
     });
 
+    // Notify Job Seeker
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (prisma as any).notification.create({
+      data: {
+        userId: application.userId,
+        content: `Your application for ${application.job.title} has been ${status.toLowerCase()}`,
+        link: `/my-applications`,
+      },
+    });
+
     revalidatePath(`/employer/jobs/${application.job.id}/applications`);
     return { success: true };
   } catch (error) {

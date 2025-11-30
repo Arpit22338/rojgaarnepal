@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { User, MapPin } from "lucide-react";
+import DeleteTalentButton from "@/components/DeleteTalentButton";
 
 interface TalentPost {
   id: string;
@@ -81,7 +82,12 @@ export default function TalentPage() {
                   )}
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">{post.user.name}</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-900">{post.user.name}</h2>
+                    {(session?.user.id === post.userId || session?.user.role === "ADMIN") && (
+                      <DeleteTalentButton postId={post.id} />
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500">{post.title}</p>
                   <Link href={`/profile/${post.userId}`} className="text-xs text-blue-600 hover:underline">
                     View Profile

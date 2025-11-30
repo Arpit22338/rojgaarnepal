@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X, User, LogOut, MessageSquare } from "lucide-react";
 import { useState, useEffect } from "react";
+import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -95,6 +96,7 @@ export default function Navbar() {
             
             {session ? (
               <div className="flex items-center space-x-4">
+                <NotificationBell />
                 <Link href="/messages" className="text-gray-600 hover:text-blue-600 relative">
                   <MessageSquare size={20} />
                   {unreadCount > 0 && (
@@ -132,14 +134,17 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-4">
             {session && (
-              <Link href="/messages" className="text-gray-600 hover:text-blue-600 relative">
-                <MessageSquare size={24} />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {unreadCount}
-                  </span>
-                )}
-              </Link>
+              <>
+                <NotificationBell />
+                <Link href="/messages" className="text-gray-600 hover:text-blue-600 relative">
+                  <MessageSquare size={24} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Link>
+              </>
             )}
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -185,13 +190,22 @@ export default function Navbar() {
             </Link>
             
             {user?.role === "JOBSEEKER" && (
-              <Link
-                href="/talent/new"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                onClick={() => setIsOpen(false)}
-              >
-                Share My Talent
-              </Link>
+              <>
+                <Link
+                  href="/talent/new"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Share My Talent
+                </Link>
+                <Link
+                  href="/my-applications"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  My Applications
+                </Link>
+              </>
             )}
 
             {(user?.role === "EMPLOYER" || user?.role === "ADMIN") && (

@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 export async function updateApplicationStatus(applicationId: string, status: "ACCEPTED" | "REJECTED") {
   const session = await getServerSession(authOptions);
 
-  if (!session || session.user.role !== "EMPLOYER") {
+  if (!session || (session.user.role !== "EMPLOYER" && session.user.role !== "ADMIN")) {
     return { error: "Unauthorized" };
   }
 
@@ -23,9 +23,23 @@ export async function updateApplicationStatus(applicationId: string, status: "AC
       return { error: "Application not found" };
     }
 
-    if (application.job.employerId !== session.user.id) {
+    // Allow Employer who owns the job OR Admin
+    if (application.job.employerId !== session.user.id && session.user.role !== "ADMIN") {
       return { error: "Unauthorized" };
     }
+
+    await prisma.application.update({
+      where: { id: applicationId },
+      data: { status },
+    });
+
+    revalidatePath(`/employer/jobs/${application.job.id}/applications`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating application status:", error);
+    return { error: "Failed to update status" };
+  }
+}
 
     await prisma.application.update({
       where: { id: applicationId },

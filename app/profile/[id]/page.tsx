@@ -181,13 +181,42 @@ export default function PublicProfilePage() {
         {profile?.skills && (
           <div>
             <h2 className="text-xl font-semibold mb-2">Skills</h2>
-            <div className="flex flex-wrap gap-2">
-              {profile.skills.split(',').map((skill, index) => (
-                <span key={index} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                  {skill.trim()}
-                </span>
-              ))}
-            </div>
+            {(() => {
+              try {
+                const skills = JSON.parse(profile.skills);
+                if (Array.isArray(skills)) {
+                  return (
+                    <div className="space-y-2 mt-2">
+                      {skills.map((skill: { name: string; level: number }, idx: number) => (
+                        <div key={idx} className="flex items-center gap-4">
+                          <span className="w-32 font-medium truncate">{skill.name}</span>
+                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-blue-600 rounded-full" 
+                              style={{ width: `${skill.level}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500 w-8">{skill.level}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+                // Fallback for non-array JSON (unlikely but safe)
+                return <p>{profile.skills}</p>;
+              } catch {
+                // Fallback for old comma-separated format
+                return (
+                  <div className="flex flex-wrap gap-2">
+                    {profile.skills.split(',').map((skill, index) => (
+                      <span key={index} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                        {skill.trim()}
+                      </span>
+                    ))}
+                  </div>
+                );
+              }
+            })()}
           </div>
         )}
 

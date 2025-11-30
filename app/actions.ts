@@ -138,13 +138,27 @@ export async function deleteJob(jobId: string) {
 
 export async function deleteUser(userId: string) {
   const session = await getServerSession(authOptions);
+  
+  console.log("Delete User Action - Session:", session?.user);
+  
   if (!session?.user?.id || session.user.role !== "ADMIN") {
+    console.log("Unauthorized delete attempt");
     throw new Error("Unauthorized");
   }
 
-  await prisma.user.delete({
-    where: { id: userId },
-  });
-
-  revalidatePath("/admin/dashboard");
+  try {
+    // Delete related records first if necessary (Prisma cascade should handle most)
+    // But let's be explicit about what we are deleting to debug
+    console.log("Deleting user:", userId);
+    
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+    
+    console.log("User deleted successfully");
+    revalidatePath("/admin/dashboard");
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw new Error("Failed to delete user");
+  }
 }

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "Job Nepal",
   description: "Connecting Nepali Youth with Opportunities",
   icons: {
-    icon: "/logo.svg",
+    icon: "/logo.png",
   },
 };
 

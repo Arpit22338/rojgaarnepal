@@ -38,7 +38,8 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        if (!user.isVerified) {
+        // Skip verification check for ADMIN
+        if (!user.isVerified && user.role !== "ADMIN") {
           throw new Error("Email not verified. Please verify your email.");
         }
 

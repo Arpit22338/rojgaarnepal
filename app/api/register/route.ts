@@ -91,9 +91,11 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error) {
+    console.error("Registration error:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json({ message: "Invalid input", errors: error.issues }, { status: 400 });
     }
-    return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
+    // Return the actual error message for debugging
+    return NextResponse.json({ message: error instanceof Error ? error.message : "Something went wrong" }, { status: 500 });
   }
 }

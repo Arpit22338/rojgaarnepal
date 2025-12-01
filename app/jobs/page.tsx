@@ -88,35 +88,34 @@ function JobsContent() {
       <RecommendedJobs />
 
       {/* Search & Filters */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 rounded-xl shadow-lg">
-        <h2 className="text-white text-xl font-semibold mb-4">Search for your next opportunity</h2>
-        <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-4">
+      <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+        <form onSubmit={handleSearch} className="flex flex-col lg:flex-row gap-3">
           <div className="flex-1 relative group">
-            <Search className="absolute left-4 top-3.5 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+            <Search className="absolute left-3 top-3 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={18} />
             <input
               type="text"
               placeholder="Job title, keywords, or company"
-              className="w-full pl-12 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-sm text-gray-900 placeholder-gray-500"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900 placeholder-gray-500 text-sm"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
           <div className="flex-1 relative group">
-            <MapPin className="absolute left-4 top-3.5 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+            <MapPin className="absolute left-3 top-3 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={18} />
             <input
               type="text"
-              placeholder="Location (e.g. Kathmandu)"
-              className="w-full pl-12 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-sm text-gray-900 placeholder-gray-500"
+              placeholder="Location"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900 placeholder-gray-500 text-sm"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
           </div>
-          <div className="w-full lg:w-56 relative">
-             <div className="absolute right-4 top-3.5 pointer-events-none text-gray-500">
-              <Briefcase size={20} />
+          <div className="w-full lg:w-48 relative">
+             <div className="absolute right-3 top-3 pointer-events-none text-gray-500">
+              <Briefcase size={18} />
             </div>
             <select
-              className="w-full pl-4 pr-10 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-sm text-gray-900 appearance-none bg-white cursor-pointer"
+              className="w-full pl-3 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900 appearance-none bg-white cursor-pointer text-sm"
               value={type}
               onChange={(e) => setType(e.target.value)}
             >
@@ -130,7 +129,7 @@ function JobsContent() {
           </div>
           <button 
             type="submit"
-            className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold py-3 px-8 rounded-lg shadow-md transition-colors duration-200"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg shadow-sm transition-colors duration-200 text-sm whitespace-nowrap"
           >
             Search
           </button>

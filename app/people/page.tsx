@@ -61,25 +61,24 @@ export default function PeoplePage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 rounded-xl shadow-lg">
-        <h2 className="text-white text-xl font-semibold mb-4">Find People & Companies</h2>
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+        <div className="flex flex-col md:flex-row gap-3">
           <div className="flex-1 relative group">
-            <Search className="absolute left-4 top-3.5 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+            <Search className="absolute left-3 top-3 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={18} />
             <input
               type="text"
               placeholder="Search by name or email..."
-              className="w-full pl-12 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-sm text-gray-900 placeholder-gray-500"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900 placeholder-gray-500 text-sm"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <div className="w-full md:w-56 relative">
-            <div className="absolute right-4 top-3.5 pointer-events-none text-gray-500">
-              <Briefcase size={20} />
+          <div className="w-full md:w-48 relative">
+            <div className="absolute right-3 top-3 pointer-events-none text-gray-500">
+              <Briefcase size={18} />
             </div>
             <select
-              className="w-full pl-4 pr-10 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-sm text-gray-900 appearance-none bg-white cursor-pointer"
+              className="w-full pl-3 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-900 appearance-none bg-white cursor-pointer text-sm"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >

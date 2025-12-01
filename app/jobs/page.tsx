@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { MapPin, Briefcase, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -23,7 +23,7 @@ interface Job {
   };
 }
 
-export default function JobsPage() {
+function JobsContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   
@@ -191,5 +191,13 @@ export default function JobsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function JobsPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
+      <JobsContent />
+    </Suspense>
   );
 }

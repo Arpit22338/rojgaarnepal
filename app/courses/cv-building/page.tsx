@@ -88,8 +88,13 @@ export default function CVCoursePage() {
           <div className="flex justify-center mb-8 overflow-auto">
             <div 
               ref={certificateRef}
-              className="w-[800px] h-[600px] bg-white border-[20px] border-double border-blue-900 p-10 relative text-center flex flex-col items-center justify-center shadow-2xl"
-              style={{ fontFamily: 'serif' }}
+              className="w-[800px] h-[600px] p-10 relative text-center flex flex-col items-center justify-center shadow-2xl"
+              style={{ 
+                fontFamily: 'serif',
+                backgroundColor: '#ffffff',
+                border: '20px double #1e3a8a', // Explicit hex for blue-900
+                color: '#111827' // Explicit hex for gray-900
+              }}
             >
               {/* Watermark/Background */}
               <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
@@ -104,44 +109,44 @@ export default function CVCoursePage() {
                    {logoBase64 && <img src={logoBase64} alt="Rojgaar Logo" className="h-20 object-contain" />}
                 </div>
                 
-                <div className="mb-2 text-blue-900 font-bold tracking-widest uppercase text-sm">Rojgaar Skills Academy</div>
-                <h1 className="text-4xl font-bold text-blue-900 mb-4 font-serif">Certificate of Completion</h1>
+                <div className="mb-2 font-bold tracking-widest uppercase text-sm" style={{ color: '#1e3a8a' }}>Rojgaar Skills Academy</div>
+                <h1 className="text-4xl font-bold mb-4 font-serif" style={{ color: '#1e3a8a' }}>Certificate of Completion</h1>
                 
-                <p className="text-lg text-gray-600 mb-4 italic">This is to certify that</p>
+                <p className="text-lg mb-4 italic" style={{ color: '#4b5563' }}>This is to certify that</p>
                 
-                <div className="text-3xl font-bold text-gray-900 mb-2 border-b-2 border-gray-300 inline-block px-10 py-1 min-w-[300px]">
+                <div className="text-3xl font-bold mb-2 border-b-2 inline-block px-10 py-1 min-w-[300px]" style={{ color: '#111827', borderColor: '#d1d5db' }}>
                   {session?.user?.name || "Student Name"}
                 </div>
                 
-                <p className="text-lg text-gray-600 mt-4 mb-4 italic">
+                <p className="text-lg mt-4 mb-4 italic" style={{ color: '#4b5563' }}>
                   has successfully completed the comprehensive course on
                 </p>
                 
-                <h2 className="text-2xl font-bold text-blue-800 mb-8">CV Writing Masterclass</h2>
+                <h2 className="text-2xl font-bold mb-8" style={{ color: '#1e40af' }}>CV Writing Masterclass</h2>
                 
                 <div className="flex justify-between items-end w-full px-12 mt-8">
                   <div className="text-center">
-                    <div className="text-base font-bold text-gray-800 border-t border-gray-400 pt-2 px-4">
+                    <div className="text-base font-bold border-t pt-2 px-4" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
                       {new Date().toLocaleDateString()}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Date</div>
+                    <div className="text-xs mt-1" style={{ color: '#6b7280' }}>Date</div>
                   </div>
 
                   <div className="flex flex-col items-center">
                      {/* Seal */}
-                     <div className="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-4 border-yellow-600 mb-2">
+                     <div className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-4 mb-2" style={{ backgroundColor: '#eab308', borderColor: '#ca8a04' }}>
                         <Award size={40} />
                      </div>
                   </div>
                   
                   <div className="text-center">
-                    <div className="text-xl font-script text-blue-900 mb-1 font-cursive" style={{ fontFamily: 'cursive' }}>
+                    <div className="text-xl font-script mb-1 font-cursive" style={{ fontFamily: 'cursive', color: '#1e3a8a' }}>
                       Arpit
                     </div>
-                    <div className="text-base font-bold text-gray-800 border-t border-gray-400 pt-2 px-4">
+                    <div className="text-base font-bold border-t pt-2 px-4" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
                       Arpit
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">CEO, Rojgaar</div>
+                    <div className="text-xs mt-1" style={{ color: '#6b7280' }}>CEO, Rojgaar</div>
                   </div>
                 </div>
               </div>

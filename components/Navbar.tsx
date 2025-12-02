@@ -12,8 +12,9 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   // Cast user to include role to satisfy editor type checking
-  const user = session?.user as { name?: string | null; email?: string | null; role?: string; isPremium?: boolean } | undefined;
+  const user = session?.user as { name?: string | null; email?: string | null; image?: string | null; role?: string; isPremium?: boolean } | undefined;
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -47,9 +48,9 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Roojgaar Logo" width={40} height={40} className="object-contain" />
+            <Image src="/logo.png" alt="Rojgaar Logo" width={40} height={40} className="object-contain" />
             <div className="text-2xl font-bold flex items-center">
-              <span className="text-blue-600">Rooj</span>
+              <span className="text-blue-600">Roj</span>
               <span className="text-black">gaar</span>
             </div>
           </Link>
@@ -162,7 +163,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-3">
+          <div className="md:hidden flex items-center gap-4">
             {session && (
               <>
                 <NotificationBell />
@@ -175,20 +176,30 @@ export default function Navbar() {
                   )}
                 </Link>
                 <button 
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="focus:outline-none"
+                  onClick={() => {
+                    setIsMobileProfileOpen(!isMobileProfileOpen);
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center gap-1 focus:outline-none"
                 >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center overflow-hidden ${user?.isPremium ? 'border-2 border-yellow-500 bg-yellow-50' : 'border border-blue-200 bg-blue-100'}`}>
-                       <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-sm`}>{(user?.name || "U").charAt(0).toUpperCase()}</span>
+                    <div className={`relative w-8 h-8 rounded-full flex items-center justify-center overflow-hidden ${user?.isPremium ? 'border-2 border-yellow-500 bg-yellow-50' : 'border border-blue-200 bg-blue-100'}`}>
+                       {user?.image ? (
+                          <Image src={user.image} alt={user.name || "User"} fill className="object-cover" />
+                       ) : (
+                          <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-sm`}>{(user?.name || "U").charAt(0).toUpperCase()}</span>
+                       )}
                     </div>
+                    <span className="text-sm font-medium text-gray-700 max-w-[80px] truncate">{user?.name}</span>
+                    <ChevronDown size={16} className="text-gray-500" />
                 </button>
               </>
             )}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 hover:text-blue-600 focus:outline-none"
+              className="p-2 text-gray-800 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none"
+              aria-label="Toggle menu"
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {isOpen ? <X size={28} strokeWidth={2.5} /> : <Menu size={28} strokeWidth={2.5} />}
             </button>
           </div>
         </div>
@@ -282,60 +293,8 @@ export default function Navbar() {
               </Link>
             )}
 
-            {session ? (
+            {!session && (
               <div className="border-t border-gray-100 pt-4 mt-2">
-                <div className="px-3 mb-4 flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden ${user?.isPremium ? 'border-2 border-yellow-500 bg-yellow-50' : 'border border-blue-200 bg-blue-100'}`}>
-                      <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-lg`}>{(user?.name || "U").charAt(0).toUpperCase()}</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{user?.name}</p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
-                  </div>
-                </div>
-
-                <Link
-                  href="/profile"
-                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <User size={20} className="mr-2" />
-                  Profile
-                </Link>
-                <Link
-                  href="/profile/edit"
-                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Settings size={20} className="mr-2" />
-                  Edit Profile
-                </Link>
-                <Link
-                  href="/premium"
-                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Crown size={20} className="mr-2 text-yellow-500" />
-                  Buy Premium
-                </Link>
-                <Link
-                  href="/support"
-                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <HelpCircle size={20} className="mr-2" />
-                  Premium Support
-                </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
-                >
-                  <LogOut size={20} className="mr-2" />
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <>
                 <Link
                   href="/login"
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
@@ -350,8 +309,68 @@ export default function Navbar() {
                 >
                   Register
                 </Link>
-              </>
+              </div>
             )}
+          </div>
+        </div>
+      )}
+      {/* Mobile Profile Menu */}
+      {isMobileProfileOpen && session && (
+        <div className="md:hidden bg-white border-t absolute top-16 left-0 w-full z-50 shadow-lg animate-in slide-in-from-top-5 duration-200">
+          <div className="px-4 py-4 space-y-1">
+             <div className="px-3 mb-4 flex items-center gap-3">
+                  <div className={`relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden ${user?.isPremium ? 'border-2 border-yellow-500 bg-yellow-50' : 'border border-blue-200 bg-blue-100'}`}>
+                      {user?.image ? (
+                          <Image src={user.image} alt={user.name || "User"} fill className="object-cover" />
+                       ) : (
+                          <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-xl`}>{(user?.name || "U").charAt(0).toUpperCase()}</span>
+                       )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900 text-lg">{user?.name}</p>
+                    <p className="text-sm text-gray-500">{user?.email}</p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/profile"
+                  className="flex items-center px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsMobileProfileOpen(false)}
+                >
+                  <User size={20} className="mr-3" />
+                  Profile
+                </Link>
+                <Link
+                  href="/profile/edit"
+                  className="flex items-center px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsMobileProfileOpen(false)}
+                >
+                  <Settings size={20} className="mr-3" />
+                  Edit Profile
+                </Link>
+                <Link
+                  href="/premium"
+                  className="flex items-center px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsMobileProfileOpen(false)}
+                >
+                  <Crown size={20} className="mr-3 text-yellow-500" />
+                  Buy Premium
+                </Link>
+                <Link
+                  href="/support"
+                  className="flex items-center px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsMobileProfileOpen(false)}
+                >
+                  <HelpCircle size={20} className="mr-3" />
+                  Premium Support
+                </Link>
+                <button
+                  onClick={() => signOut()}
+                  className="flex w-full items-center px-3 py-3 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
+                >
+                  <LogOut size={20} className="mr-3" />
+                  Sign Out
+                </button>
           </div>
         </div>
       )}

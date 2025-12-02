@@ -30,10 +30,11 @@ export async function PUT(req: Request) {
   });
 
   // Notify user
+  const replySnippet = reply.length > 50 ? reply.substring(0, 50) + "..." : reply;
   await (prisma as any).notification.create({
     data: {
       userId: ticket.userId,
-      content: `Support: Admin replied to your ticket "${ticket.subject}"`,
+      content: `Support: Admin replied to "${ticket.subject}": ${replySnippet}`,
       link: "/support", // Or a specific ticket view if we had one
     },
   });

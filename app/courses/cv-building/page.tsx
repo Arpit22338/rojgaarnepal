@@ -1,7 +1,156 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowLeft, BookOpen, PenTool, CheckCircle, Star, AlertCircle, GraduationCap } from "lucide-react";
+import { ArrowLeft, BookOpen, PenTool, CheckCircle, Star, AlertCircle, GraduationCap, Download, Award } from "lucide-react";
+import { useState, useRef } from "react";
+import { useSession } from "next-auth/react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export default function CVCoursePage() {
+  const { data: session } = useSession();
+  const [showCertificate, setShowCertificate] = useState(false);
+  const certificateRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleComplete = () => {
+    setShowCertificate(true);
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const downloadCertificate = async () => {
+    if (!certificateRef.current) return;
+    
+    setIsGenerating(true);
+    try {
+      const canvas = await html2canvas(certificateRef.current, {
+        scale: 2, // Higher quality
+        logging: false,
+        useCORS: true
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('Rojgaar_CV_Masterclass_Certificate.pdf');
+    } catch (error) {
+      console.error("Error generating certificate:", error);
+      alert("Failed to generate certificate. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  if (showCertificate) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <Link href="/courses" className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-8 transition-colors">
+          <ArrowLeft size={20} className="mr-2" />
+          Back to Classroom
+        </Link>
+
+        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-green-600 mb-2 flex items-center justify-center gap-2">
+              <CheckCircle size={32} />
+              Course Completed!
+            </h2>
+            <p className="text-gray-600">Congratulations! You have successfully finished the CV Writing Masterclass.</p>
+          </div>
+
+          {/* Certificate Preview */}
+          <div className="flex justify-center mb-8 overflow-auto">
+            <div 
+              ref={certificateRef}
+              className="w-[800px] h-[600px] bg-white border-[20px] border-double border-blue-900 p-10 relative text-center flex flex-col items-center justify-center shadow-2xl"
+              style={{ fontFamily: 'serif' }}
+            >
+              {/* Watermark/Background */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                <Award size={400} />
+              </div>
+
+              <div className="relative z-10 w-full">
+                <div className="mb-2 text-blue-900 font-bold tracking-widest uppercase text-sm">Rojgaar Skills Academy</div>
+                <h1 className="text-5xl font-bold text-blue-900 mb-8 font-serif">Certificate of Completion</h1>
+                
+                <p className="text-xl text-gray-600 mb-6 italic">This is to certify that</p>
+                
+                <div className="text-4xl font-bold text-gray-900 mb-2 border-b-2 border-gray-300 inline-block px-10 py-2 min-w-[300px]">
+                  {session?.user?.name || "Student Name"}
+                </div>
+                
+                <p className="text-xl text-gray-600 mt-6 mb-8 italic">
+                  has successfully completed the comprehensive course on
+                </p>
+                
+                <h2 className="text-3xl font-bold text-blue-800 mb-12">CV Writing Masterclass</h2>
+                
+                <div className="flex justify-between items-end w-full px-16 mt-12">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-gray-800 border-t border-gray-400 pt-2 px-4">
+                      {new Date().toLocaleDateString()}
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">Date</div>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                     {/* Seal */}
+                     <div className="w-24 h-24 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-4 border-yellow-600 mb-2">
+                        <Award size={48} />
+                     </div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="text-2xl font-script text-blue-900 mb-1 font-cursive" style={{ fontFamily: 'cursive' }}>
+                      Arpit
+                    </div>
+                    <div className="text-lg font-bold text-gray-800 border-t border-gray-400 pt-2 px-4">
+                      Arpit
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">CEO, Rojgaar</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={() => setShowCertificate(false)}
+              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Back to Lesson
+            </button>
+            <button
+              onClick={downloadCertificate}
+              disabled={isGenerating}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-md disabled:opacity-70"
+            >
+              {isGenerating ? (
+                <span className="flex items-center">Generating...</span>
+              ) : (
+                <>
+                  <Download size={20} className="mr-2" />
+                  Download Certificate (PDF)
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <Link href="/courses" className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-8 transition-colors">
@@ -22,7 +171,7 @@ export default function CVCoursePage() {
               &quot;The Art of Professional Storytelling&quot;
             </p>
             <div className="mt-6 inline-block bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 text-sm">
-              <span className="text-gray-400">Instructor:</span> <span className="text-white font-semibold">Prof. Rojgaar AI</span>
+              <span className="text-gray-400">Instructor:</span> <span className="text-white font-semibold">Rojgaar Team</span>
             </div>
           </div>
         </div>
@@ -165,7 +314,7 @@ export default function CVCoursePage() {
           {/* Homework */}
           <div className="border-t-2 border-dashed border-gray-200 pt-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">📝 Class Assignment</h3>
-            <div className="bg-gray-50 p-6 rounded-xl">
+            <div className="bg-gray-50 p-6 rounded-xl mb-8">
               <p className="mb-4 text-gray-700">Before you apply for your next job, complete this checklist:</p>
               <ul className="space-y-3">
                 <li className="flex items-center">
@@ -189,6 +338,16 @@ export default function CVCoursePage() {
                   <span className="text-gray-700">I have saved the file as <code>FirstName_LastName_CV.pdf</code>.</span>
                 </li>
               </ul>
+            </div>
+
+            <div className="flex justify-center">
+              <button 
+                onClick={handleComplete}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transform transition hover:scale-105 flex items-center text-lg"
+              >
+                <CheckCircle className="mr-2" size={24} />
+                I Have Completed My Assignment
+              </button>
             </div>
           </div>
 

@@ -15,7 +15,7 @@ export default async function CoursesPage() {
   const cvCourse = {
     id: "cv-building",
     title: "CV Building Masterclass",
-    description: "Learn how to craft a professional CV that stands out. Includes video tutorials and templates.",
+    description: "Learn how to craft a professional CV that stands out. Includes certificate and templates.",
     price: 0,
     instructor: "Rojgaar Team",
     duration: "1 Hour",

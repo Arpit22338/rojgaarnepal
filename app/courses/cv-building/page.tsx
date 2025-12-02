@@ -5,7 +5,6 @@ import { ArrowLeft, BookOpen, PenTool, CheckCircle, Star, AlertCircle, Graduatio
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 
 export default function CVCoursePage() {
   const { data: session } = useSession();
@@ -53,17 +52,10 @@ export default function CVCoursePage() {
       });
       
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4'
-      });
-      
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save('Rojgaar_CV_Masterclass_Certificate.pdf');
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = 'Rojgaar_CV_Masterclass_Certificate.png';
+      link.click();
     } catch (error) {
       console.error("Error generating certificate:", error);
       alert("Failed to generate certificate. Please try again.");
@@ -106,47 +98,47 @@ export default function CVCoursePage() {
                 {/* Logo at top */}
                 <div className="mb-4">
                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                   {logoBase64 && <img src={logoBase64} alt="Rojgaar Logo" className="h-24 object-contain" />}
+                   {logoBase64 && <img src={logoBase64} alt="Rojgaar Logo" className="h-20 object-contain" />}
                 </div>
                 
                 <div className="mb-2 text-blue-900 font-bold tracking-widest uppercase text-sm">Rojgaar Skills Academy</div>
-                <h1 className="text-5xl font-bold text-blue-900 mb-8 font-serif">Certificate of Completion</h1>
+                <h1 className="text-4xl font-bold text-blue-900 mb-4 font-serif">Certificate of Completion</h1>
                 
-                <p className="text-xl text-gray-600 mb-6 italic">This is to certify that</p>
+                <p className="text-lg text-gray-600 mb-4 italic">This is to certify that</p>
                 
-                <div className="text-4xl font-bold text-gray-900 mb-2 border-b-2 border-gray-300 inline-block px-10 py-2 min-w-[300px]">
+                <div className="text-3xl font-bold text-gray-900 mb-2 border-b-2 border-gray-300 inline-block px-10 py-1 min-w-[300px]">
                   {session?.user?.name || "Student Name"}
                 </div>
                 
-                <p className="text-xl text-gray-600 mt-6 mb-8 italic">
+                <p className="text-lg text-gray-600 mt-4 mb-4 italic">
                   has successfully completed the comprehensive course on
                 </p>
                 
-                <h2 className="text-3xl font-bold text-blue-800 mb-12">CV Writing Masterclass</h2>
+                <h2 className="text-2xl font-bold text-blue-800 mb-8">CV Writing Masterclass</h2>
                 
-                <div className="flex justify-between items-end w-full px-16 mt-12">
+                <div className="flex justify-between items-end w-full px-12 mt-8">
                   <div className="text-center">
-                    <div className="text-lg font-bold text-gray-800 border-t border-gray-400 pt-2 px-4">
+                    <div className="text-base font-bold text-gray-800 border-t border-gray-400 pt-2 px-4">
                       {new Date().toLocaleDateString()}
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">Date</div>
+                    <div className="text-xs text-gray-500 mt-1">Date</div>
                   </div>
 
                   <div className="flex flex-col items-center">
                      {/* Seal */}
-                     <div className="w-24 h-24 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-4 border-yellow-600 mb-2">
-                        <Award size={48} />
+                     <div className="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-4 border-yellow-600 mb-2">
+                        <Award size={40} />
                      </div>
                   </div>
                   
                   <div className="text-center">
-                    <div className="text-2xl font-script text-blue-900 mb-1 font-cursive" style={{ fontFamily: 'cursive' }}>
-                      Arpit
-                    </div>
-                    <div className="text-lg font-bold text-gray-800 border-t border-gray-400 pt-2 px-4">
+                    <div className="text-xl font-script text-blue-900 mb-1 font-cursive" style={{ fontFamily: 'cursive' }}>
                       Arpit Kafle
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">CEO, Rojgaar</div>
+                    <div className="text-base font-bold text-gray-800 border-t border-gray-400 pt-2 px-4">
+                      Arpit Kafle
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">CEO, Rojgaar</div>
                   </div>
                 </div>
               </div>
@@ -170,7 +162,7 @@ export default function CVCoursePage() {
               ) : (
                 <>
                   <Download size={20} className="mr-2" />
-                  Download Certificate (PDF)
+                  Download Certificate (PNG)
                 </>
               )}
             </button>

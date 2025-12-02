@@ -109,9 +109,47 @@ export default async function Home() {
                   </h3>
                   <p className="text-gray-600 text-sm mb-2">{user.jobSeekerProfile?.bio?.substring(0, 60)}...</p>
                   <div className="mt-auto flex flex-wrap justify-center gap-1">
-                    {user.jobSeekerProfile?.skills?.split(",").slice(0, 3).map((skill, i) => (
-                      <span key={i} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">{skill.trim()}</span>
-                    ))}
+                    {(() => {
+                      const skills = user.jobSeekerProfile?.skills;
+                      if (!skills) return null;
+                      
+                      // Try parsing as JSON first
+                      try {
+                        const parsed = JSON.parse(skills);
+                        if (Array.isArray(parsed)) {
+                          return parsed.slice(0, 3).map((skill: any, i: number) => (
+                            <span key={i} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
+                              {typeof skill === 'string' ? skill : skill.name}
+                            </span>
+                          ));
+                        }
+                      } catch (e) {
+                        // If JSON parse fails, try regex for malformed JSON
+                        if (skills.includes('"name":')) {
+                          const extractedSkills = [];
+                          const parts = skills.split('}');
+                          for (const part of parts) {
+                             const n = /"name":"([^"]+)"/.exec(part);
+                             if (n) extractedSkills.push(n[1]);
+                          }
+                          if (extractedSkills.length > 0) {
+                            return extractedSkills.slice(0, 3).map((skill, i) => (
+                              <span key={i} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">{skill}</span>
+                            ));
+                          }
+                        }
+                      }
+
+                      // Fallback to comma split
+                      return skills.split(",").slice(0, 3).map((skill, i) => {
+                         // Clean up any JSON artifacts if split failed to separate cleanly
+                         const clean = skill.replace(/[\[\]"{}]/g, '').replace(/name:/g, '').replace(/level:\d+/g, '').trim();
+                         if (!clean) return null;
+                         return (
+                           <span key={i} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">{clean}</span>
+                         );
+                      });
+                    })()}
                   </div>
                 </div>
               </Link>

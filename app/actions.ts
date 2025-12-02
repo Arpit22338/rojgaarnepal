@@ -5,6 +5,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+import { sendApplicationEmail, sendUntrustEmail } from "@/lib/mail";
+
 export async function toggleTrust(trustedId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -12,6 +14,7 @@ export async function toggleTrust(trustedId: string) {
   }
 
   const trusterId = session.user.id;
+  const trusterName = session.user.name || "A user";
 
   if (trusterId === trustedId) {
     throw new Error("Cannot trust yourself");
@@ -35,6 +38,26 @@ export async function toggleTrust(trustedId: string) {
         },
       },
     });
+
+    // Send notification message for untrust
+    await prisma.message.create({
+      data: {
+        senderId: trusterId,
+        receiverId: trustedId,
+        content: "I removed the trust, Sorry!",
+      },
+    });
+
+    // Send email notification
+    const trustedUser = await prisma.user.findUnique({
+      where: { id: trustedId },
+      select: { email: true }
+    });
+
+    if (trustedUser?.email) {
+      await sendUntrustEmail(trustedUser.email, trusterName);
+    }
+
     revalidatePath(`/profile/${trustedId}`);
     return { trusted: false };
   } else {
@@ -54,14 +77,12 @@ export async function toggleTrust(trustedId: string) {
       },
     });
 
+    // ...
+
     revalidatePath(`/profile/${trustedId}`);
     return { trusted: true };
   }
 }
-
-import { sendApplicationEmail } from "@/lib/mail";
-
-// ...
 
 export async function applyForJob(jobId: string, employerId: string) {
   const session = await getServerSession(authOptions);

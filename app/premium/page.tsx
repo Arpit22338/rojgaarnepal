@@ -165,7 +165,7 @@ export default function PremiumPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 relative">
+    <div className="max-w-6xl mx-auto py-8 px-4 relative">
       {zoomedImage && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4"
@@ -184,9 +184,9 @@ export default function PremiumPage() {
         </div>
       )}
 
-      <h1 className="text-3xl font-bold text-center mb-8">Upgrade to Premium</h1>
+      <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">Upgrade to Premium</h1>
 
-      <div className="grid md:grid-cols-2 gap-8 mb-12">
+      <div className="grid lg:grid-cols-2 gap-8 mb-12">
         {/* Plans */}
         <div className="space-y-4">
           <h2 className="text-xl font-semibold mb-4">1. Select a Plan</h2>

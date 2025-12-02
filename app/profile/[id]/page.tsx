@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { BadgeCheck } from "lucide-react";
 
 import { toggleTrust } from "@/app/actions";
 
@@ -14,6 +15,7 @@ interface User {
   email: string;
   role: string;
   image?: string;
+  isPremium?: boolean;
 }
 
 interface Profile {
@@ -92,28 +94,38 @@ export default function PublicProfilePage() {
               src={user.image}
               alt={user.name}
               fill
-              className="rounded-full object-cover border-4 border-gray-100"
+              className={`rounded-full object-cover border-4 ${user.isPremium ? 'border-yellow-500' : 'border-gray-100'}`}
             />
           ) : (
-            <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-4xl font-bold">
+            <div className={`w-full h-full rounded-full flex items-center justify-center text-gray-500 text-4xl font-bold border-4 ${user.isPremium ? 'border-yellow-500 bg-yellow-50' : 'border-gray-100 bg-gray-200'}`}>
               {user.name.charAt(0).toUpperCase()}
             </div>
           )}
         </div>
         
         <div className="flex-1 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start gap-4">
-            <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
-            <div className="flex items-center bg-green-50 px-3 py-1 rounded-full border border-green-100">
-              <svg className="w-4 h-4 text-green-600 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm font-medium text-green-700">{trustCount} Trusted</span>
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
+            <div className="flex items-center justify-center md:justify-start gap-2">
+              <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
+              {user.isPremium && (
+                <BadgeCheck className="text-blue-500" size={24} fill="currentColor" color="white" />
+              )}
             </div>
           </div>
-          <p className="text-gray-600 mt-1 capitalize">{user.role.toLowerCase()}</p>
+          
+          <div className="flex items-center justify-center md:justify-start gap-6 mb-4">
+            <div className="text-center md:text-left">
+              <span className="block text-xl font-bold text-gray-900">{trustCount}</span>
+              <span className="text-sm text-gray-500">Trusted</span>
+            </div>
+            <div className="text-center md:text-left">
+              <span className="block text-xl font-bold text-gray-900 capitalize">{user.role.toLowerCase()}</span>
+              <span className="text-sm text-gray-500">Role</span>
+            </div>
+          </div>
+
           {profile?.location && (
-            <p className="text-gray-500 mt-1 flex items-center justify-center md:justify-start gap-1">
+            <p className="text-gray-500 mt-1 flex items-center justify-center md:justify-start gap-1 mb-4">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -126,24 +138,18 @@ export default function PublicProfilePage() {
             <div className="mt-4 flex gap-3 justify-center md:justify-start">
               <button
                 onClick={handleTrust}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                   isTrusted
-                    ? "bg-green-100 text-green-700 hover:bg-green-200 border border-green-200"
-                    : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                    ? "bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300"
+                    : "bg-blue-600 text-white hover:bg-blue-700 border border-transparent"
                 }`}
               >
-                <svg className={`w-4 h-4 ${isTrusted ? "fill-current" : "none"}`} stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
                 {isTrusted ? "Trusted" : "Trust"}
               </button>
               <Link
                 href={`/messages/${user.id}`}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
               >
-                <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
                 Message
               </Link>
             </div>
@@ -205,12 +211,15 @@ export default function PublicProfilePage() {
                 return <p>{profile.skills}</p>;
               } catch {
                 // Try to regex extract if it looks like JSON but is broken
+                // Handle missing commas between objects or properties
+                // Pattern: {"name":"HMML" "level":100} or {"name":"HMML","level":100}
                 if (profile.skills.includes('"name":')) {
                    const extractedSkills = [];
+                   // Split by '}' to separate objects roughly
                    const parts = profile.skills.split('}');
                    for (const part of parts) {
-                      const n = /"name":"([^"]+)"/.exec(part);
-                      const l = /"level":(\d+)/.exec(part);
+                      const n = /"name"\s*:\s*"([^"]+)"/.exec(part);
+                      const l = /"level"\s*:\s*(\d+)/.exec(part);
                       if (n) {
                         extractedSkills.push({ name: n[1], level: l ? parseInt(l[1]) : 50 });
                       }

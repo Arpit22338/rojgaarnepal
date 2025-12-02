@@ -162,7 +162,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-3">
             {session && (
               <>
                 <NotificationBell />
@@ -174,6 +174,14 @@ export default function Navbar() {
                     </span>
                   )}
                 </Link>
+                <button 
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="focus:outline-none"
+                >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center overflow-hidden ${user?.isPremium ? 'border-2 border-yellow-500 bg-yellow-50' : 'border border-blue-200 bg-blue-100'}`}>
+                       <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-sm`}>{(user?.name || "U").charAt(0).toUpperCase()}</span>
+                    </div>
+                </button>
               </>
             )}
             <button
@@ -275,8 +283,17 @@ export default function Navbar() {
             )}
 
             {session ? (
-              <>
-                {/* Messages link removed from hamburger as it is now in the top bar */}
+              <div className="border-t border-gray-100 pt-4 mt-2">
+                <div className="px-3 mb-4 flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden ${user?.isPremium ? 'border-2 border-yellow-500 bg-yellow-50' : 'border border-blue-200 bg-blue-100'}`}>
+                      <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-lg`}>{(user?.name || "U").charAt(0).toUpperCase()}</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{user?.name}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  </div>
+                </div>
+
                 <Link
                   href="/profile"
                   className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
@@ -285,14 +302,38 @@ export default function Navbar() {
                   <User size={20} className="mr-2" />
                   Profile
                 </Link>
+                <Link
+                  href="/profile/edit"
+                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Settings size={20} className="mr-2" />
+                  Edit Profile
+                </Link>
+                <Link
+                  href="/premium"
+                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Crown size={20} className="mr-2 text-yellow-500" />
+                  Buy Premium
+                </Link>
+                <Link
+                  href="/support"
+                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <HelpCircle size={20} className="mr-2" />
+                  Premium Support
+                </Link>
                 <button
                   onClick={() => signOut()}
                   className="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
                 >
                   <LogOut size={20} className="mr-2" />
-                  Logout
+                  Sign Out
                 </button>
-              </>
+              </div>
             ) : (
               <>
                 <Link

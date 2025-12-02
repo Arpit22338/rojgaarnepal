@@ -11,9 +11,7 @@ export async function GET() {
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userId = (session.user as any).id;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const user: any = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -26,14 +24,13 @@ export async function GET() {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let profileData: any = {};
     if (user.role === "JOBSEEKER" && user.jobSeekerProfile) {
-      profileData = { ...user.jobSeekerProfile, image: user.image };
+      profileData = { ...user.jobSeekerProfile, image: user.image, isPremium: user.isPremium };
     } else if (user.role === "EMPLOYER" && user.employerProfile) {
-      profileData = { ...user.employerProfile, image: user.image };
+      profileData = { ...user.employerProfile, image: user.image, isPremium: user.isPremium };
     } else {
-      profileData = { image: user.image };
+      profileData = { image: user.image, isPremium: user.isPremium };
     }
 
     return NextResponse.json({ profile: profileData });
@@ -52,7 +49,6 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { role, id: userId } = session.user as any;
     const { image } = body;
 
@@ -62,17 +58,16 @@ export async function PUT(req: Request) {
     if (image) {
       await prisma.user.update({
         where: { id: userId },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: { image } as any,
       });
     }
 
     if (role === "JOBSEEKER") {
-      const { bio, skills, location, experience, education, resumeUrl } = body;
+      const { bio, skills, location, experience, education, resumeUrl, portfolioUrl } = body;
       
       await prisma.jobSeekerProfile.upsert({
         where: { userId },
-        update: { bio, skills, location, experience, education, resumeUrl },
+        update: { bio, skills, location, experience, education, resumeUrl, portfolioUrl } as any,
         create: {
           userId,
           bio,
@@ -81,21 +76,23 @@ export async function PUT(req: Request) {
           experience,
           education,
           resumeUrl,
-        },
+          portfolioUrl,
+        } as any,
       });
     } else if (role === "EMPLOYER") {
-      const { companyName, description, location, website } = body;
+      const { companyName, description, location, website, portfolioUrl } = body;
 
       await prisma.employerProfile.upsert({
         where: { userId },
-        update: { companyName, description, location, website },
+        update: { companyName, description, location, website, portfolioUrl } as any,
         create: {
           userId,
           companyName,
           description,
           location,
           website,
-        },
+          portfolioUrl,
+        } as any,
       });
     }
 

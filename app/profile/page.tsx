@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import GetPremiumButton from "@/components/GetPremiumButton";
+import { Crown } from "lucide-react";
 
 interface Skill {
   name: string;
@@ -23,6 +25,7 @@ interface Profile {
   education?: string;
   resumeUrl?: string;
   image?: string;
+  isPremium?: boolean;
 }
 
 export default function ProfilePage() {
@@ -81,7 +84,13 @@ export default function ProfilePage() {
               className="rounded-full object-cover border"
             />
           )}
-          <h1 className="text-2xl font-bold">My Profile</h1>
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              My Profile
+              {profile.isPremium && <Crown className="text-yellow-500" size={24} fill="currentColor" />}
+            </h1>
+            {!profile.isPremium && <div className="mt-2"><GetPremiumButton /></div>}
+          </div>
         </div>
         <Link
           href="/profile/edit"

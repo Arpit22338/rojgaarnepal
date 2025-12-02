@@ -23,10 +23,8 @@ export default function NotificationBell() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const data: any = await getNotifications();
         setNotifications(data);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setUnreadCount(data.filter((n: any) => !n.isRead).length);
       } catch (error) {
         console.error("Failed to fetch notifications", error);

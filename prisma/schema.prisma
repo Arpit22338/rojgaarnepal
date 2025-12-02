@@ -27,13 +27,17 @@ model User {
   // New Features
   isVerified       Boolean   @default(false)
   isPremium        Boolean   @default(false)
+  premiumExpiresAt DateTime?
+  jobLimit         Int       @default(2)
+  talentLimit      Int       @default(1)
+  isBanned         Boolean   @default(false)
   verificationDoc  String?
   otp              String?
   otpExpires       DateTime?
   
   sentMessages     Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
-  talentPost       TalentPost?
+  talentPosts      TalentPost[]
   
   questions        Question[]
   answers          Answer[]
@@ -43,6 +47,28 @@ model User {
   savedJobs        SavedJob[]
   reportsMade      Report[]  @relation("Reporter")
   reportsReceived  Report[]  @relation("ReportedUser")
+  premiumRequests  PremiumRequest[]
+}
+
+model TempRegistration {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  otp        String
+  otpExpires DateTime
+  data       String   // JSON string of user data
+  createdAt  DateTime @default(now())
+}
+
+model PremiumRequest {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planType      String
+  amount        Float
+  screenshotUrl String
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Report {
@@ -85,7 +111,7 @@ model Message {
 
 model TalentPost {
   id          String   @id @default(cuid())
-  userId      String   @unique
+  userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String
   bio         String
@@ -101,6 +127,7 @@ model JobSeekerProfile {
   bio         String?
   skills      String?  // Comma separated or JSON
   resumeUrl   String?
+  portfolioUrl String?
   location    String?
   experience  String?
   education   String?
@@ -113,6 +140,7 @@ model EmployerProfile {
   companyName String
   description String?
   website     String?
+  portfolioUrl String?
   location    String?
   logoUrl     String?
 }

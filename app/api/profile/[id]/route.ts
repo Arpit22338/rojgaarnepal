@@ -15,7 +15,6 @@ export async function GET(
       return NextResponse.json({ message: "Invalid User ID" }, { status: 400 });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const user: any = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -44,7 +43,6 @@ export async function GET(
       isTrusted = !!trust;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let profileData: any = {};
     if (user.role === "JOBSEEKER" && user.jobSeekerProfile) {
       profileData = { ...user.jobSeekerProfile, image: user.image };

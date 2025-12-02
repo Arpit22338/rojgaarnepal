@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, MapPin, Briefcase, MessageSquare } from "lucide-react";
+import { Search, MapPin, Briefcase, MessageSquare, Crown } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -11,6 +11,7 @@ interface UserProfile {
   email: string;
   image: string | null;
   role: string;
+  isPremium?: boolean;
   jobSeekerProfile: {
     bio: string | null;
     skills: string | null;
@@ -115,10 +116,11 @@ export default function PeoplePage() {
                   )}
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 line-clamp-1">
+                  <h2 className="text-lg font-semibold text-gray-900 line-clamp-1 flex items-center gap-1">
                     <Link href={`/profile/${user.id}`} className="hover:text-blue-600">
                       {user.name}
                     </Link>
+                    {user.isPremium && <Crown size={16} className="text-yellow-500" fill="currentColor" />}
                   </h2>
                   <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                     user.role === 'EMPLOYER' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'

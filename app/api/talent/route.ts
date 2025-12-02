@@ -12,7 +12,6 @@ const talentPostSchema = z.object({
 
 export async function GET() {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const posts = await (prisma as any).talentPost.findMany({
       include: {
         user: {
@@ -37,14 +36,19 @@ export async function POST(req: Request) {
   }
 
   try {
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (!user) return NextResponse.json({ message: "User not found" }, { status: 404 });
+
+    const count = await prisma.talentPost.count({ where: { userId: user.id } });
+    if (count >= (user as any).talentLimit) {
+        return NextResponse.json({ message: `Limit reached (${(user as any).talentLimit}). Upgrade to Premium.` }, { status: 403 });
+    }
+
     const body = await req.json();
     const { title, bio, skills } = talentPostSchema.parse(body);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const post = await (prisma as any).talentPost.upsert({
-      where: { userId: session.user.id },
-      update: { title, bio, skills },
-      create: {
+    const post = await (prisma as any).talentPost.create({
+      data: {
         userId: session.user.id,
         title,
         bio,
@@ -55,7 +59,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ post });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return NextResponse.json({ message: "Invalid input", errors: (error as any).errors }, { status: 400 });
     }
     console.error(error);

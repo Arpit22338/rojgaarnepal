@@ -18,7 +18,6 @@ interface Props {
 export default async function JobDetailsPage({ params }: Props) {
   const { jobId } = await params;
   const session = await getServerSession(authOptions);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const job: any = await prisma.job.findUnique({
     where: { id: jobId },
     include: {
@@ -44,7 +43,6 @@ export default async function JobDetailsPage({ params }: Props) {
         },
       },
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
 
   if (!job) {
@@ -171,7 +169,6 @@ export default async function JobDetailsPage({ params }: Props) {
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4">Required Skills</h2>
             <div className="flex flex-wrap gap-2">
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {job.requiredSkills.split(",").map((skill: any, index: number) => (
                 <span key={index} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
                   {skill.trim()}
@@ -220,7 +217,6 @@ export default async function JobDetailsPage({ params }: Props) {
             {job.questions.length === 0 ? (
               <p className="text-gray-500 italic">No questions yet. Be the first to ask!</p>
             ) : (
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               job.questions.map((q: any) => (
                 <div key={q.id} className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-start gap-3 mb-2">
@@ -264,7 +260,6 @@ export default async function JobDetailsPage({ params }: Props) {
                   
                   {/* Answers Section */}
                   <div className="ml-14 space-y-3 mt-2">
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {q.answers.map((answer: any) => (
                       <div key={answer.id} className="bg-white p-3 rounded border border-gray-200">
                         <div className="flex justify-between items-start">

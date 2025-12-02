@@ -252,7 +252,6 @@ export async function createAnswer(questionId: string, content: string) {
   // Allow anyone to reply? User said "others can reply to anyone of their choice".
   // So yes, any authenticated user can reply.
   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma as any).answer.create({
     data: {
       content,
@@ -263,7 +262,6 @@ export async function createAnswer(questionId: string, content: string) {
 
   // Notify the question author
   if (question.userId !== session.user.id) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (prisma as any).notification.create({
       data: {
         userId: question.userId,
@@ -282,7 +280,6 @@ export async function deleteAnswer(answerId: string) {
     throw new Error("Unauthorized");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const answer = await (prisma as any).answer.findUnique({
     where: { id: answerId },
   });
@@ -296,7 +293,6 @@ export async function deleteAnswer(answerId: string) {
     throw new Error("Unauthorized");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma as any).answer.delete({
     where: { id: answerId },
   });
@@ -317,7 +313,6 @@ export async function getNotifications() {
     return [];
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (prisma as any).notification.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
@@ -331,7 +326,6 @@ export async function markNotificationAsRead(notificationId: string) {
     throw new Error("Unauthorized");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const notification = await (prisma as any).notification.findUnique({
     where: { id: notificationId },
   });
@@ -340,7 +334,6 @@ export async function markNotificationAsRead(notificationId: string) {
     throw new Error("Unauthorized");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma as any).notification.update({
     where: { id: notificationId },
     data: { isRead: true },
@@ -355,7 +348,6 @@ export async function markAllNotificationsAsRead() {
     throw new Error("Unauthorized");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma as any).notification.updateMany({
     where: { userId: session.user.id, isRead: false },
     data: { isRead: true },

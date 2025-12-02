@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Menu, X, User, LogOut, MessageSquare } from "lucide-react";
+import { Menu, X, User, LogOut, MessageSquare, ChevronDown, Crown, Settings, HelpCircle, AlertTriangle } from "lucide-react";
 import { useState, useEffect } from "react";
 import NotificationBell from "./NotificationBell";
 
@@ -14,6 +14,7 @@ export default function Navbar() {
   // Cast user to include role to satisfy editor type checking
   const user = session?.user as { name?: string | null; email?: string | null; role?: string } | undefined;
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const getLinkClass = (path: string) => {
@@ -28,7 +29,6 @@ export default function Navbar() {
           const res = await fetch("/api/messages");
           if (res.ok) {
             const data = await res.json();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const totalUnread = data.conversations.reduce((acc: number, conv: any) => acc + conv.unreadCount, 0);
             setUnreadCount(totalUnread);
           }
@@ -47,10 +47,10 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="JobNepal Logo" width={40} height={40} className="object-contain" />
+            <Image src="/logo.png" alt="Rogjaar Logo" width={40} height={40} className="object-contain" />
             <div className="text-2xl font-bold flex items-center">
-              <span className="text-blue-600">Job</span>
-              <span className="text-black">Nepal</span>
+              <span className="text-blue-600">Rog</span>
+              <span className="text-black">jaar</span>
             </div>
           </Link>
 
@@ -108,16 +108,46 @@ export default function Navbar() {
                     </span>
                   )}
                 </Link>
-                <Link href="/profile" className="flex items-center space-x-1 text-gray-600 hover:text-blue-600">
-                  <User size={20} />
-                  <span>{user?.name || "Profile"}</span>
-                </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="flex items-center space-x-1 text-red-600 hover:text-red-700"
-                >
-                  <LogOut size={20} />
-                </button>
+                
+                <div className="relative">
+                  <button 
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center gap-2 focus:outline-none hover:bg-gray-50 p-1 rounded-full transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden border border-blue-200">
+                       <span className="text-blue-600 font-bold text-sm">{(user?.name || "U").charAt(0).toUpperCase()}</span>
+                    </div>
+                    <ChevronDown size={16} className="text-gray-500" />
+                  </button>
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+                      <div className="px-4 py-2 border-b mb-1">
+                        <p className="font-semibold text-gray-900 truncate">{user?.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      </div>
+                      <Link href="/profile" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileOpen(false)}>
+                        <User size={16} className="text-gray-400"/> Profile
+                      </Link>
+                      <Link href="/profile/edit" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileOpen(false)}>
+                        <Settings size={16} className="text-gray-400"/> Edit Profile
+                      </Link>
+                      <Link href="/premium" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" onClick={() => setIsProfileOpen(false)}>
+                        <Crown size={16} className="text-yellow-500"/> Buy Premium
+                      </Link>
+                      <a href="mailto:support@rogjaar.com" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <HelpCircle size={16} className="text-gray-400"/> Contact Support
+                      </a>
+                      <a href="mailto:bugs@rogjaar.com" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <AlertTriangle size={16} className="text-gray-400"/> Report Bug
+                      </a>
+                      <div className="border-t my-1"></div>
+                      <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left">
+                        <LogOut size={16}/> Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="flex items-center space-x-4">

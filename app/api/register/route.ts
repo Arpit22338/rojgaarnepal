@@ -34,24 +34,38 @@ export async function POST(req: Request) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpires = new Date(Date.now() + 3600000); // 1 hour from now
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        image: image || null,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        otp,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        otpExpires,
-        isVerified: false,
-      },
+    const userData = JSON.stringify({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      image: image || null,
     });
+
+    // Check/Update TempRegistration
+    const existingTemp = await (prisma as any).tempRegistration.findUnique({
+        where: { email }
+    });
+
+    if (existingTemp) {
+        await (prisma as any).tempRegistration.update({
+            where: { email },
+            data: {
+                otp,
+                otpExpires,
+                data: userData
+            }
+        });
+    } else {
+        await (prisma as any).tempRegistration.create({
+            data: {
+                email,
+                otp,
+                otpExpires,
+                data: userData
+            }
+        });
+    }
 
     // Send verification email
     try {
@@ -61,34 +75,9 @@ export async function POST(req: Request) {
       // We don't fail the registration, but the user will need to resend OTP
     }
 
-    // Create profile based on role
-    if (role === "JOBSEEKER") {
-      await prisma.jobSeekerProfile.create({
-        data: {
-          userId: user.id,
-        },
-      });
-    } else if (role === "EMPLOYER") {
-      await prisma.employerProfile.create({
-        data: {
-          userId: user.id,
-          companyName: name || "My Company", // Default company name
-        },
-      });
-    }
-
-    const userWithoutPassword = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
-
     return NextResponse.json(
-      { user: userWithoutPassword, message: "User created successfully" },
-      { status: 201 }
+      { message: "Verification code sent to your email" },
+      { status: 200 }
     );
   } catch (error) {
     console.error("Registration error:", error);

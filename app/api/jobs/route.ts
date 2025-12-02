@@ -28,6 +28,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Only employers can post jobs" }, { status: 403 });
     }
 
+    // Check limits
+    const jobCount = await prisma.job.count({
+      where: { employerId: user.id },
+    });
+
+    if (jobCount >= (user as any).jobLimit) {
+      return NextResponse.json({ 
+        error: `You have reached your job posting limit (${(user as any).jobLimit}). Upgrade to Premium for more.` 
+      }, { status: 403 });
+    }
+
     const body = await req.json();
     const validatedData = jobSchema.parse(body);
 
@@ -41,7 +52,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ job }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return NextResponse.json({ error: (error as any).errors }, { status: 400 });
     }
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

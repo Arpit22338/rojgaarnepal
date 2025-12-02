@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Job Nepal",
+  title: "Rogjaar",
   description: "Connecting Nepali Youth with Opportunities",
   icons: {
     icon: "/logo.png",
@@ -30,13 +30,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 flex flex-col min-h-screen`}
       >
         <Providers>
           <Navbar />
-          <main className="container mx-auto px-4 py-8">
+          <main className="container mx-auto px-4 py-8 flex-grow">
             {children}
           </main>
+          <footer className="bg-white border-t py-6 mt-auto">
+            <div className="container mx-auto px-4 text-center text-gray-600">
+              <p>&copy; {new Date().getFullYear()} Rogjaar. All rights reserved.</p>
+              <p className="text-sm mt-2">Developed by <span className="font-semibold text-blue-600">Arpit Kafle</span></p>
+            </div>
+          </footer>
         </Providers>
       </body>
     </html>

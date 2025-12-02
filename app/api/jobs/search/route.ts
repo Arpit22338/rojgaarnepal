@@ -12,7 +12,6 @@ export async function GET(request: Request) {
   const skip = (page - 1) * pageSize;
 
   // Build the where clause
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = {};
 
   if (query) {

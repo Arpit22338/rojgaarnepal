@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Briefcase, GraduationCap, Users } from "lucide-react";
+import { Search, Briefcase, GraduationCap, Users, Crown, MapPin } from "lucide-react";
 import { prisma } from "../lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -9,6 +9,22 @@ export default async function Home() {
   const jobCount = await prisma.job.count();
   const jobSeekerCount = await prisma.user.count({ where: { role: "JOBSEEKER" } });
   const courseCount = await prisma.course.count();
+
+  // Fetch Premium Jobs
+  const premiumJobs = await prisma.job.findMany({
+    where: { employer: { isPremium: true } },
+    take: 3,
+    orderBy: { createdAt: "desc" },
+    include: { employer: { include: { employerProfile: true } } }
+  });
+
+  // Fetch Premium Talent
+  const premiumTalent = await prisma.user.findMany({
+    where: { role: "JOBSEEKER", isPremium: true },
+    take: 3,
+    orderBy: { createdAt: "desc" },
+    include: { jobSeekerProfile: true }
+  });
 
   return (
     <div className="space-y-16">
@@ -36,6 +52,73 @@ export default async function Home() {
           </Link>
         </div>
       </section>
+
+      {/* Premium Jobs Section */}
+      {premiumJobs.length > 0 && (
+        <section>
+          <div className="flex items-center gap-2 mb-6">
+            <Crown className="text-yellow-500" size={28} fill="currentColor" />
+            <h2 className="text-3xl font-bold text-gray-900">Featured Jobs</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {premiumJobs.map((job) => (
+              <Link key={job.id} href={`/jobs/${job.id}`} className="block group">
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-yellow-200 hover:shadow-md transition-all h-full flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xl font-bold text-gray-500">
+                      {job.employer.employerProfile?.companyName?.charAt(0) || "C"}
+                    </div>
+                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{job.type}</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">{job.title}</h3>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-1">{job.employer.employerProfile?.companyName}</p>
+                  <div className="mt-auto flex items-center text-gray-500 text-sm">
+                    <MapPin size={14} className="mr-1" />
+                    {job.location}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Premium Talent Section */}
+      {premiumTalent.length > 0 && (
+        <section>
+          <div className="flex items-center gap-2 mb-6">
+            <Crown className="text-yellow-500" size={28} fill="currentColor" />
+            <h2 className="text-3xl font-bold text-gray-900">Featured Talent</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {premiumTalent.map((user) => (
+              <Link key={user.id} href={`/profile/${user.id}`} className="block group">
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-yellow-200 hover:shadow-md transition-all h-full flex flex-col items-center text-center">
+                  <div className="w-20 h-20 rounded-full bg-gray-200 mb-4 overflow-hidden relative border-2 border-yellow-400">
+                    {user.image ? (
+                      <Image src={user.image} alt={user.name || "User"} fill className="object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-gray-500">
+                        {(user.name || "U").charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="font-bold text-lg group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                    {user.name}
+                    <Crown size={14} className="text-yellow-500" fill="currentColor" />
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-2">{user.jobSeekerProfile?.bio?.substring(0, 60)}...</p>
+                  <div className="mt-auto flex flex-wrap justify-center gap-1">
+                    {user.jobSeekerProfile?.skills?.split(",").slice(0, 3).map((skill, i) => (
+                      <span key={i} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">{skill.trim()}</span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Stats Section */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">

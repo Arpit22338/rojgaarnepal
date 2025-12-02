@@ -158,7 +158,6 @@ export default function ChatPage() {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const isMe = msg.senderId === (session?.user as any)?.id;
           
           return (
@@ -228,10 +227,8 @@ export default function ChatPage() {
               {/* My PFP (Right) */}
               {isMe && (
                 <div className="flex-shrink-0">
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(session?.user as any)?.image ? (
                     <Image
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       src={(session?.user as any).image}
                       alt="Me"
                       width={32}

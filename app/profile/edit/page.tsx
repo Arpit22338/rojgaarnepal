@@ -16,6 +16,7 @@ const jobSeekerSchema = z.object({
   experience: z.string().min(2, "Experience is required"),
   education: z.string().nullable().optional(),
   resumeUrl: z.string().nullable().optional(),
+  portfolioUrl: z.string().nullable().optional(),
   image: z.string().nullable().optional(),
 });
 
@@ -24,6 +25,7 @@ const employerSchema = z.object({
   description: z.string().min(10, "Description is required"),
   location: z.string().min(2, "Location is required"),
   website: z.string().nullable().optional(),
+  portfolioUrl: z.string().nullable().optional(),
   image: z.string().nullable().optional(),
 });
 
@@ -188,7 +190,6 @@ export default function EditProfilePage() {
 
   // Helper to safely access errors
   const getError = (field: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (errors as any)[field]?.message;
   };
 
@@ -239,6 +240,14 @@ export default function EditProfilePage() {
               <input
                 {...register("website")}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Portfolio/Company Deck URL</label>
+              <input
+                {...register("portfolioUrl")}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                placeholder="https://drive.google.com/..."
               />
             </div>
           </>
@@ -328,6 +337,14 @@ export default function EditProfilePage() {
               <input
                 {...register("education")}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Portfolio URL</label>
+              <input
+                {...register("portfolioUrl")}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                placeholder="https://drive.google.com/..."
               />
             </div>
           </>

@@ -12,7 +12,6 @@ export async function GET(req: Request) {
 
   if (otherUserId) {
     // Get messages between current user and specific user
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const messages = await (prisma as any).message.findMany({
       where: {
         OR: [
@@ -26,14 +25,12 @@ export async function GET(req: Request) {
 
     const otherUser = await prisma.user.findUnique({
       where: { id: otherUserId },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       select: { id: true, name: true, image: true } as any,
     });
 
     return NextResponse.json({ messages, otherUser });
   } else {
     // Get list of conversations with details (last message, unread count)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const allMessages = await (prisma as any).message.findMany({
       where: {
         OR: [
@@ -47,7 +44,6 @@ export async function GET(req: Request) {
 
     const conversationMap = new Map();
 
-    /// eslint-disable-next-line @typescript-eslint/no-explicit-any
     for (const msg of allMessages) {
       const otherUser = msg.senderId === session.user.id ? msg.receiver : msg.sender;
       const otherUserId = otherUser.id;
@@ -84,7 +80,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Missing fields" }, { status: 400 });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const message = await (prisma as any).message.create({
     data: {
       senderId: session.user.id,
@@ -94,7 +89,6 @@ export async function POST(req: Request) {
   });
 
   // Create notification
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma as any).notification.create({
     data: {
       userId: receiverId,
@@ -118,7 +112,6 @@ export async function PUT(req: Request) {
   }
 
   // Mark all messages from senderId to current user as read
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma as any).message.updateMany({
     where: {
       senderId: senderId,

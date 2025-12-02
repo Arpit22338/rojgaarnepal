@@ -18,6 +18,15 @@ export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   const getLinkClass = (path: string) => {
     const isActive = path === "/" ? pathname === "/" : pathname.startsWith(path);
     return `${isActive ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-600"} text-base transition-colors`;
@@ -116,7 +125,11 @@ export default function Navbar() {
                     className="flex items-center gap-2 focus:outline-none hover:bg-gray-50 p-1 rounded-full transition-colors"
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center overflow-hidden ${user?.isPremium ? 'border-2 border-yellow-500 bg-yellow-50' : 'border border-blue-200 bg-blue-100'}`}>
-                       <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-sm`}>{(user?.name || "U").charAt(0).toUpperCase()}</span>
+                       {user?.image ? (
+                          <Image src={user.image} alt={user.name || "User"} width={32} height={32} className="object-cover w-full h-full" />
+                       ) : (
+                          <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-xs`}>{getInitials(user?.name || "U")}</span>
+                       )}
                     </div>
                     <ChevronDown size={16} className="text-gray-500" />
                   </button>
@@ -186,10 +199,9 @@ export default function Navbar() {
                        {user?.image ? (
                           <Image src={user.image} alt={user.name || "User"} fill className="object-cover" />
                        ) : (
-                          <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-sm`}>{(user?.name || "U").charAt(0).toUpperCase()}</span>
+                          <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-xs`}>{getInitials(user?.name || "U")}</span>
                        )}
                     </div>
-                    <span className="text-sm font-medium text-gray-700 max-w-[80px] truncate">{user?.name}</span>
                     <ChevronDown size={16} className="text-gray-500" />
                 </button>
               </>
@@ -323,7 +335,7 @@ export default function Navbar() {
                       {user?.image ? (
                           <Image src={user.image} alt={user.name || "User"} fill className="object-cover" />
                        ) : (
-                          <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-xl`}>{(user?.name || "U").charAt(0).toUpperCase()}</span>
+                          <span className={`${user?.isPremium ? 'text-yellow-700' : 'text-blue-600'} font-bold text-lg`}>{getInitials(user?.name || "U")}</span>
                        )}
                   </div>
                   <div>

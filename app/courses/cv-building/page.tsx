@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft, BookOpen, PenTool, CheckCircle, Star, AlertCircle, GraduationCap, Download, Award } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -12,6 +12,27 @@ export default function CVCoursePage() {
   const [showCertificate, setShowCertificate] = useState(false);
   const certificateRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [logoBase64, setLogoBase64] = useState<string>("");
+
+  useEffect(() => {
+    // Convert logo to base64 to avoid CORS issues in html2canvas
+    const getBase64FromUrl = async (url: string) => {
+      const data = await fetch(url);
+      const blob = await data.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          const base64data = reader.result;
+          resolve(base64data);
+        };
+      });
+    };
+
+    getBase64FromUrl('/logo.png').then((base64) => {
+      setLogoBase64(base64 as string);
+    });
+  }, []);
 
   const handleComplete = () => {
     setShowCertificate(true);
@@ -28,7 +49,6 @@ export default function CVCoursePage() {
         scale: 2, // Higher quality
         logging: false,
         useCORS: true,
-        allowTaint: true,
         backgroundColor: '#ffffff'
       });
       
@@ -79,14 +99,14 @@ export default function CVCoursePage() {
               {/* Watermark/Background */}
               <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo.png" alt="Watermark" className="w-[500px] h-[500px] object-contain" />
+                {logoBase64 && <img src={logoBase64} alt="Watermark" className="w-[500px] h-[500px] object-contain" />}
               </div>
 
               <div className="relative z-10 w-full flex flex-col items-center">
                 {/* Logo at top */}
                 <div className="mb-4">
                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                   <img src="/logo.png" alt="Rojgaar Logo" className="h-24 object-contain" />
+                   {logoBase64 && <img src={logoBase64} alt="Rojgaar Logo" className="h-24 object-contain" />}
                 </div>
                 
                 <div className="mb-2 text-blue-900 font-bold tracking-widest uppercase text-sm">Rojgaar Skills Academy</div>
@@ -124,7 +144,7 @@ export default function CVCoursePage() {
                       Arpit
                     </div>
                     <div className="text-lg font-bold text-gray-800 border-t border-gray-400 pt-2 px-4">
-                      Arpit
+                      Arpit Kafle
                     </div>
                     <div className="text-sm text-gray-500 mt-1">CEO, Rojgaar</div>
                   </div>

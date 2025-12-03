@@ -44,7 +44,7 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-center mb-6">Login to JobNepal</h2>
+      <h2 className="text-2xl font-bold text-center mb-6">Login to RojgaarNepal</h2>
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
@@ -63,7 +63,12 @@ export default function LoginPage() {
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Password</label>
+          <div className="flex justify-between items-center">
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+              Forgot Password?
+            </Link>
+          </div>
           <input
             type="password"
             {...register("password")}

@@ -411,3 +411,21 @@ export async function getCurrentUserImage() {
   
   return user?.image;
 }
+
+export async function getEmployerStats() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { isPremium: true, id: true }
+  });
+
+  if (!user) return null;
+
+  const jobCount = await prisma.job.count({
+    where: { employerId: user.id }
+  });
+
+  return { isPremium: user.isPremium, jobCount };
+}

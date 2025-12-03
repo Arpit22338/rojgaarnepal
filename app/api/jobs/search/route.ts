@@ -12,12 +12,22 @@ export async function GET(request: Request) {
   const skip = (page - 1) * pageSize;
 
   // Build the where clause
-  const where: any = {};
+  const where: any = {
+    OR: [
+      { expiresAt: null },
+      { expiresAt: { gt: new Date() } }
+    ]
+  };
 
   if (query) {
-    where.OR = [
-      { title: { contains: query, mode: "insensitive" } },
-      { description: { contains: query, mode: "insensitive" } },
+    where.AND = [
+      ...(where.AND || []),
+      {
+        OR: [
+          { title: { contains: query, mode: "insensitive" } },
+          { description: { contains: query, mode: "insensitive" } },
+        ]
+      }
     ];
   }
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 const jobSchema = z.object({
@@ -28,25 +29,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Only employers can post jobs" }, { status: 403 });
     }
 
-    // Check limits
-    const jobCount = await prisma.job.count({
-      where: { employerId: user.id },
-    });
+    // Check limits for Non-Premium Users
+    if (!user.isPremium) {
+      const jobCount = await prisma.job.count({
+        where: { employerId: user.id },
+      });
 
-    if (jobCount >= (user as any).jobLimit) {
-      return NextResponse.json({ 
-        error: `You have reached your job posting limit (${(user as any).jobLimit}). Upgrade to Premium for more.` 
-      }, { status: 403 });
+      if (jobCount >= 1) {
+        return NextResponse.json({ 
+          error: "Free plan limit reached (1 job). Upgrade to Premium to post more jobs." 
+        }, { status: 403 });
+      }
     }
 
     const body = await req.json();
     const validatedData = jobSchema.parse(body);
 
+    // Set expiry for non-premium users (24 hours)
+    const expiresAt = user.isPremium ? null : new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     const job = await prisma.job.create({
       data: {
         ...validatedData,
         employerId: user.id,
-      },
+        expiresAt: expiresAt,
+      } as any,
     });
 
     return NextResponse.json({ job }, { status: 201 });
@@ -60,7 +67,15 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
+    const whereClause: Prisma.JobWhereInput = {
+      OR: [
+        { expiresAt: null } as any,
+        { expiresAt: { gt: new Date() } } as any
+      ]
+    };
+
     const jobs = await prisma.job.findMany({
+      where: whereClause,
       include: {
         employer: {
           include: {

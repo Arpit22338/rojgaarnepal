@@ -109,7 +109,7 @@ export default function CVCoursePage() {
                    {logoBase64 && <img src={logoBase64} alt="Rojgaar Logo" className="h-16 object-contain" />}
                 </div>
                 
-                <div className="mb-2 font-bold tracking-widest uppercase text-sm" style={{ color: '#1e3a8a' }}>Rojgaar Skills Academy</div>
+                <div className="mb-2 font-bold tracking-widest uppercase text-sm" style={{ color: '#1e3a8a' }}>RojgaarNepal Skills Academy</div>
                 <h1 className="text-4xl font-bold mb-4 font-serif" style={{ color: '#1e3a8a' }}>Certificate of Completion</h1>
                 
                 <p className="text-lg mb-4 italic" style={{ color: '#4b5563' }}>This is to certify that</p>
@@ -146,7 +146,7 @@ export default function CVCoursePage() {
                     <div className="text-base font-bold border-t pt-2 px-4 min-w-[150px]" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
                       Arpit Kafle
                     </div>
-                    <div className="text-xs mt-1" style={{ color: '#6b7280' }}>CEO, Rojgaar</div>
+                    <div className="text-xs mt-1" style={{ color: '#6b7280' }}>CEO, RojgaarNepal</div>
                   </div>
                 </div>
               </div>
@@ -200,7 +200,7 @@ export default function CVCoursePage() {
               &quot;The Art of Professional Storytelling&quot;
             </p>
             <div className="mt-6 inline-block bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 text-sm">
-              <span className="text-gray-400">Instructor:</span> <span className="text-white font-semibold">Rojgaar Team</span>
+              <span className="text-gray-400">Instructor:</span> <span className="text-white font-semibold">RojgaarNepal Team</span>
             </div>
           </div>
         </div>

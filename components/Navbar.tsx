@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Menu, X, User, LogOut, MessageSquare, ChevronDown, Crown, Settings, HelpCircle } from "lucide-react";
+import { Menu, X, User, LogOut, MessageSquare, ChevronDown, Crown, Settings, HelpCircle, Lock } from "lucide-react";
 import { useState, useEffect } from "react";
 import NotificationBell from "./NotificationBell";
 import { getCurrentUserImage } from "@/app/actions";
@@ -66,8 +66,8 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo.png" alt="Rojgaar Logo" width={40} height={40} className="object-contain" />
             <div className="text-2xl font-bold flex items-center">
-              <span className="text-blue-600">Roj</span>
-              <span className="text-black">gaar</span>
+              <span className="text-blue-600">Rojgaar</span>
+              <span className="text-black">Nepal</span>
             </div>
           </Link>
 
@@ -324,6 +324,15 @@ export default function Navbar() {
                 Admin
               </Link>
             )}
+
+            {session && (
+              <button
+                onClick={() => signOut()}
+                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
+              >
+                Sign Out
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -360,6 +369,14 @@ export default function Navbar() {
                 >
                   <Settings size={20} className="mr-3" />
                   Edit Profile
+                </Link>
+                <Link
+                  href="/profile/change-password"
+                  className="flex items-center px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  onClick={() => setIsMobileProfileOpen(false)}
+                >
+                  <Lock size={20} className="mr-3" />
+                  Change Password
                 </Link>
                 <Link
                   href="/premium"

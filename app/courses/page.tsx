@@ -11,13 +11,13 @@ export default async function CoursesPage() {
     },
   });
 
-  // Hardcoded CV Course
+  
   const cvCourse = {
     id: "cv-building",
     title: "CV Building Masterclass",
     description: "Learn how to craft a professional CV that stands out. Includes certificate and templates.",
     price: 0,
-    instructor: "Rojgaar Team",
+    instructor: "RojgaarNepal Team",
     duration: "1 Hour",
   };
 

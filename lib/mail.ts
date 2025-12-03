@@ -20,18 +20,55 @@ export async function sendVerificationEmail(email: string, otp: string) {
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"Jobs Nepal" <noreply@jobsnepal.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
     to: email,
-    subject: "Verify your email - Jobs Nepal",
+    subject: "Verify your email - RojgaarNepal",
     text: `Your verification code is: ${otp}`,
     html: `
       <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2563eb;">Verify your email</h2>
-        <p>Thank you for registering with Jobs Nepal. Please use the following code to verify your email address:</p>
+        <p>Thank you for registering with RojgaarNepal. Please use the following code to verify your email address:</p>
         <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
           <span style="font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #1f2937;">${otp}</span>
         </div>
         <p>This code will expire in 1 hour.</p>
+        <p>If you didn't request this, please ignore this email.</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendPasswordResetEmail(email: string, otp: string) {
+  if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD) {
+    console.log("==================================================");
+    console.log(`[DEV MODE] Password Reset Email to ${email}`);
+    console.log(`[DEV MODE] OTP: ${otp}`);
+    console.log("==================================================");
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_SERVER_HOST || "smtp.gmail.com",
+    port: Number(process.env.EMAIL_SERVER_PORT) || 587,
+    auth: {
+      user: process.env.EMAIL_SERVER_USER,
+      pass: process.env.EMAIL_SERVER_PASSWORD,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
+    to: email,
+    subject: "Reset Your Password - RojgaarNepal",
+    text: `Your password reset code is: ${otp}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2563eb;">Reset Your Password</h2>
+        <p>You requested to reset your password for RojgaarNepal. Use the code below:</p>
+        <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
+          <span style="font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #1f2937;">${otp}</span>
+        </div>
+        <p>This code will expire in 15 minutes.</p>
         <p>If you didn't request this, please ignore this email.</p>
       </div>
     `,
@@ -54,15 +91,15 @@ export async function sendUntrustEmail(trustedEmail: string, trusterName: string
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"Rojgaar" <noreply@rojgaar.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
     to: trustedEmail,
-    subject: "Trust Update - Rojgaar",
+    subject: "Trust Update - RojgaarNepal",
     text: `${trusterName} removed their trust.`,
     html: `
       <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #dc2626;">Trust Update</h2>
         <p><strong>${trusterName}</strong> removed their trust.</p>
-        <p style="color: #6b7280; font-size: 12px; margin-top: 20px;">This is an automated notification from Rojgaar.</p>
+        <p style="color: #6b7280; font-size: 12px; margin-top: 20px;">This is an automated notification from RojgaarNepal.</p>
       </div>
     `,
   });
@@ -84,7 +121,7 @@ export async function sendApplicationEmail(employerEmail: string, jobTitle: stri
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"Jobs Nepal" <noreply@jobsnepal.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
     to: employerEmail,
     subject: `New Application for ${jobTitle}`,
     html: `
@@ -113,7 +150,7 @@ export async function sendApplicationStatusEmail(applicantEmail: string, jobTitl
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"Jobs Nepal" <noreply@jobsnepal.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
     to: applicantEmail,
     subject: `Application Status Update: ${jobTitle}`,
     html: `
@@ -125,3 +162,4 @@ export async function sendApplicationStatusEmail(applicantEmail: string, jobTitl
     `,
   });
 }
+

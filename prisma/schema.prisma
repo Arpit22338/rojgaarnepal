@@ -157,6 +157,7 @@ model Job {
   employer    User          @relation("EmployerJobs", fields: [employerId], references: [id], onDelete: Cascade)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  expiresAt   DateTime?
   views       Int           @default(0)
   applications Application[]
   savedByUsers SavedJob[]

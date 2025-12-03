@@ -224,16 +224,15 @@ export default function TeacherVerificationPage() {
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90 p-4 cursor-pointer"
           onClick={() => setZoomedImage(null)}
         >
-          <div className="relative w-full max-w-md aspect-square">
+          <div className="relative max-w-full max-h-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
             <Image 
               src={zoomedImage} 
               alt="Zoomed QR Code" 
-              fill 
-              className="object-contain bg-white rounded-lg"
+              width={500}
+              height={500}
+              className="object-contain max-h-[80vh] w-auto bg-white rounded-lg"
             />
-            <div className="absolute -bottom-12 left-0 right-0 text-center text-white">
-              <p className="text-lg font-medium">Tap anywhere to close</p>
-            </div>
+            <p className="text-white text-center mt-4 text-lg font-medium">Tap anywhere to close</p>
           </div>
           {/* Close button for accessibility/clarity */}
           <button 

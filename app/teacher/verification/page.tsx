@@ -132,16 +132,31 @@ export default function TeacherVerificationPage() {
           <h2 className="font-semibold text-lg mb-2">Step 1: Make Payment</h2>
           <p className="text-sm text-gray-600 mb-4">Scan the QR code or use the details below to pay.</p>
           
-          <div className="flex flex-col md:flex-row gap-6 items-center justify-center bg-white p-6 rounded-lg border border-gray-200">
-            {/* Placeholder QR Code */}
-            <div className="w-40 h-40 bg-gray-200 flex items-center justify-center rounded-lg">
-              <span className="text-gray-400 text-xs">QR Code Here</span>
+          <div className="flex flex-col md:flex-row gap-8 items-center justify-center bg-white p-6 rounded-lg border border-gray-200">
+            <div className="flex gap-4">
+                <div className="flex flex-col items-center">
+                    <div className="relative w-32 h-32 mb-2">
+                        <Image src="/esewa-qr.jpg" alt="eSewa QR" fill className="object-contain" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-500">eSewa</span>
+                </div>
+                <div className="flex flex-col items-center">
+                    <div className="relative w-32 h-32 mb-2">
+                        <Image src="/khalti-qr.jpg" alt="Khalti QR" fill className="object-contain" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-500">Khalti</span>
+                </div>
             </div>
-            <div className="text-left space-y-2">
-              <p><span className="font-semibold">eSewa ID:</span> 9800000000</p>
-              <p><span className="font-semibold">Khalti ID:</span> 9800000000</p>
-              <p><span className="font-semibold">Bank:</span> Nabil Bank</p>
-              <p><span className="font-semibold">Account:</span> 00000000000000</p>
+            
+            <div className="text-left space-y-3">
+              <div>
+                  <p className="font-semibold text-gray-900">E-Wallet Payment</p>
+                  <p className="text-sm text-gray-600">Send Rs. 499 to:</p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded border border-gray-200">
+                  <p className="text-lg font-mono font-bold text-blue-600">9808467028</p>
+                  <p className="text-xs text-gray-500">(eSewa / Khalti)</p>
+              </div>
             </div>
           </div>
         </div>

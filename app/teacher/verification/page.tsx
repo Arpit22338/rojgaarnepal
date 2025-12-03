@@ -135,18 +135,26 @@ export default function TeacherVerificationPage() {
           
           <div className="flex flex-col md:flex-row gap-8 items-center justify-center bg-white p-6 rounded-lg border border-gray-200">
             <div className="flex gap-4">
-                <div className="flex flex-col items-center cursor-pointer group" onClick={() => setZoomedImage("/esewa-qr.jpg")}>
+                <button 
+                  type="button"
+                  className="flex flex-col items-center cursor-zoom-in group focus:outline-none" 
+                  onClick={() => setZoomedImage("/esewa-qr.jpg")}
+                >
                     <div className="relative w-32 h-32 mb-2 transition-transform group-hover:scale-105">
                         <Image src="/esewa-qr.jpg" alt="eSewa QR" fill className="object-contain" />
                     </div>
-                    <span className="text-xs font-medium text-gray-500">eSewa (Tap to zoom)</span>
-                </div>
-                <div className="flex flex-col items-center cursor-pointer group" onClick={() => setZoomedImage("/khalti-qr.jpg")}>
+                    <span className="text-xs font-medium text-gray-500 group-hover:text-blue-600 transition-colors">eSewa (Tap to zoom)</span>
+                </button>
+                <button 
+                  type="button"
+                  className="flex flex-col items-center cursor-zoom-in group focus:outline-none" 
+                  onClick={() => setZoomedImage("/khalti-qr.jpg")}
+                >
                     <div className="relative w-32 h-32 mb-2 transition-transform group-hover:scale-105">
                         <Image src="/khalti-qr.jpg" alt="Khalti QR" fill className="object-contain" />
                     </div>
-                    <span className="text-xs font-medium text-gray-500">Khalti (Tap to zoom)</span>
-                </div>
+                    <span className="text-xs font-medium text-gray-500 group-hover:text-blue-600 transition-colors">Khalti (Tap to zoom)</span>
+                </button>
             </div>
             
             <div className="text-left space-y-3">
@@ -213,7 +221,7 @@ export default function TeacherVerificationPage() {
       {/* Zoom Modal */}
       {zoomedImage && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4 cursor-pointer"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90 p-4 cursor-pointer"
           onClick={() => setZoomedImage(null)}
         >
           <div className="relative w-full max-w-md aspect-square">
@@ -227,6 +235,14 @@ export default function TeacherVerificationPage() {
               <p className="text-lg font-medium">Tap anywhere to close</p>
             </div>
           </div>
+          {/* Close button for accessibility/clarity */}
+          <button 
+            className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 rounded-full"
+            onClick={() => setZoomedImage(null)}
+          >
+            <span className="sr-only">Close</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
       )}
     </div>

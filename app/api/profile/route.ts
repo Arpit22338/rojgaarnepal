@@ -26,11 +26,11 @@ export async function GET() {
 
     let profileData: any = {};
     if (user.role === "JOBSEEKER" && user.jobSeekerProfile) {
-      profileData = { ...user.jobSeekerProfile, image: user.image, isPremium: user.isPremium };
+      profileData = { ...user.jobSeekerProfile, image: user.image, isPremium: user.isPremium, premiumExpiresAt: user.premiumExpiresAt };
     } else if (user.role === "EMPLOYER" && user.employerProfile) {
-      profileData = { ...user.employerProfile, image: user.image, isPremium: user.isPremium };
+      profileData = { ...user.employerProfile, image: user.image, isPremium: user.isPremium, premiumExpiresAt: user.premiumExpiresAt };
     } else {
-      profileData = { image: user.image, isPremium: user.isPremium };
+      profileData = { image: user.image, isPremium: user.isPremium, premiumExpiresAt: user.premiumExpiresAt };
     }
 
     return NextResponse.json({ profile: profileData });

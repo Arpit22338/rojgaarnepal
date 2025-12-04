@@ -34,43 +34,58 @@ export async function PUT(req: Request) {
     let talentLimitIncrement = 0;
 
     // Determine benefits based on plan type
-    switch (request.planType) {
-      case "15_UPLOADS":
-        // Just increase limits, no premium badge
-        jobLimitIncrement = 15;
-        talentLimitIncrement = 15;
-        // Validity 30 days for the pack usage? Or just one time? 
-        // Prompt says "for 30 days", implying the pack expires or the status lasts 30 days.
-        // But usually upload packs are permanent until used. 
-        // However, prompt says "200 for 15 upload pack for 30 days".
-        // Let's set expiration for 30 days but NOT set isPremium/isVerified.
-        expiresAt.setDate(now.getDate() + 30);
-        break;
+    // Check if it is a course
+    const course = await prisma.course.findFirst({ where: { title: request.planType } });
+    
+    if (course) {
+      // It is a course!
+      // 1. Approve Enrollment
+      await prisma.enrollment.updateMany({
+        where: {
+          courseId: course.id,
+          userId: request.userId
+        },
+        data: { status: "APPROVED" } as any
+      });
+
+      // 2. Give 3 Days Premium
+      isPremium = true;
+      expiresAt.setDate(now.getDate() + 3);
       
-      case "7_DAYS":
-        isPremium = true;
-        expiresAt.setDate(now.getDate() + 7);
-        break;
+    } else {
+      switch (request.planType) {
+        case "15_UPLOADS":
+          // Just increase limits, no premium badge
+          jobLimitIncrement = 15;
+          talentLimitIncrement = 15;
+          expiresAt.setDate(now.getDate() + 30);
+          break;
+        
+        case "7_DAYS":
+          isPremium = true;
+          expiresAt.setDate(now.getDate() + 7);
+          break;
 
-      case "30_DAYS":
-        isPremium = true;
-        expiresAt.setDate(now.getDate() + 30);
-        break;
+        case "30_DAYS":
+          isPremium = true;
+          expiresAt.setDate(now.getDate() + 30);
+          break;
 
-      case "75_DAYS":
-        isPremium = true;
-        expiresAt.setDate(now.getDate() + 75);
-        break;
+        case "75_DAYS":
+          isPremium = true;
+          expiresAt.setDate(now.getDate() + 75);
+          break;
 
-      case "6_MONTHS":
-        isPremium = true;
-        expiresAt.setDate(now.getDate() + 180);
-        break;
+        case "6_MONTHS":
+          isPremium = true;
+          expiresAt.setDate(now.getDate() + 180);
+          break;
 
-      default:
-        // Fallback to manual duration if provided, or default 30
-        expiresAt.setDate(now.getDate() + (durationDays || 30));
-        isPremium = true;
+        default:
+          // Fallback to manual duration if provided, or default 30
+          expiresAt.setDate(now.getDate() + (durationDays || 30));
+          isPremium = true;
+      }
     }
 
     const updateData: any = {

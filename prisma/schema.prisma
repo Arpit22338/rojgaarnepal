@@ -233,6 +233,7 @@ model Course {
   price       Float
   instructor  String?
   duration    String?
+  thumbnail   String?
   createdAt   DateTime     @default(now())
   enrollments Enrollment[]
 }
@@ -244,6 +245,7 @@ model Enrollment {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   progress  Int      @default(0)
+  status    String   @default("PENDING") // PENDING, APPROVED
   createdAt DateTime @default(now())
 
   @@unique([courseId, userId])

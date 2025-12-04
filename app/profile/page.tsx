@@ -26,6 +26,7 @@ interface Profile {
   resumeUrl?: string;
   image?: string;
   isPremium?: boolean;
+  premiumExpiresAt?: string;
 }
 
 export default function ProfilePage() {
@@ -53,6 +54,15 @@ export default function ProfilePage() {
       fetchProfile();
     }
   }, [status, session, router]);
+
+  const getDaysRemaining = (dateString?: string) => {
+    if (!dateString) return 0;
+    const expiry = new Date(dateString);
+    const now = new Date();
+    const diff = expiry.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days > 0 ? days : 0;
+  };
 
   if (loading) return <div className="p-8 text-center">Loading...</div>;
 
@@ -89,6 +99,11 @@ export default function ProfilePage() {
               My Profile
               {profile.isPremium && <Crown className="text-yellow-500" size={24} fill="currentColor" />}
             </h1>
+            {profile.isPremium && profile.premiumExpiresAt && (
+              <p className="text-sm text-yellow-600 font-medium mt-1">
+                Premium expires in {getDaysRemaining(profile.premiumExpiresAt)} days
+              </p>
+            )}
             {!profile.isPremium && <div className="mt-2"><GetPremiumButton /></div>}
           </div>
         </div>

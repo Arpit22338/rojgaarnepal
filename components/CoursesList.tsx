@@ -1,10 +1,11 @@
 "use client";
 
-import { BookOpen, Clock, User, Lock } from "lucide-react";
+import { BookOpen, Clock, User, Lock, Unlock } from "lucide-react";
 import { useState } from "react";
 import { PaymentModal } from "@/components/PaymentModal";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Course {
   id: string;
@@ -13,6 +14,8 @@ interface Course {
   price: number;
   instructor: string;
   duration: string;
+  thumbnail?: string | null;
+  isUnlocked?: boolean;
 }
 
 export default function CoursesList({ courses }: { courses: Course[] }) {
@@ -51,10 +54,15 @@ export default function CoursesList({ courses }: { courses: Course[] }) {
           courses.map((course) => (
             <div key={course.id} className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition flex flex-col">
               <div className="h-48 bg-gray-200 flex items-center justify-center relative">
-                <BookOpen size={48} className="text-gray-400" />
+                {course.thumbnail ? (
+                  <Image src={course.thumbnail} alt={course.title} fill className="object-cover" />
+                ) : (
+                  <BookOpen size={48} className="text-gray-400" />
+                )}
                 {course.price > 0 && (
-                  <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs font-bold flex items-center">
-                    <Lock size={12} className="mr-1" /> Premium
+                  <div className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold flex items-center z-10 ${course.isUnlocked ? "bg-green-500 text-white" : "bg-yellow-500 text-white"}`}>
+                    {course.isUnlocked ? <Unlock size={12} className="mr-1" /> : <Lock size={12} className="mr-1" />}
+                    {course.isUnlocked ? "Unlocked" : "Premium"}
                   </div>
                 )}
               </div>
@@ -84,9 +92,13 @@ export default function CoursesList({ courses }: { courses: Course[] }) {
                     </span>
                     <button
                       onClick={() => handleEnroll(course)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        course.isUnlocked 
+                          ? "bg-green-600 hover:bg-green-700 text-white" 
+                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                      }`}
                     >
-                      Enroll Now
+                      {course.isUnlocked ? "Enter Course" : "Enroll Now"}
                     </button>
                   </div>
                 </div>

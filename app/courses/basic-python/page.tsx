@@ -48,6 +48,8 @@ export default function PythonCoursePage() {
   const [quizScore, setQuizScore] = useState<number | null>(null);
   const [examPassed, setExamPassed] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [enrollmentStatus, setEnrollmentStatus] = useState<"NONE" | "PENDING" | "APPROVED">("NONE");
+  const [loading, setLoading] = useState(true);
   
   // Quiz State
   const [answers, setAnswers] = useState<number[]>(new Array(QUIZ_DATA.length).fill(-1));
@@ -58,6 +60,20 @@ export default function PythonCoursePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [logoBase64, setLogoBase64] = useState<string>("");
   const [signBase64, setSignBase64] = useState<string>("");
+
+  useEffect(() => {
+    if (session) {
+      fetch("/api/courses/check-enrollment?title=Basic Python Programming")
+        .then(res => res.json())
+        .then(data => {
+          setEnrollmentStatus(data.status || "NONE");
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [session]);
 
   // Load images for certificate
   useEffect(() => {
@@ -483,39 +499,95 @@ my_function("Linus")`}
               <Code size={32} className="text-slate-900" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4 font-serif">Basic Python Programming</h1>
-            <p className="text-xl text-yellow-200 max-w-2xl mx-auto font-light">
+            <p className="text-xl text-yellow-200 max-w-2xl mx-auto font-light mb-6">
               &quot;Unlock the Power of Code&quot;
             </p>
+            
+            {!loading && (
+              <div className="flex justify-center">
+                {enrollmentStatus === "APPROVED" ? (
+                  <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold text-lg flex items-center gap-2 shadow-lg transition-transform hover:scale-105">
+                    <CheckCircle size={24} /> Enter Course
+                  </button>
+                ) : enrollmentStatus === "PENDING" ? (
+                  <button disabled className="bg-gray-500 text-white px-8 py-3 rounded-full font-bold text-lg flex items-center gap-2 cursor-not-allowed">
+                    <HelpCircle size={24} /> Enrollment Pending
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => setShowPaymentModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold text-lg flex items-center gap-2 shadow-lg transition-transform hover:scale-105"
+                  >
+                    Enroll Now - Rs. 299
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex border-b bg-gray-50">
-          <button 
-            onClick={() => setActiveTab("lessons")}
-            className={`flex-1 py-4 text-center font-medium transition-colors ${activeTab === "lessons" ? "bg-white border-t-2 border-blue-600 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            <BookOpen className="inline-block mr-2 mb-1" size={18} /> Lessons
-          </button>
-          <button 
-            onClick={() => setActiveTab("quiz")}
-            className={`flex-1 py-4 text-center font-medium transition-colors ${activeTab === "quiz" ? "bg-white border-t-2 border-blue-600 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            <HelpCircle className="inline-block mr-2 mb-1" size={18} /> Quiz & Exam
-          </button>
-          <button 
-            onClick={() => examPassed ? setActiveTab("certificate") : alert("You must pass the exam first!")}
-            className={`flex-1 py-4 text-center font-medium transition-colors ${activeTab === "certificate" ? "bg-white border-t-2 border-blue-600 text-blue-600" : "text-gray-400 cursor-not-allowed"}`}
-          >
-            <Award className="inline-block mr-2 mb-1" size={18} /> Certificate {examPassed ? "" : "(Locked)"}
-          </button>
-        </div>
+        {/* Content Section - Only visible if Approved */}
+        {enrollmentStatus === "APPROVED" ? (
+          <>
+            {/* Navigation Tabs */}
+            <div className="flex border-b bg-gray-50">
+              <button 
+                onClick={() => setActiveTab("lessons")}
+                className={`flex-1 py-4 text-center font-medium transition-colors ${activeTab === "lessons" ? "bg-white border-t-2 border-blue-600 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                <BookOpen className="inline-block mr-2 mb-1" size={18} /> Lessons
+              </button>
+              <button 
+                onClick={() => setActiveTab("quiz")}
+                className={`flex-1 py-4 text-center font-medium transition-colors ${activeTab === "quiz" ? "bg-white border-t-2 border-blue-600 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                <HelpCircle className="inline-block mr-2 mb-1" size={18} /> Quiz & Exam
+              </button>
+              <button 
+                onClick={() => examPassed ? setActiveTab("certificate") : alert("You must pass the exam first!")}
+                className={`flex-1 py-4 text-center font-medium transition-colors ${activeTab === "certificate" ? "bg-white border-t-2 border-blue-600 text-blue-600" : "text-gray-400 cursor-not-allowed"}`}
+              >
+                <Award className="inline-block mr-2 mb-1" size={18} /> Certificate {examPassed ? "" : "(Locked)"}
+              </button>
+            </div>
 
-        <div className="p-8 md:p-12">
-          {activeTab === "lessons" && renderLessons()}
-          {activeTab === "quiz" && renderQuiz()}
-          {activeTab === "certificate" && renderCertificate()}
-        </div>
+            <div className="p-8 md:p-12">
+              {activeTab === "lessons" && renderLessons()}
+              {activeTab === "quiz" && renderQuiz()}
+              {activeTab === "certificate" && renderCertificate()}
+            </div>
+          </>
+        ) : (
+          <div className="p-12 text-center bg-gray-50">
+            <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-sm">
+              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <BookOpen size={32} />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Course Content Locked</h2>
+              <p className="text-gray-600 mb-6">
+                {enrollmentStatus === "PENDING" 
+                  ? "Your enrollment is currently under review. You will be notified once approved."
+                  : "Enroll in this course to access lessons, quizzes, and earn a certificate."}
+              </p>
+              {enrollmentStatus === "NONE" && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left mt-8">
+                  <div className="p-4 border rounded-lg">
+                    <div className="font-bold text-gray-900 mb-1">10+ Lessons</div>
+                    <div className="text-sm text-gray-500">Comprehensive Python curriculum</div>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <div className="font-bold text-gray-900 mb-1">Interactive Quiz</div>
+                    <div className="text-sm text-gray-500">Test your knowledge</div>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <div className="font-bold text-gray-900 mb-1">Certificate</div>
+                    <div className="text-sm text-gray-500">Verified credential upon completion</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <PaymentModal 
@@ -523,7 +595,10 @@ my_function("Linus")`}
         onClose={() => setShowPaymentModal(false)}
         planName="Basic Python Programming"
         amount={299}
-        onSuccess={() => setShowPaymentModal(false)}
+        onSuccess={() => {
+          setShowPaymentModal(false);
+          setEnrollmentStatus("PENDING");
+        }}
       />
     </div>
   );

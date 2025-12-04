@@ -2,45 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, BookOpen, Code, CheckCircle, Terminal, Cpu, Award, HelpCircle, Download } from "lucide-react";
+import { ArrowLeft, BookOpen, Code, CheckCircle, Terminal, Cpu, Award, HelpCircle, Download, ChevronDown, ChevronUp, PlayCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import html2canvas from "html2canvas";
 import { PaymentModal } from "@/components/PaymentModal";
-
-// --- Quiz Data ---
-const QUIZ_DATA = [
-  {
-    id: 1,
-    question: "What is the correct file extension for Python files?",
-    options: [".pt", ".pyt", ".py", ".python"],
-    answer: 2 // Index of correct answer
-  },
-  {
-    id: 2,
-    question: "Which operator is used for exponentiation in Python?",
-    options: ["^", "**", "//", "exp()"],
-    answer: 1
-  },
-  {
-    id: 3,
-    question: "How do you create a function in Python?",
-    options: ["function myFunction():", "def myFunction():", "create myFunction():", "func myFunction():"],
-    answer: 1
-  },
-  {
-    id: 4,
-    question: "Which collection is ordered, changeable, and allows duplicate members?",
-    options: ["Set", "Dictionary", "Tuple", "List"],
-    answer: 3
-  },
-  {
-    id: 5,
-    question: "What is the output of: print(10 // 3)?",
-    options: ["3.33", "3", "4", "3.0"],
-    answer: 1
-  }
-];
+import { COURSE_MODULES, FINAL_EXAM_DATA } from "./data";
+import ReactMarkdown from "react-markdown";
 
 export default function PythonCoursePage() {
   const { data: session } = useSession();
@@ -51,9 +19,15 @@ export default function PythonCoursePage() {
   const [enrollmentStatus, setEnrollmentStatus] = useState<"NONE" | "PENDING" | "APPROVED">("NONE");
   const [loading, setLoading] = useState(true);
   
-  // Quiz State
-  const [answers, setAnswers] = useState<number[]>(new Array(QUIZ_DATA.length).fill(-1));
+  // Lesson State
+  const [expandedModule, setExpandedModule] = useState<string | null>("module-1");
+  const [activeLessonId, setActiveLessonId] = useState<string>("l1-1");
+  const [lessonQuizAnswers, setLessonQuizAnswers] = useState<Record<string, number>>({});
+
+  // Exam State
+  const [answers, setAnswers] = useState<number[]>(new Array(FINAL_EXAM_DATA.length).fill(-1));
   const [submitted, setSubmitted] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   
   // Certificate State
   const certificateRef = useRef<HTMLDivElement>(null);
@@ -103,10 +77,10 @@ export default function PythonCoursePage() {
   const handleQuizSubmit = (answers: number[]) => {
     let score = 0;
     answers.forEach((ans, idx) => {
-      if (ans === QUIZ_DATA[idx].answer) score++;
+      if (ans === FINAL_EXAM_DATA[idx].answer) score++;
     });
     setQuizScore(score);
-    if (score === QUIZ_DATA.length) {
+    if (score >= FINAL_EXAM_DATA.length * 0.7) { // 70% passing score
       setExamPassed(true);
     }
   };
@@ -137,130 +111,82 @@ export default function PythonCoursePage() {
   // --- Render Components ---
 
   const renderLessons = () => (
-    <div className="space-y-12">
-      {/* Introduction */}
-      <div className="prose max-w-none">
-        <h2 className="text-2xl font-bold text-gray-800 border-b pb-2 mb-4">Introduction: Why Python?</h2>
-        <p className="text-gray-600 text-lg leading-relaxed">
-          Python is one of the most popular and versatile programming languages in the world. 
-          Known for its simplicity and readability, it&apos;s the perfect language for beginners. 
-          From web development to data science and artificial intelligence, Python is everywhere.
+    <div className="space-y-8">
+      <div className="prose max-w-none mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Course Curriculum</h2>
+        <p className="text-gray-600 text-lg">
+          This comprehensive 40+ hour course will take you from a complete beginner to a job-ready Python developer.
+          Master the fundamentals, data structures, OOP, and build real-world projects.
         </p>
       </div>
 
-      {/* Lesson 1: Variables & Data Types */}
-      <div className="bg-yellow-50 rounded-xl p-8 border border-yellow-100">
-        <div className="flex items-center mb-6">
-          <div className="bg-yellow-500 text-white p-2 rounded-lg mr-4">
-            <Terminal size={24} />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900">Lesson 1: Variables & Data Types</h3>
-        </div>
-        <p className="text-gray-700 mb-6">
-          Variables are containers for storing data values. Unlike other languages, Python has no command for declaring a variable.
-        </p>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h4 className="font-bold text-yellow-800 mb-3">Common Data Types</h4>
-            <ul className="space-y-3 text-gray-600">
-              <li className="flex items-start"><CheckCircle size={18} className="text-green-500 mr-2 mt-1" /> <strong>String (str):</strong> Text, e.g., &quot;Hello&quot;</li>
-              <li className="flex items-start"><CheckCircle size={18} className="text-green-500 mr-2 mt-1" /> <strong>Integer (int):</strong> Whole numbers, e.g., 10</li>
-              <li className="flex items-start"><CheckCircle size={18} className="text-green-500 mr-2 mt-1" /> <strong>Float (float):</strong> Decimals, e.g., 3.14</li>
-              <li className="flex items-start"><CheckCircle size={18} className="text-green-500 mr-2 mt-1" /> <strong>Boolean (bool):</strong> True/False</li>
-            </ul>
-          </div>
-          <div className="bg-slate-800 p-6 rounded-lg shadow-sm text-white font-mono text-sm">
-            <pre className="whitespace-pre-wrap">
-{`x = 5           # int
-y = "John"      # str
-z = 4.5         # float
-active = True   # bool
+      <div className="space-y-4">
+        {COURSE_MODULES.map((module) => (
+          <div key={module.id} className="border rounded-xl overflow-hidden bg-white shadow-sm">
+            <button
+              onClick={() => setExpandedModule(expandedModule === module.id ? null : module.id)}
+              className="w-full flex items-center justify-between p-6 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+            >
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">{module.title}</h3>
+                <p className="text-sm text-gray-500 mt-1 flex items-center gap-2">
+                  <Clock size={14} /> {module.duration} • {module.lessons.length} Lessons
+                </p>
+              </div>
+              {expandedModule === module.id ? <ChevronUp className="text-gray-400" /> : <ChevronDown className="text-gray-400" />}
+            </button>
 
-print(type(x))  # <class 'int'>`}
-            </pre>
-          </div>
-        </div>
-      </div>
+            {expandedModule === module.id && (
+              <div className="divide-y">
+                {module.lessons.map((lesson) => (
+                  <div key={lesson.id} className="p-6 bg-white">
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1">
+                        <PlayCircle className="text-blue-600" size={24} />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-lg font-semibold text-gray-900 mb-2">{lesson.title}</h4>
+                        <div className="prose prose-sm max-w-none text-gray-600 mb-6 bg-gray-50 p-4 rounded-lg border">
+                          <ReactMarkdown>{lesson.content}</ReactMarkdown>
+                        </div>
 
-      {/* Lesson 2: Operators */}
-      <div className="bg-purple-50 rounded-xl p-8 border border-purple-100">
-        <div className="flex items-center mb-6">
-          <div className="bg-purple-600 text-white p-2 rounded-lg mr-4">
-            <Code size={24} />
+                        {/* Lesson Quiz */}
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                          <h5 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                            <HelpCircle size={16} /> Quick Check
+                          </h5>
+                          <p className="text-sm font-medium text-gray-800 mb-3">{lesson.quiz.question}</p>
+                          <div className="space-y-2">
+                            {lesson.quiz.options.map((opt, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setLessonQuizAnswers(prev => ({ ...prev, [lesson.id]: idx }))}
+                                className={`w-full text-left px-4 py-2 rounded text-sm transition-colors ${
+                                  lessonQuizAnswers[lesson.id] === idx
+                                    ? idx === lesson.quiz.answer
+                                      ? "bg-green-100 text-green-800 border border-green-200"
+                                      : "bg-red-100 text-red-800 border border-red-200"
+                                    : "bg-white hover:bg-gray-50 border border-gray-200"
+                                }`}
+                              >
+                                {opt}
+                                {lessonQuizAnswers[lesson.id] === idx && (
+                                  <span className="float-right font-bold">
+                                    {idx === lesson.quiz.answer ? "Correct!" : "Try Again"}
+                                  </span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <h3 className="text-2xl font-bold text-gray-900">Lesson 2: Basic Operators</h3>
-        </div>
-        <p className="text-gray-700 mb-6">
-          Operators are used to perform operations on variables and values.
-        </p>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b">
-                <th className="pb-2">Operator</th>
-                <th className="pb-2">Name</th>
-                <th className="pb-2">Example</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm">
-              <tr className="border-b"><td className="py-2 font-mono">+</td><td>Addition</td><td className="font-mono">x + y</td></tr>
-              <tr className="border-b"><td className="py-2 font-mono">-</td><td>Subtraction</td><td className="font-mono">x - y</td></tr>
-              <tr className="border-b"><td className="py-2 font-mono">*</td><td>Multiplication</td><td className="font-mono">x * y</td></tr>
-              <tr className="border-b"><td className="py-2 font-mono">/</td><td>Division</td><td className="font-mono">x / y</td></tr>
-              <tr className="border-b"><td className="py-2 font-mono">%</td><td>Modulus (Remainder)</td><td className="font-mono">x % y</td></tr>
-              <tr className="border-b"><td className="py-2 font-mono">**</td><td>Exponentiation</td><td className="font-mono">x ** y</td></tr>
-              <tr><td className="py-2 font-mono">{'//'}</td><td>Floor Division</td><td className="font-mono">x {'//'} y</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Lesson 3: Control Flow */}
-      <div className="bg-blue-50 rounded-xl p-8 border border-blue-100">
-        <div className="flex items-center mb-6">
-          <div className="bg-blue-600 text-white p-2 rounded-lg mr-4">
-            <Cpu size={24} />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900">Lesson 3: Control Flow (If/Else)</h3>
-        </div>
-        <p className="text-gray-700 mb-6">
-          Python supports the usual logical conditions from mathematics. These conditions can be used in several ways, most commonly in &quot;if statements&quot; and loops.
-        </p>
-        <div className="bg-slate-800 p-6 rounded-lg shadow-sm text-white font-mono text-sm">
-            <pre className="whitespace-pre-wrap">
-{`a = 200
-b = 33
-if b > a:
-  print("b is greater than a")
-elif a == b:
-  print("a and b are equal")
-else:
-  print("a is greater than b")`}
-            </pre>
-        </div>
-      </div>
-
-      {/* Lesson 4: Functions */}
-      <div className="bg-green-50 rounded-xl p-8 border border-green-100">
-        <div className="flex items-center mb-6">
-          <div className="bg-green-600 text-white p-2 rounded-lg mr-4">
-            <BookOpen size={24} />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900">Lesson 4: Functions</h3>
-        </div>
-        <p className="text-gray-700 mb-6">
-          A function is a block of code which only runs when it is called. You can pass data, known as parameters, into a function.
-        </p>
-        <div className="bg-slate-800 p-6 rounded-lg shadow-sm text-white font-mono text-sm">
-            <pre className="whitespace-pre-wrap">
-{`def my_function(fname):
-  print(fname + " Refsnes")
-
-my_function("Emil")
-my_function("Tobias")
-my_function("Linus")`}
-            </pre>
-        </div>
+        ))}
       </div>
 
       <div className="text-center pt-8">
@@ -268,106 +194,133 @@ my_function("Linus")`}
           onClick={() => setActiveTab("quiz")}
           className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-blue-700 transition-transform hover:scale-105 shadow-lg flex items-center mx-auto"
         >
-          <HelpCircle className="mr-2" />
-          Take the Quiz to Unlock Certificate
+          <Award className="mr-2" />
+          Take Final Exam to Get Certified
         </button>
       </div>
     </div>
   );
 
   const renderQuiz = () => {
-    const checkAnswers = () => {
-      handleQuizSubmit(answers);
-      setSubmitted(true);
+    const currentQuestion = FINAL_EXAM_DATA[currentQuestionIndex];
+    const isLastQuestion = currentQuestionIndex === FINAL_EXAM_DATA.length - 1;
+
+    const handleAnswerSelect = (optionIndex: number) => {
+      if (submitted) return;
+      const newAnswers = [...answers];
+      newAnswers[currentQuestionIndex] = optionIndex;
+      setAnswers(newAnswers);
     };
+
+    const handleNextQuestion = () => {
+      const selectedAnswer = answers[currentQuestionIndex];
+      
+      if (selectedAnswer === -1) {
+        alert("Please select an answer.");
+        return;
+      }
+
+      if (selectedAnswer === currentQuestion.answer) {
+        // Correct
+        if (isLastQuestion) {
+          setSubmitted(true);
+          setExamPassed(true);
+          setQuizScore(FINAL_EXAM_DATA.length); // Perfect score if they made it here
+        } else {
+          setCurrentQuestionIndex(prev => prev + 1);
+        }
+      } else {
+        // Wrong
+        alert("Incorrect answer. Redirecting to the relevant lesson for review.");
+        
+        // Find module for the lesson
+        const lessonId = currentQuestion.relatedLessonId;
+        if (lessonId) {
+          const module = COURSE_MODULES.find(m => m.lessons.some(l => l.id === lessonId));
+          if (module) {
+            setExpandedModule(module.id);
+            setActiveLessonId(lessonId);
+            setActiveTab("lessons");
+            
+            // Reset this question so they can try again later
+            const newAnswers = [...answers];
+            newAnswers[currentQuestionIndex] = -1;
+            setAnswers(newAnswers);
+          }
+        }
+      }
+    };
+
+    if (submitted && examPassed) {
+       return (
+        <div className="text-center space-y-6">
+          <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto">
+            <Award size={40} />
+          </div>
+          <h2 className="text-3xl font-bold text-green-800">Congratulations!</h2>
+          <p className="text-xl text-gray-600">You have passed the final exam with a perfect score.</p>
+          <button 
+            onClick={() => setActiveTab("certificate")}
+            className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 shadow-lg transition-transform hover:scale-105"
+          >
+            Claim Your Certificate
+          </button>
+        </div>
+       );
+    }
 
     return (
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="bg-white p-8 rounded-xl shadow-sm border">
-          <h2 className="text-2xl font-bold mb-6 text-center">Final Exam Quiz</h2>
-          <p className="text-gray-600 text-center mb-8">Answer all questions correctly to pass and get your certificate.</p>
-          
-          <div className="space-y-8">
-            {QUIZ_DATA.map((q, qIdx) => (
-              <div key={q.id} className="border-b pb-6 last:border-0">
-                <p className="font-semibold text-lg mb-4">{qIdx + 1}. {q.question}</p>
-                <div className="space-y-2">
-                  {q.options.map((opt, oIdx) => (
-                    <label key={oIdx} className={`flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
-                      answers[qIdx] === oIdx 
-                        ? "bg-blue-50 border-blue-500" 
-                        : "hover:bg-gray-50 border-gray-200"
-                    } ${
-                      submitted && q.answer === oIdx ? "bg-green-100 border-green-500" : ""
-                    } ${
-                      submitted && answers[qIdx] === oIdx && answers[qIdx] !== q.answer ? "bg-red-100 border-red-500" : ""
-                    }`}>
-                      <input 
-                        type="radio" 
-                        name={`q-${q.id}`} 
-                        className="mr-3"
-                        checked={answers[qIdx] === oIdx}
-                        onChange={() => {
-                          if (!submitted) {
-                            const newAnswers = [...answers];
-                            newAnswers[qIdx] = oIdx;
-                            setAnswers(newAnswers);
-                          }
-                        }}
-                        disabled={submitted}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Final Exam</h2>
+            <span className="text-sm font-medium text-gray-500">
+              Question {currentQuestionIndex + 1} of {FINAL_EXAM_DATA.length}
+            </span>
           </div>
 
-          {!submitted && (
-            <div className="mt-8 text-center">
-              <button 
-                onClick={checkAnswers}
-                disabled={answers.includes(-1)}
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Submit Answers
-              </button>
+          <div className="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+            <div 
+              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
+              style={{ width: `${((currentQuestionIndex + 1) / FINAL_EXAM_DATA.length) * 100}%` }}
+            ></div>
+          </div>
+          
+          <div className="mb-8">
+            <p className="font-semibold text-xl mb-6">{currentQuestion.question}</p>
+            <div className="space-y-3">
+              {currentQuestion.options.map((opt, oIdx) => (
+                <label 
+                  key={oIdx} 
+                  className={`flex items-center p-4 rounded-lg border cursor-pointer transition-all ${
+                    answers[currentQuestionIndex] === oIdx 
+                      ? "bg-blue-50 border-blue-500 shadow-sm" 
+                      : "hover:bg-gray-50 border-gray-200"
+                  }`}
+                >
+                  <input 
+                    type="radio" 
+                    name={`q-${currentQuestion.id}`} 
+                    className="w-5 h-5 text-blue-600 mr-4"
+                    checked={answers[currentQuestionIndex] === oIdx}
+                    onChange={() => handleAnswerSelect(oIdx)}
+                  />
+                  <span className="text-lg">{opt}</span>
+                </label>
+              ))}
             </div>
-          )}
+          </div>
 
-          {submitted && (
-            <div className="mt-8 text-center space-y-4">
-              <div className="text-2xl font-bold">
-                Score: {quizScore} / {QUIZ_DATA.length}
-              </div>
-              {quizScore === QUIZ_DATA.length ? (
-                <div className="text-green-600">
-                  <p className="mb-4">Congratulations! You passed the exam.</p>
-                  <button 
-                    onClick={() => setActiveTab("certificate")}
-                    className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 animate-bounce"
-                  >
-                    Get Certificate
-                  </button>
-                </div>
-              ) : (
-                <div className="text-red-600">
-                  <p className="mb-4">You need 100% to pass. Please try again.</p>
-                  <button 
-                    onClick={() => {
-                      setAnswers(new Array(QUIZ_DATA.length).fill(-1));
-                      setSubmitted(false);
-                      setQuizScore(null);
-                    }}
-                    className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-900"
-                  >
-                    Retry Quiz
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+          <div className="flex justify-end">
+            <button 
+              onClick={handleNextQuestion}
+              disabled={answers[currentQuestionIndex] === -1}
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {isLastQuestion ? "Finish Exam" : "Next Question"}
+              {!isLastQuestion && <ArrowLeft className="rotate-180" size={20} />}
+            </button>
+          </div>
         </div>
       </div>
     );

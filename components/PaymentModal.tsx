@@ -219,26 +219,20 @@ export function PaymentModal({ isOpen, onClose, planName, amount, onSuccess }: P
       {/* Zoom Modal */}
       {mounted && zoomedQr && createPortal(
         <div 
-          className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[9999] bg-black/90 flex flex-col items-center justify-center p-4 cursor-pointer"
           onClick={() => setZoomedQr(null)}
         >
-          <div 
-            className="relative w-full max-w-[500px] aspect-square bg-white p-2 rounded-lg shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="relative w-full max-w-[500px] aspect-square bg-white p-2 rounded-lg shadow-2xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={zoomedQr} 
               alt="Zoomed QR" 
               className="w-full h-full object-contain" 
             />
-            <button 
-              onClick={() => setZoomedQr(null)}
-              className="absolute -top-10 right-0 text-white hover:text-gray-300"
-            >
-              <X size={32} />
-            </button>
           </div>
+          <p className="text-white mt-6 text-lg font-medium animate-pulse">
+            Tap anywhere to go back
+          </p>
         </div>,
         document.body
       )}

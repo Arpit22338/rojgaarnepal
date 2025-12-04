@@ -151,16 +151,16 @@ export default function CVCoursePage() {
                   
                   <div className="text-center flex flex-col items-center relative">
                     {/* Signature positioned absolutely to overlap the line */}
-                    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+                    <div className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 z-10">
                        {signBase64 ? (
-                         <Image src={signBase64} alt="Signature" width={500} height={250} className="h-[240px] w-auto object-contain" unoptimized />
+                         <Image src={signBase64} alt="Signature" width={450} height={225} className="h-[220px] w-auto object-contain" unoptimized />
                        ) : (
                          <div className="text-7xl font-script font-cursive" style={{ fontFamily: 'cursive', color: '#1e3a8a' }}>Arpit</div>
                        )}
                     </div>
                     
                     {/* Name Line - Reduced margin to prevent overflow */}
-                    <div className="text-base font-bold border-t pt-2 px-8 min-w-[200px] mt-12 relative z-0" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
+                    <div className="text-base font-bold border-t pt-2 px-8 min-w-[200px] mt-10 relative z-0" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
                       Arpit Kafle
                     </div>
                     <div className="text-xs mt-1" style={{ color: '#6b7280' }}>CEO, RojgaarNepal</div>

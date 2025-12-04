@@ -115,26 +115,26 @@ export default function CVCoursePage() {
 
               <div className="relative z-10 w-full flex flex-col items-center">
                 {/* Logo at top */}
-                <div className="mb-2">
-                   {logoBase64 && <Image src={logoBase64} alt="Rojgaar Logo" width={200} height={64} className="h-16 w-auto object-contain" unoptimized />}
+                <div className="mb-1">
+                   {logoBase64 && <Image src={logoBase64} alt="Rojgaar Logo" width={200} height={64} className="h-12 w-auto object-contain" unoptimized />}
                 </div>
                 
-                <div className="mb-2 font-bold tracking-widest uppercase text-sm" style={{ color: '#1e3a8a' }}>RojgaarNepal Skills Academy</div>
-                <h1 className="text-4xl font-bold mb-4 font-serif" style={{ color: '#1e3a8a' }}>Certificate of Completion</h1>
+                <div className="mb-1 font-bold tracking-widest uppercase text-xs" style={{ color: '#1e3a8a' }}>RojgaarNepal Skills Academy</div>
+                <h1 className="text-3xl font-bold mb-3 font-serif" style={{ color: '#1e3a8a' }}>Certificate of Completion</h1>
                 
-                <p className="text-lg mb-4 italic" style={{ color: '#4b5563' }}>This is to certify that</p>
+                <p className="text-base mb-3 italic" style={{ color: '#4b5563' }}>This is to certify that</p>
                 
-                <div className="text-3xl font-bold mb-2 border-b-2 inline-block px-10 py-1 min-w-[300px]" style={{ color: '#111827', borderColor: '#d1d5db' }}>
+                <div className="text-2xl font-bold mb-2 border-b-2 inline-block px-10 py-1 min-w-[300px]" style={{ color: '#111827', borderColor: '#d1d5db' }}>
                   {session?.user?.name || "Student Name"}
                 </div>
                 
-                <p className="text-lg mt-4 mb-4 italic" style={{ color: '#4b5563' }}>
+                <p className="text-base mt-3 mb-3 italic" style={{ color: '#4b5563' }}>
                   has successfully completed the comprehensive course on
                 </p>
                 
-                <h2 className="text-2xl font-bold mb-8" style={{ color: '#1e40af' }}>CV Writing Masterclass</h2>
+                <h2 className="text-xl font-bold mb-6" style={{ color: '#1e40af' }}>CV Writing Masterclass</h2>
                 
-                <div className="flex justify-between items-end w-full px-8 mt-8">
+                <div className="flex justify-between items-end w-full px-8 mt-4">
                   <div className="text-center flex flex-col items-center">
                     <div className="text-base font-bold border-b px-4 pb-1 mb-1 min-w-[120px]" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
                       {new Date().toLocaleDateString()}
@@ -144,20 +144,23 @@ export default function CVCoursePage() {
 
                   <div className="flex flex-col items-center">
                      {/* Seal */}
-                     <div className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-4 mb-2" style={{ backgroundColor: '#eab308', borderColor: '#ca8a04' }}>
-                        <Award size={40} />
+                     <div className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-4 mb-2" style={{ backgroundColor: '#eab308', borderColor: '#ca8a04' }}>
+                        <Award size={32} />
                      </div>
                   </div>
                   
-                  <div className="text-center flex flex-col items-center">
-                    <div className="mb-[-2rem] h-48 flex items-end justify-center relative z-10">
+                  <div className="text-center flex flex-col items-center relative">
+                    {/* Signature positioned absolutely to overlap the line */}
+                    <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
                        {signBase64 ? (
-                         <Image src={signBase64} alt="Signature" width={400} height={192} className="h-full w-auto object-contain" unoptimized />
+                         <Image src={signBase64} alt="Signature" width={200} height={100} className="h-20 w-auto object-contain" unoptimized />
                        ) : (
-                         <div className="text-5xl font-script font-cursive" style={{ fontFamily: 'cursive', color: '#1e3a8a' }}>Arpit</div>
+                         <div className="text-4xl font-script font-cursive" style={{ fontFamily: 'cursive', color: '#1e3a8a' }}>Arpit</div>
                        )}
                     </div>
-                    <div className="text-base font-bold border-t pt-2 px-8 min-w-[200px] relative z-0" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
+                    
+                    {/* Name Line - Added margin top to make space for signature visual balance */}
+                    <div className="text-base font-bold border-t pt-2 px-8 min-w-[200px] mt-12 relative z-0" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
                       Arpit Kafle
                     </div>
                     <div className="text-xs mt-1" style={{ color: '#6b7280' }}>CEO, RojgaarNepal</div>

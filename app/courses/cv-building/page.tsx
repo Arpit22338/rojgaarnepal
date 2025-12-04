@@ -150,14 +150,14 @@ export default function CVCoursePage() {
                   </div>
                   
                   <div className="text-center flex flex-col items-center">
-                    <div className="mb-[-2.5rem] h-48 flex items-end justify-center relative z-10">
+                    <div className="mb-[-4rem] h-52 flex items-end justify-center relative z-10">
                        {signBase64 ? (
-                         <Image src={signBase64} alt="Signature" width={400} height={192} className="h-48 w-auto object-contain" unoptimized />
+                         <Image src={signBase64} alt="Signature" width={400} height={200} className="h-full w-auto object-contain" unoptimized />
                        ) : (
-                         <div className="text-4xl font-script font-cursive" style={{ fontFamily: 'cursive', color: '#1e3a8a' }}>Arpit</div>
+                         <div className="text-5xl font-script font-cursive" style={{ fontFamily: 'cursive', color: '#1e3a8a' }}>Arpit</div>
                        )}
                     </div>
-                    <div className="text-base font-bold border-t pt-2 px-4 min-w-[150px] relative z-0" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
+                    <div className="text-base font-bold border-t pt-2 px-8 min-w-[200px] relative z-0" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
                       Arpit Kafle
                     </div>
                     <div className="text-xs mt-1" style={{ color: '#6b7280' }}>CEO, RojgaarNepal</div>

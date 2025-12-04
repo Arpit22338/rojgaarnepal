@@ -29,17 +29,18 @@ export default function CoursesList({ courses }: { courses: Course[] }) {
       return;
     }
 
-    if (course.price > 0) {
-      setSelectedCourse(course);
-    } else {
-      // Free course
+    // If course is unlocked or free, navigate to it
+    if (course.isUnlocked || course.price === 0) {
       if (course.id === "cv-building") {
         router.push("/courses/cv-building");
-      } else if (course.id === "basic-python") {
+      } else if (course.id === "basic-python" || course.title === "Basic Python Programming") {
         router.push("/courses/basic-python");
       } else {
         router.push(`/courses/${course.id}`);
       }
+    } else {
+      // Paid and locked -> Open Payment Modal
+      setSelectedCourse(course);
     }
   };
 

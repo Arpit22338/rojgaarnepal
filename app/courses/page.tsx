@@ -32,7 +32,7 @@ export default async function CoursesPage() {
     price: 0,
     instructor: "RojgaarNepal Team",
     duration: "1 Hour",
-    thumbnail: "/cv-course.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=500&auto=format&fit=crop",
     isUnlocked: true // Free course
   };
 
@@ -43,14 +43,20 @@ export default async function CoursesPage() {
     price: 299,
     instructor: "RojgaarNepal Team",
     duration: "2 Hours",
-    thumbnail: "/python-course.jpg",
+    thumbnail: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg",
     isUnlocked: unlockedTitles.includes("Basic Python Programming")
   };
+
+  // Filter out DB courses that duplicate the hardcoded ones
+  const filteredDbCourses = courses.filter(c => 
+    c.title !== "Basic Python Programming" && 
+    c.title !== "CV Building Masterclass"
+  );
 
   const allCourses = [
     cvCourse, 
     pythonCourse, 
-    ...courses.map(c => ({
+    ...filteredDbCourses.map(c => ({
       ...c,
       instructor: c.instructor || "Unknown",
       duration: c.duration || "Self-paced",

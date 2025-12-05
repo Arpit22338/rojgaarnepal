@@ -839,60 +839,70 @@ python my_script.py
 
 export const FINAL_EXAM_DATA = [
   {
+    id: "q1",
     question: "What is the correct file extension for Python files?",
     options: [".pyt", ".pt", ".py", ".python"],
     answer: 2,
     relatedLessonId: "l6-2"
   },
   {
+    id: "q2",
     question: "Which function is used to output text to the screen?",
     options: ["echo()", "print()", "write()", "log()"],
     answer: 1,
     relatedLessonId: "l1-2"
   },
   {
+    id: "q3",
     question: "How do you create a variable with the numeric value 5?",
     options: ["x = 5", "int x = 5", "x : 5", "var x = 5"],
     answer: 0,
     relatedLessonId: "l1-3"
   },
   {
+    id: "q4",
     question: "Which operator is used for exponentiation (power)?",
     options: ["^", "**", "//", "exp"],
     answer: 1,
     relatedLessonId: "l2-1"
   },
   {
+    id: "q5",
     question: "What is the result of 10 // 3?",
     options: ["3.33", "3", "1", "3.0"],
     answer: 1,
     relatedLessonId: "l2-1"
   },
   {
+    id: "q6",
     question: "Which of these is a valid list?",
     options: ["(1, 2, 3)", "{1, 2, 3}", "[1, 2, 3]", "<1, 2, 3>"],
     answer: 2,
     relatedLessonId: "l4-1"
   },
   {
+    id: "q7",
     question: "How do you start a while loop?",
     options: ["while x > 5:", "while (x > 5)", "loop while x > 5", "while x > 5 then"],
     answer: 0,
     relatedLessonId: "l3-2"
   },
   {
+    id: "q8",
     question: "Which keyword is used to define a function?",
     options: ["function", "def", "fun", "define"],
     answer: 1,
     relatedLessonId: "l5-1"
   },
   {
+    id: "q9",
     question: "What is the output of print(type(3.14))?",
     options: ["<class 'int'>", "<class 'float'>", "<class 'double'>", "<class 'number'>"],
     answer: 1,
     relatedLessonId: "l1-3"
   },
   {
+    id: "q10",
     question: "Which method adds an item to the end of a list?",
     options: ["add()", "insert()", "push()", "append()"],
     answer: 3,

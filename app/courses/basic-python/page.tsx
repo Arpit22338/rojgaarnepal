@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, BookOpen, Code, CheckCircle, Award, HelpCircle, Download, ChevronDown, ChevronRight, PlayCircle, Menu, X } from "lucide-react";
+import { ArrowLeft, BookOpen, Code, CheckCircle, Award, HelpCircle, Download, ChevronDown, ChevronRight, PlayCircle, Menu, X, Clock } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import html2canvas from "html2canvas";

@@ -158,6 +158,14 @@ export default function PythonCoursePage() {
                 ))}
               </div>
             </div>
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 h-1.5">
+              <div 
+                className="bg-blue-600 h-1.5 transition-all duration-500"
+                style={{ width: `${((activeModuleIndex + 1) / COURSE_MODULES.length) * 100}%` }}
+              />
+            </div>
           </div>
 
           <div className="p-6 md:p-12 space-y-12">
@@ -186,7 +194,36 @@ export default function PythonCoursePage() {
                   </div>
                   
                   <div className="prose max-w-none mb-8 text-gray-700 prose-headings:font-bold prose-a:text-blue-600 prose-code:text-blue-800 prose-code:bg-white prose-code:px-1 prose-code:rounded prose-pre:bg-slate-900 prose-pre:text-slate-50">
-                    <ReactMarkdown>{lesson.content}</ReactMarkdown>
+                    <ReactMarkdown
+                      components={{
+                        code({node, inline, className, children, ...props}) {
+                          const match = /language-(\w+)/.exec(className || '')
+                          return !inline && match ? (
+                            <div className="relative rounded-lg overflow-hidden my-6 shadow-lg border border-slate-700">
+                              <div className="bg-slate-800 px-4 py-2 flex items-center justify-between border-b border-slate-700">
+                                 <div className="flex gap-1.5">
+                                   <div className="w-3 h-3 rounded-full bg-red-500/50" />
+                                   <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
+                                   <div className="w-3 h-3 rounded-full bg-green-500/50" />
+                                 </div>
+                                 <span className="text-xs text-slate-400 font-mono">python</span>
+                              </div>
+                              <pre className="bg-slate-900 p-4 overflow-x-auto m-0">
+                                <code className={`${className} text-sm font-mono text-slate-300`} {...props}>
+                                  {children}
+                                </code>
+                              </pre>
+                            </div>
+                          ) : (
+                            <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-sm border border-slate-200" {...props}>
+                              {children}
+                            </code>
+                          )
+                        }
+                      }}
+                    >
+                      {lesson.content}
+                    </ReactMarkdown>
                   </div>
 
                   {/* Playground Card */}
@@ -228,7 +265,10 @@ export default function PythonCoursePage() {
                       </div>
                       
                       <div className="p-6">
-                        <p className="text-lg font-medium text-gray-800 mb-4">{lesson.quiz.question}</p>
+                        <p className="text-xl font-bold text-gray-900 mb-6 flex gap-3">
+                          <span className="text-blue-600">•</span>
+                          {lesson.quiz.question}
+                        </p>
                         <div className="space-y-3">
                           {lesson.quiz.options.map((opt, idx) => {
                             const isSelected = lessonQuizAnswers[lesson.id] === idx;

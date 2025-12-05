@@ -196,7 +196,7 @@ export default function PythonCoursePage() {
                   <div className="prose max-w-none mb-8 text-gray-700 prose-headings:font-bold prose-a:text-blue-600 prose-code:text-blue-800 prose-code:bg-white prose-code:px-1 prose-code:rounded prose-pre:bg-slate-900 prose-pre:text-slate-50">
                     <ReactMarkdown
                       components={{
-                        code({node, inline, className, children, ...props}) {
+                        code({node, inline, className, children, ...props}: any) {
                           const match = /language-(\w+)/.exec(className || '')
                           return !inline && match ? (
                             <div className="relative rounded-lg overflow-hidden my-6 shadow-lg border border-slate-700">

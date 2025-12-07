@@ -279,7 +279,7 @@ export default function Navbar() {
               aria-label="Toggle menu"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </div>
+            </button>
           </div>
         </div>
       </nav>

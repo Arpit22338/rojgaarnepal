@@ -69,14 +69,14 @@ export default function Navbar() {
   }, [session]);
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 flex-nowrap">
           {/* Left: Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="flex items-center gap-2 group">
               <Image src="/logo.png" alt="Rojgaar Logo" width={32} height={32} className="object-contain group-hover:scale-105 transition-transform" />
-              <div className="text-xl font-bold flex items-center tracking-tight">
+              <div className="text-xl font-bold flex items-center tracking-tight whitespace-nowrap">
                 <span className="text-blue-600">Rojgaar</span>
                 <span className="text-gray-900">Nepal</span>
               </div>
@@ -84,56 +84,56 @@ export default function Navbar() {
           </div>
 
           {/* Center: Desktop Menu */}
-          <div className="hidden lg:flex flex-1 justify-center items-center space-x-8">
-            <Link href="/" className={getLinkClass("/")}>
+          <div className="hidden lg:flex flex-1 justify-center items-center gap-6 xl:gap-8">
+            <Link href="/" className={`${getLinkClass("/")} whitespace-nowrap`}>
               Home
             </Link>
-            <Link href="/jobs" className={getLinkClass("/jobs")}>
+            <Link href="/jobs" className={`${getLinkClass("/jobs")} whitespace-nowrap`}>
               Find Jobs
             </Link>
-            <Link href="/people" className={getLinkClass("/people")}>
+            <Link href="/people" className={`${getLinkClass("/people")} whitespace-nowrap`}>
               Community
             </Link>
-            <Link href="/talent" className={getLinkClass("/talent")}>
+            <Link href="/talent" className={`${getLinkClass("/talent")} whitespace-nowrap`}>
               Find Talent
             </Link>
-            <Link href="/courses" className={getLinkClass("/courses")}>
+            <Link href="/courses" className={`${getLinkClass("/courses")} whitespace-nowrap`}>
               Skill Courses
             </Link>
             {session && (
-              <Link href="/my-certificates" className={getLinkClass("/my-certificates")}>
+              <Link href="/my-certificates" className={`${getLinkClass("/my-certificates")} whitespace-nowrap`}>
                 Certificates
               </Link>
             )}
             {user?.role === "JOBSEEKER" && (
               <>
-                <Link href="/talent/new" className={getLinkClass("/talent/new")}>
+                <Link href="/talent/new" className={`${getLinkClass("/talent/new")} whitespace-nowrap`}>
                   Share My Talent
                 </Link>
-                <Link href="/my-applications" className={getLinkClass("/my-applications")}>
+                <Link href="/my-applications" className={`${getLinkClass("/my-applications")} whitespace-nowrap`}>
                   My Applications
                 </Link>
               </>
             )}
             {(user?.role === "EMPLOYER" || user?.role === "ADMIN") && (
               <>
-                <Link href="/employer/jobs/new" className={getLinkClass("/employer/jobs/new")}>
+                <Link href="/employer/jobs/new" className={`${getLinkClass("/employer/jobs/new")} whitespace-nowrap`}>
                   Post a Job
                 </Link>
-                <Link href="/employer/dashboard" className={getLinkClass("/employer/dashboard")}>
+                <Link href="/employer/dashboard" className={`${getLinkClass("/employer/dashboard")} whitespace-nowrap`}>
                   Dashboard
                 </Link>
               </>
             )}
             {user?.role === "ADMIN" && (
-              <Link href="/admin/dashboard" className={getLinkClass("/admin/dashboard")}>
+              <Link href="/admin/dashboard" className={`${getLinkClass("/admin/dashboard")} whitespace-nowrap`}>
                 Admin
               </Link>
             )}
           </div>
 
           {/* Right: Icons & Auth */}
-          <div className="hidden lg:flex items-center space-x-4 flex-shrink-0">
+          <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
             {session ? (
               <>
                 <NotificationBell />
@@ -238,7 +238,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Drawer */}
       {isOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black/20 backdrop-blur-sm" onClick={() => setIsOpen(false)}>
+        <div className="lg:hidden fixed inset-0 z-[100] bg-black/20 backdrop-blur-sm" onClick={() => setIsOpen(false)}>
           <div 
             className="fixed inset-y-0 right-0 w-[280px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col"
             onClick={(e) => e.stopPropagation()}

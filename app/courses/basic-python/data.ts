@@ -63,7 +63,7 @@ print("Welcome to Python")
 \`\`\`
 
 **Output:**
-\`\`\`
+\`\`\`text
 Hello
 Welcome to Python
 \`\`\`
@@ -173,7 +173,7 @@ print("Hello,", name)
 \`\`\`
 
 **Output (if user types Sita):**
-\`\`\`
+\`\`\`text
 Enter your name: Sita
 Hello, Sita
 \`\`\`
@@ -269,13 +269,13 @@ print(x and y) # False
         content: `### Arithmetic Operators
 Arithmetic operators let you perform math operations:
 
-*   \`+\` addition
-*   \`-\` subtraction
-*   \`*\` multiplication
-*   \`/\` division (float division)
-*   \`//\` floor division (integer result)
-*   \`%\` modulus (remainder)
-*   \`**\` exponent (power)
+• \`+\` addition
+• \`-\` subtraction
+• \`*\` multiplication
+• \`/\` division (float division)
+• \`//\` floor division (integer result)
+• \`%\` modulus (remainder)
+• \`**\` exponent (power)
 
 ### Examples
 \`\`\`python
@@ -290,9 +290,9 @@ print(a ** b)  # 1000
 \`\`\`
 
 ### Use Cases
-*   \`/\` is useful when you care about decimals.
-*   \`//\` is useful when you only want the integer part.
-*   \`%\` is useful for checking divisibility (e.g., even/odd).
+• \`/\` is useful when you care about decimals.
+• \`//\` is useful when you only want the integer part.
+• \`%\` is useful for checking divisibility (e.g., even/odd).
 `,
         quiz: {
           question: "What is the result of 17 % 5?",
@@ -316,12 +316,12 @@ print(a ** b)  # 1000
         content: `### Comparison Operators
 Comparison operators compare two values and return a boolean (\`True\` or \`False\`):
 
-*   \`==\` equal to
-*   \`!=\` not equal to
-*   \`<\` less than
-*   \`>\` greater than
-*   \`<=\` less than or equal to
-*   \`>=\` greater than or equal to
+• \`==\` equal to
+• \`!=\` not equal to
+• \`<\` less than
+• \`>\` greater than
+• \`<=\` less than or equal to
+• \`>=\` greater than or equal to
 
 ### Examples
 \`\`\`python
@@ -355,9 +355,9 @@ We use comparison operators in conditions (if statements, loops, etc.).
         content: `### Logical Operators
 Logical operators combine boolean values:
 
-*   \`and\` – True if both conditions are True
-*   \`or\` – True if at least one condition is True
-*   \`not\` – reverses True/False
+• \`and\` – True if both conditions are True
+• \`or\` – True if at least one condition is True
+• \`not\` – reverses True/False
 
 ### Examples
 \`\`\`python
@@ -398,10 +398,10 @@ print(age >= 18 and grade == "A")  # True
 Basic assignment uses \`=\`.
 
 Compound assignment operators update a variable based on its current value:
-*   \`x += 1\` → \`x = x + 1\`
-*   \`x -= 2\` → \`x = x - 2\`
-*   \`x *= 3\` → \`x = x * 3\`
-*   \`x /= 4\` → \`x = x / 4\`
+• \`x += 1\` → \`x = x + 1\`
+• \`x -= 2\` → \`x = x - 2\`
+• \`x *= 3\` → \`x = x * 3\`
+• \`x /= 4\` → \`x = x / 4\`
 
 ### Example
 \`\`\`python
@@ -430,8 +430,8 @@ x *= 3  # x = 21
         id: "l2-5",
         title: "Membership and Identity Operators",
         content: `### Membership Operators
-*   \`in\` – True if a value exists in a sequence
-*   \`not in\` – True if a value does not exist in a sequence
+• \`in\` – True if a value exists in a sequence
+• \`not in\` – True if a value does not exist in a sequence
 
 \`\`\`python
 name = "Python"
@@ -439,8 +439,8 @@ print("P" in name)      # True
 \`\`\`
 
 ### Identity Operators
-*   \`is\` – True if two variables refer to the same object in memory
-*   \`is not\` – True if they do not refer to the same object
+• \`is\` – True if two variables refer to the same object in memory
+• \`is not\` – True if they do not refer to the same object
 
 \`\`\`python
 a = [1, 2, 3]

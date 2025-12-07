@@ -9,7 +9,7 @@ export async function GET() {
 
   const records = await prisma.kycRecord.findMany({
     orderBy: { createdAt: "desc" },
-    include: { teacher: { select: { name: true, email: true } } }
+    include: { teacher: { select: { name: true, email: true, phoneNumber: true, qrCodeUrl: true } } }
   });
 
   return NextResponse.json(records);

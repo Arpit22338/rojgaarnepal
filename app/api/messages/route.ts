@@ -25,7 +25,7 @@ export async function GET(req: Request) {
 
     const otherUser = await prisma.user.findUnique({
       where: { id: otherUserId },
-      select: { id: true, name: true, image: true } as any,
+      select: { id: true, name: true, image: true, lastActivityAt: true } as any,
     });
 
     return NextResponse.json({ messages, otherUser });
@@ -88,6 +88,12 @@ export async function POST(req: Request) {
     },
   });
 
+  // Update last activity
+  await prisma.user.update({
+    where: { id: session.user.id },
+    data: { lastActivityAt: new Date() },
+  });
+
   // Create notification
   await (prisma as any).notification.create({
     data: {
@@ -121,6 +127,12 @@ export async function PUT(req: Request) {
     data: {
       isRead: true,
     },
+  });
+
+  // Update last activity
+  await prisma.user.update({
+    where: { id: session.user.id },
+    data: { lastActivityAt: new Date() },
   });
 
   return NextResponse.json({ success: true });

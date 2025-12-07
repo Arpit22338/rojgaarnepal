@@ -5,9 +5,11 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const kycSchema = z.object({
-  documentType: z.enum(["citizenship", "passport", "national_id"]),
+  documentType: z.enum(["citizenship", "passport", "national_id", "driving_license"]),
   frontImageUrl: z.string().url(),
   backImageUrl: z.string().url(),
+  phoneNumber: z.string().min(10),
+  qrCodeUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export async function POST(req: Request) {
@@ -18,7 +20,16 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { documentType, frontImageUrl, backImageUrl } = kycSchema.parse(body);
+    const { documentType, frontImageUrl, backImageUrl, phoneNumber, qrCodeUrl } = kycSchema.parse(body);
+
+    // Update user profile with phone and QR
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        phoneNumber,
+        qrCodeUrl: qrCodeUrl || undefined,
+      },
+    });
 
     // Check if record already exists
     const existingRecord = await (prisma as any).kycRecord.findFirst({

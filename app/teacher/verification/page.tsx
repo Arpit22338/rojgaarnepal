@@ -116,7 +116,7 @@ export default function TeacherVerificationPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Verification Pending</h1>
         <p className="text-gray-600 mb-8 max-w-md">
           We have received your payment screenshot. Our team will verify it shortly. 
-          This usually takes 1-2 hours.
+          Usually approved within 24 hours.
         </p>
         <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-sm text-yellow-800">
           Please check back later or wait for an email confirmation.

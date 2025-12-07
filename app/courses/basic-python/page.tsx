@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, BookOpen, Code, CheckCircle, Award, HelpCircle, Download, ChevronRight, PlayCircle, Menu, X, Clock, PenTool, Star, AlertCircle, GraduationCap } from "lucide-react";
+import { ArrowLeft, BookOpen, Code, CheckCircle, Award, HelpCircle, Download, Clock } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import html2canvas from "html2canvas";
@@ -193,7 +193,7 @@ export default function PythonCoursePage() {
                     <h3 className="text-2xl font-bold text-gray-900">{lesson.title}</h3>
                   </div>
                   
-                  <div className="prose max-w-none mb-8 text-gray-700 prose-headings:font-bold prose-a:text-blue-600 prose-code:text-blue-800 prose-code:bg-white prose-code:px-1 prose-code:rounded prose-pre:bg-slate-900 prose-pre:text-slate-50">
+                  <div className="mb-8 text-gray-700">
                     <ReactMarkdown
                       components={{
                         code({node, inline, className, children, ...props}: any) {
@@ -394,9 +394,9 @@ export default function PythonCoursePage() {
         // Find module for the lesson
         const lessonId = currentQuestion.relatedLessonId;
         if (lessonId) {
-          const module = COURSE_MODULES.find(m => m.lessons.some(l => l.id === lessonId));
-          if (module) {
-            setActiveModuleId(module.id);
+          const targetModule = COURSE_MODULES.find(m => m.lessons.some(l => l.id === lessonId));
+          if (targetModule) {
+            setActiveModuleId(targetModule.id);
             setActiveTab("lessons");
             // Reset this question so they can try again later
             const newAnswers = [...answers];

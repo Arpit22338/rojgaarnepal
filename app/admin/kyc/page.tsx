@@ -13,7 +13,7 @@ import {
 } from "../../../components/ui/table";
 import { Badge } from "../../../components/ui/badge";
 import { useToast } from "../../../components/ui/use-toast";
-import { Loader2, Check, X, Eye } from "lucide-react";
+import { Loader2, Check, X, Eye, QrCode } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,8 @@ interface KycRecord {
   teacher: {
     name: string | null;
     email: string | null;
+    phoneNumber: string | null;
+    qrCodeUrl: string | null;
   };
 }
 
@@ -102,8 +104,10 @@ export default function AdminKycPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Teacher</TableHead>
+              <TableHead>Contact Info</TableHead>
               <TableHead>Document Type</TableHead>
               <TableHead>Documents</TableHead>
+              <TableHead>Payment QR</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Actions</TableHead>
@@ -115,6 +119,9 @@ export default function AdminKycPage() {
                 <TableCell>
                   <div className="font-medium">{record.teacher.name || "Unknown"}</div>
                   <div className="text-sm text-gray-500">{record.teacher.email}</div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm">{record.teacher.phoneNumber || "N/A"}</div>
                 </TableCell>
                 <TableCell className="capitalize">
                   {record.documentType.replace("_", " ")}
@@ -165,6 +172,32 @@ export default function AdminKycPage() {
                   </div>
                 </TableCell>
                 <TableCell>
+                  {record.teacher.qrCodeUrl ? (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <QrCode className="w-3 h-3 mr-1" /> View QR
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Payment QR Code</DialogTitle>
+                        </DialogHeader>
+                        <div className="relative w-full h-[400px]">
+                          <Image
+                            src={record.teacher.qrCodeUrl}
+                            alt="Payment QR"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  ) : (
+                    <span className="text-gray-400 text-sm">None</span>
+                  )}
+                </TableCell>
+                <TableCell>
                   <Badge
                     variant={
                       record.status === "APPROVED"
@@ -207,7 +240,7 @@ export default function AdminKycPage() {
             ))}
             {records.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                   No KYC requests found.
                 </TableCell>
               </TableRow>

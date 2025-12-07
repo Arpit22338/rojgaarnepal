@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
+  ArrowLeft,
   Flag,
   MoreVertical,
   Trash2,
@@ -25,13 +26,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -46,6 +45,7 @@ interface ChatUser {
   id: string;
   name: string | null;
   image: string | null;
+  lastActivityAt?: string | null;
 }
 
 export default function ChatPage() {
@@ -56,10 +56,29 @@ export default function ChatPage() {
   const [otherUser, setOtherUser] = useState<ChatUser | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const getLastSeenText = (dateString?: string | null) => {
+    if (!dateString) return "Offline";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    
+    if (minutes < 2) return "Online";
+    if (minutes < 60) return `Last seen ${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Last seen ${hours}h ago`;
+    return `Last seen ${date.toLocaleDateString()}`;
+  };
+
+  const isOnline = otherUser?.lastActivityAt 
+    ? (new Date().getTime() - new Date(otherUser.lastActivityAt).getTime() < 2 * 60 * 1000) 
+    : false;
 
   const formatMessageContent = (content: string, isMe: boolean) => {
     const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
@@ -152,10 +171,13 @@ export default function ChatPage() {
   };
 
   return (
-    <Card className="mx-auto flex h-[calc(100vh-100px)] min-h-0 w-full grow flex-col overflow-hidden shadow-none border-0 rounded-none md:rounded-lg">
+    <div className="flex flex-col h-full w-full bg-background">
       {/* Header */}
-      <CardHeader className="sticky top-0 z-10 flex flex-row items-center justify-between gap-2 border-b bg-background px-4 py-3">
+      <div className="sticky top-0 z-10 flex flex-row items-center justify-between gap-2 border-b bg-background px-4 py-3 shadow-sm">
         <div className="flex items-center gap-3">
+          <Link href="/messages" className="md:hidden text-muted-foreground hover:text-foreground">
+            <ArrowLeft size={24} />
+          </Link>
           {otherUser ? (
             <Link href={`/profile/${otherUser.id}`} className="flex items-center gap-3 group">
               <div className="relative">
@@ -163,12 +185,20 @@ export default function ChatPage() {
                   <AvatarImage alt={otherUser.name || "User"} src={otherUser.image || undefined} />
                   <AvatarFallback>{otherUser.name?.[0] || "U"}</AvatarFallback>
                 </Avatar>
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></span>
+                {isOnline && (
+                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></span>
+                )}
               </div>
               <div className="flex flex-col">
                 <div className="font-semibold text-base group-hover:text-primary transition-colors">{otherUser.name || "User"}</div>
                 <div className="flex items-center gap-1 text-muted-foreground text-xs">
-                  <span className="inline-block size-2 rounded-full bg-green-500" /> Online
+                  {isOnline ? (
+                    <>
+                      <span className="inline-block size-2 rounded-full bg-green-500" /> Online
+                    </>
+                  ) : (
+                    <span>{getLastSeenText(otherUser.lastActivityAt)}</span>
+                  )}
                 </div>
               </div>
             </Link>
@@ -192,11 +222,10 @@ export default function ChatPage() {
             </Button>
           </DropdownMenuContent>
         </DropdownMenu>
-      </CardHeader>
+      </div>
 
       {/* Messages */}
-      <CardContent className="min-h-0 flex-1 p-0 relative">
-        <ScrollArea className="h-full px-4 py-4">
+      <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50" ref={messagesContainerRef}>
           <div className="flex flex-col gap-4 pb-4">
             {messages.map((msg) => {
               const isMe = msg.senderId === (session?.user as any)?.id;
@@ -286,8 +315,7 @@ export default function ChatPage() {
             })}
             <div ref={messagesEndRef} />
           </div>
-        </ScrollArea>
-      </CardContent>
+      </div>
 
       {/* Input Area */}
       <div className="p-4 border-t bg-background">
@@ -309,6 +337,6 @@ export default function ChatPage() {
           </Button>
         </form>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -162,7 +162,7 @@ export default function DynamicCoursePage() {
             {isEnrolled ? (
               <>
                 <h2 className="text-2xl font-bold mb-4">{activeLesson?.title}</h2>
-                <div className="prose max-w-none">
+                <div className="">
                   <ReactMarkdown>{activeLesson?.content}</ReactMarkdown>
                 </div>
               </>

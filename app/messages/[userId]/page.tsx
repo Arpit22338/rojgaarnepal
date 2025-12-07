@@ -62,6 +62,10 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const getLastSeenText = (dateString?: string | null) => {
     if (!dateString) return "Offline";
     const date = new Date(dateString);
@@ -171,9 +175,9 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-background">
+    <div className="flex flex-col h-full w-full bg-background overflow-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-10 flex flex-row items-center justify-between gap-2 border-b bg-background px-4 py-3 shadow-sm">
+      <div className="shrink-0 flex flex-row items-center justify-between gap-2 border-b bg-background px-4 py-3 shadow-sm z-10">
         <div className="flex items-center gap-3">
           <Link href="/messages" className="md:hidden text-muted-foreground hover:text-foreground">
             <ArrowLeft size={24} />
@@ -318,7 +322,7 @@ export default function ChatPage() {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t bg-background">
+      <div className="shrink-0 p-4 border-t bg-background">
         <form onSubmit={sendMessage} className="flex gap-2 items-center max-w-4xl mx-auto relative">
           <input
             type="text"

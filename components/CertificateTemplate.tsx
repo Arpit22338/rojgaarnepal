@@ -126,39 +126,45 @@ export default function CertificateTemplate({
           <h2 className="text-xl font-bold mb-8" style={{ color: '#1e40af' }}>{courseName}</h2>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', paddingLeft: '60px', paddingRight: '60px', marginTop: '40px' }}>
-            {/* Date Block */}
-            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: 120 }}>
-              <div style={{ fontSize: '16px', fontWeight: 'bold', borderBottom: '1px solid #9ca3af', paddingLeft: '16px', paddingRight: '16px', paddingBottom: '4px', marginBottom: '4px', minWidth: '120px', color: '#1f2937' }}>
-                {new Date(completionDate).toLocaleDateString()}
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '24px' }}>
+              {/* Seal - Centered */}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#eab308', border: '5px solid #ca8a04', marginBottom: '8px' }}>
+                  <Award size={40} style={{ color: '#ffffff' }} />
+                </div>
               </div>
-              <div style={{ fontSize: '12px', color: '#6b7280' }}>Date</div>
-            </div>
 
-            {/* Signature Block */}
-            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: 120, minWidth: 220, position: 'relative' }}>
-              <div style={{ marginBottom: 0 }}>
+              {/* Signature - Centered, Larger */}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginTop: '8px', marginBottom: '0' }}>
                 {signBase64 ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img 
                     src={signBase64} 
                     alt="Signature" 
-                    style={{ height: '60px', width: 'auto', maxWidth: 'none', marginBottom: '-8px' }} 
+                    style={{ height: '90px', width: 'auto', maxWidth: 'none', marginBottom: '-8px' }} 
                   />
                 ) : (
-                   <div style={{ fontSize: '36px', fontFamily: 'cursive', color: '#1e3a8a', marginBottom: '-8px' }}>Arpit</div>
-                 )}
+                  <div style={{ fontSize: '54px', fontFamily: 'cursive', color: '#1e3a8a', marginBottom: '-8px' }}>Arpit</div>
+                )}
               </div>
-              <div style={{ fontSize: '16px', fontWeight: 'bold', borderTop: '1px solid #9ca3af', paddingTop: '8px', paddingLeft: '32px', paddingRight: '32px', minWidth: '160px', marginTop: '0', color: '#1f2937' }}>
-                {instructorName}
-              </div>
-              <div style={{ fontSize: '12px', marginTop: '4px', color: '#6b7280' }}>CEO, RojgaarNepal</div>
-            </div>
 
-            {/* Seal Block */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: 120 }}>
-               <div style={{ width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#eab308', border: '4px solid #ca8a04', marginBottom: '8px' }}>
-                  <Award size={32} style={{ color: '#ffffff' }} />
-               </div>
+              {/* Date and Instructor Name - Row, Underlined */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', marginTop: '8px', paddingLeft: '60px', paddingRight: '60px' }}>
+                {/* Date */}
+                <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '180px' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', borderBottom: '2px solid #9ca3af', paddingLeft: '16px', paddingRight: '16px', paddingBottom: '4px', marginBottom: '4px', minWidth: '120px', color: '#1f2937' }}>
+                    {new Date(completionDate).toLocaleDateString()}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#6b7280' }}>Date</div>
+                </div>
+                {/* Instructor Name */}
+                <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '220px' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', borderBottom: '2px solid #9ca3af', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '4px', minWidth: '160px', color: '#1f2937' }}>
+                    {instructorName}
+                  </div>
+                  <div style={{ fontSize: '12px', marginTop: '4px', color: '#6b7280' }}>CEO, RojgaarNepal</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

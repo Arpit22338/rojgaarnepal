@@ -73,31 +73,32 @@ export default function PythonPlayground({
     }
     
     setIsRunning(true);
-    setOutput("");
+    setOutput("Running...");
     setStatus("idle");
 
+    // Small delay to show the running state
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     try {
-      // Create a namespace for this execution
-      const namespace = pyodide.globals.get('dict')();
-      
-      // Setup output capture in the namespace
-      await pyodide.runPythonAsync(`
+      // Setup output capture
+      pyodide.runPython(`
 import sys
 from io import StringIO
-sys.stdout = StringIO()
-      `, { globals: namespace });
+_stdout = StringIO()
+sys.stdout = _stdout
+      `);
 
       // Run the user's code
-      await pyodide.runPythonAsync(code, { globals: namespace });
+      pyodide.runPython(code);
 
-      // Get the output
-      const result = await pyodide.runPythonAsync(`sys.stdout.getvalue()`, { globals: namespace });
+      // Get the captured output
+      const result = pyodide.runPython("_stdout.getvalue()");
       
       setOutput(result || "(No output)");
 
       if (expectedOutput) {
         // Normalize outputs (trim whitespace)
-        const cleanOutput = result.trim();
+        const cleanOutput = (result || "").trim();
         const cleanExpected = expectedOutput.trim();
 
         if (cleanOutput === cleanExpected) {
@@ -108,6 +109,7 @@ sys.stdout = StringIO()
         }
       }
     } catch (err: any) {
+      console.error("Python execution error:", err);
       const errorMessage = err.message || String(err);
       setOutput(`Error: ${errorMessage}`);
       setStatus("error");

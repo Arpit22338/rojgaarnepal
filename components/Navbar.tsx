@@ -34,15 +34,45 @@ export default function Navbar() {
   };
 
   const router = useRouter();
+  const [teacherKycApproved, setTeacherKycApproved] = useState<boolean | null>(null);
+
+  // Check teacher KYC status with polling
+  useEffect(() => {
+    if (session && user?.role === "TEACHER") {
+      const checkKycStatus = () => {
+        fetch("/api/teacher/kyc")
+          .then(res => res.json())
+          .then(data => {
+            if (data.record && data.record.status === "APPROVED") {
+              setTeacherKycApproved(true);
+            } else {
+              setTeacherKycApproved(false);
+            }
+          })
+          .catch(() => setTeacherKycApproved(false));
+      };
+
+      // Check immediately
+      checkKycStatus();
+
+      // Poll every 30 seconds to catch status changes
+      const interval = setInterval(checkKycStatus, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [session, user]);
 
   useEffect(() => {
-    if (session && user?.role === "TEACHER" && !user.isPremium) {
-      const allowedPaths = ["/teacher/verification", "/teacher/kyc", "/login"];
-      if (!allowedPaths.some(path => pathname.startsWith(path))) {
-        router.push("/teacher/verification");
+    if (session && user?.role === "TEACHER") {
+      // Only redirect if we've confirmed KYC is NOT approved
+      if (teacherKycApproved === false) {
+        const allowedPaths = ["/teacher/verification", "/teacher/kyc", "/login"];
+        if (!allowedPaths.some(path => pathname.startsWith(path))) {
+          router.push("/teacher/verification");
+        }
       }
+      // If teacherKycApproved === true or null (still checking), don't redirect
     }
-  }, [session, user, pathname, router]);
+  }, [session, user, pathname, router, teacherKycApproved]);
 
   useEffect(() => {
     if (session) {
@@ -86,7 +116,7 @@ export default function Navbar() {
           </div>
 
           {/* Center: Desktop Menu */}
-          <div className="hidden lg:flex flex-1 justify-start items-center gap-6 ml-10">
+          <div className="hidden lg:flex flex-1 justify-start items-center gap-4 ml-10">
             <Link href="/" className={`${getLinkClass("/")} whitespace-nowrap`}>
               Home
             </Link>
@@ -208,14 +238,22 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden flex items-center gap-3">
+          <div className="lg:hidden flex items-center gap-2">
             {!session && (
-              <Link
-                href="/register"
-                className="text-xs font-medium bg-blue-600 text-white px-3 py-1.5 rounded-full hover:bg-blue-700 transition"
-              >
-                Register
-              </Link>
+              <>
+                <Link
+                  href="/login"
+                  className="text-xs font-medium text-gray-700 hover:text-blue-600 px-2 py-1.5 rounded-lg transition"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-xs font-medium bg-blue-600 text-white px-3 py-1.5 rounded-full hover:bg-blue-700 transition whitespace-nowrap"
+                >
+                  Register
+                </Link>
+              </>
             )}
             {session && (
               <>
@@ -350,6 +388,17 @@ export default function Navbar() {
                 </Link>
               )}
             </div>
+
+            {session && (
+              <div className="p-4 border-t space-y-2">
+                <Link href="/profile/change-password" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
+                  <Settings size={18} className="text-gray-400"/> Change Password
+                </Link>
+                <button onClick={() => { signOut(); setIsOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-red-600 hover:bg-red-50 transition-colors text-left">
+                  <LogOut size={18}/> Sign Out
+                </button>
+              </div>
+            )}
 
             {!session && (
               <div className="p-4 border-t space-y-3">

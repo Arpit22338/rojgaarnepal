@@ -130,18 +130,52 @@ export async function PUT(req: Request) {
       data: {
         userId: request.userId,
         content: `Your Premium Request for ${request.planType} has been APPROVED!`,
+        type: "PREMIUM",
         link: "/profile",
       },
     });
+
+    // Send email notification
+    const user = await prisma.user.findUnique({
+      where: { id: request.userId },
+      select: { email: true },
+    });
+
+    if (user?.email) {
+      const { sendNotificationEmail } = await import("@/lib/mail");
+      await sendNotificationEmail(
+        user.email,
+        `Your Premium Request for ${request.planType} has been APPROVED!`,
+        "PREMIUM",
+        "/profile"
+      ).catch(err => console.error("Failed to send notification email:", err));
+    }
   } else if (status === "REJECTED") {
      // Create Notification
      await (prisma as any).notification.create({
       data: {
         userId: request.userId,
         content: `Your Premium Request for ${request.planType} was rejected. Please contact support.`,
+        type: "PREMIUM",
         link: "/premium",
       },
     });
+
+    // Send email notification
+    const user = await prisma.user.findUnique({
+      where: { id: request.userId },
+      select: { email: true },
+    });
+
+    if (user?.email) {
+      const { sendNotificationEmail } = await import("@/lib/mail");
+      await sendNotificationEmail(
+        user.email,
+        `Your Premium Request for ${request.planType} was rejected. Please contact support.`,
+        "PREMIUM",
+        "/premium"
+      ).catch(err => console.error("Failed to send notification email:", err));
+    }
   }
 
   return NextResponse.json(request);

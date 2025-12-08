@@ -35,9 +35,26 @@ export async function PUT(req: Request) {
     data: {
       userId: ticket.userId,
       content: `Support: Admin replied to "${ticket.subject}": ${replySnippet}`,
-      link: "/support", // Or a specific ticket view if we had one
+      type: "SUPPORT",
+      link: "/support",
     },
   });
+
+  // Send email notification
+  const user = await prisma.user.findUnique({
+    where: { id: ticket.userId },
+    select: { email: true },
+  });
+
+  if (user?.email) {
+    const { sendNotificationEmail } = await import("@/lib/mail");
+    await sendNotificationEmail(
+      user.email,
+      `Admin replied to your support ticket "${ticket.subject}": ${replySnippet}`,
+      "SUPPORT",
+      "/support"
+    ).catch(err => console.error("Failed to send notification email:", err));
+  }
 
   return NextResponse.json(ticket);
 }

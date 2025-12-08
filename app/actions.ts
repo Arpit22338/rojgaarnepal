@@ -287,9 +287,26 @@ export async function createAnswer(questionId: string, content: string) {
       data: {
         userId: question.userId,
         content: `Someone replied to your question on ${question.job.title}`,
+        type: "INFO",
         link: `/jobs/${question.jobId}`,
       },
     });
+
+    // Send email notification
+    const questionAuthor = await prisma.user.findUnique({
+      where: { id: question.userId },
+      select: { email: true },
+    });
+
+    if (questionAuthor?.email) {
+      const { sendNotificationEmail } = await import("@/lib/mail");
+      await sendNotificationEmail(
+        questionAuthor.email,
+        `Someone replied to your question on ${question.job.title}`,
+        "INFO",
+        `/jobs/${question.jobId}`
+      ).catch(err => console.error("Failed to send notification email:", err));
+    }
   }
 
   revalidatePath(`/jobs/${question.jobId}`);

@@ -202,7 +202,7 @@ sys.stdout = _stdout_capture
       </div>
 
       {/* Editor Area */}
-      <div className="flex-1 relative overflow-hidden group min-h-0">
+      <div className="h-[250px] sm:h-[300px] md:h-[350px] relative overflow-hidden group shrink-0">
         <textarea
           value={code}
           onChange={(e) => setCode(e.target.value)}

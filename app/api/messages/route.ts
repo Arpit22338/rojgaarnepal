@@ -99,9 +99,26 @@ export async function POST(req: Request) {
     data: {
       userId: receiverId,
       content: `New message from ${session.user.name}`,
+      type: "MESSAGE",
       link: `/messages/${session.user.id}`,
     },
   });
+
+  // Send email notification
+  const receiver = await prisma.user.findUnique({
+    where: { id: receiverId },
+    select: { email: true },
+  });
+  
+  if (receiver?.email) {
+    const { sendNotificationEmail } = await import("@/lib/mail");
+    await sendNotificationEmail(
+      receiver.email,
+      `New message from ${session.user.name}`,
+      "MESSAGE",
+      `/messages/${session.user.id}`
+    ).catch(err => console.error("Failed to send notification email:", err));
+  }
 
   return NextResponse.json({ message });
 }

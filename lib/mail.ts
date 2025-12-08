@@ -20,7 +20,7 @@ export async function sendVerificationEmail(email: string, otp: string) {
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
     to: email,
     subject: "Verify your email - RojgaarNepal",
     text: `Your verification code is: ${otp}`,
@@ -57,7 +57,7 @@ export async function sendPasswordResetEmail(email: string, otp: string) {
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
     to: email,
     subject: "Reset Your Password - RojgaarNepal",
     text: `Your password reset code is: ${otp}`,
@@ -91,7 +91,7 @@ export async function sendUntrustEmail(trustedEmail: string, trusterName: string
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
     to: trustedEmail,
     subject: "Trust Update - RojgaarNepal",
     text: `${trusterName} removed their trust.`,
@@ -121,7 +121,7 @@ export async function sendApplicationEmail(employerEmail: string, jobTitle: stri
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
     to: employerEmail,
     subject: `New Application for ${jobTitle}`,
     html: `
@@ -150,7 +150,7 @@ export async function sendApplicationStatusEmail(applicantEmail: string, jobTitl
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <noreply@rojgaarnepal.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
     to: applicantEmail,
     subject: `Application Status Update: ${jobTitle}`,
     html: `
@@ -158,6 +158,84 @@ export async function sendApplicationStatusEmail(applicantEmail: string, jobTitl
         <h2>Application Update</h2>
         <p>Your application for <strong>${jobTitle}</strong> has been marked as <strong>${status}</strong>.</p>
         <p>Log in to check details.</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendNotificationEmail(
+  email: string, 
+  content: string, 
+  type: string = "INFO",
+  link?: string
+) {
+  if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD) {
+    console.log("==================================================");
+    console.log(`[DEV MODE] Notification Email to ${email}`);
+    console.log(`[DEV MODE] Type: ${type}`);
+    console.log(`[DEV MODE] Content: ${content}`);
+    console.log("==================================================");
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_SERVER_HOST || "smtp.gmail.com",
+    port: Number(process.env.EMAIL_SERVER_PORT) || 587,
+    auth: {
+      user: process.env.EMAIL_SERVER_USER,
+      pass: process.env.EMAIL_SERVER_PASSWORD,
+    },
+  });
+
+  // Determine subject and icon based on type
+  let subject = "New Notification - RojgaarNepal";
+  let icon = "🔔";
+  let color = "#2563eb";
+
+  if (type === "MESSAGE") {
+    subject = "New Message - RojgaarNepal";
+    icon = "💬";
+    color = "#059669";
+  } else if (type === "APPLICATION_STATUS") {
+    subject = "Application Status Update - RojgaarNepal";
+    icon = "📋";
+    color = "#dc2626";
+  } else if (type === "PREMIUM") {
+    subject = "Premium Update - RojgaarNepal";
+    icon = "👑";
+    color = "#f59e0b";
+  } else if (type === "SUPPORT") {
+    subject = "Support Update - RojgaarNepal";
+    icon = "🎧";
+    color = "#8b5cf6";
+  }
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
+    to: email,
+    subject,
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; background-color: #f9fafb;">
+        <div style="background-color: white; border-radius: 10px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <span style="font-size: 48px;">${icon}</span>
+          </div>
+          <h2 style="color: ${color}; text-align: center; margin-bottom: 20px;">New Notification</h2>
+          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; border-left: 4px solid ${color};">
+            <p style="margin: 0; color: #1f2937; font-size: 16px; line-height: 1.6;">${content}</p>
+          </div>
+          ${link ? `
+          <div style="text-align: center; margin-top: 30px;">
+            <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}${link}" 
+               style="display: inline-block; background-color: ${color}; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+              View Details
+            </a>
+          </div>
+          ` : ''}
+          <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+            This is an automated notification from RojgaarNepal. You received this because you have an account with us.
+          </p>
+        </div>
       </div>
     `,
   });

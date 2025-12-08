@@ -39,6 +39,7 @@ export async function updateApplicationStatus(applicationId: string, status: "PE
       data: {
         userId: application.userId,
         content: `Your application for ${application.job.title} has been ${status.toLowerCase()}`,
+        type: "APPLICATION_STATUS",
         link: `/my-applications`,
       },
     });

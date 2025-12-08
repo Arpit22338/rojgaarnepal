@@ -116,19 +116,34 @@ export default function Navbar() {
           </div>
 
           {/* Center: Desktop Menu */}
-          <div className="hidden lg:flex flex-1 justify-start items-center gap-4 ml-10">
+          <div className="hidden lg:flex items-center gap-4 ml-10">
             <Link href="/" className={`${getLinkClass("/")} whitespace-nowrap`}>
               Home
             </Link>
-            <Link href="/jobs" className={`${getLinkClass("/jobs")} whitespace-nowrap`}>
-              Find Jobs
-            </Link>
-            <Link href="/people" className={`${getLinkClass("/people")} whitespace-nowrap`}>
-              Community
-            </Link>
-            <Link href="/talent" className={`${getLinkClass("/talent")} whitespace-nowrap`}>
-              Find Talent
-            </Link>
+            
+            {user?.role === "TEACHER" ? (
+              <>
+                <Link href="/teacher/course" className={`${getLinkClass("/teacher/course")} whitespace-nowrap`}>
+                  Add Course
+                </Link>
+                <Link href="/teacher/dashboard" className={`${getLinkClass("/teacher/dashboard")} whitespace-nowrap`}>
+                  Teacher Dashboard
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/jobs" className={`${getLinkClass("/jobs")} whitespace-nowrap`}>
+                  Find Jobs
+                </Link>
+                <Link href="/people" className={`${getLinkClass("/people")} whitespace-nowrap`}>
+                  Community
+                </Link>
+                <Link href="/talent" className={`${getLinkClass("/talent")} whitespace-nowrap`}>
+                  Find Talent
+                </Link>
+              </>
+            )}
+            
             <Link href="/courses" className={`${getLinkClass("/courses")} whitespace-nowrap`}>
               Skill Courses
             </Link>
@@ -165,7 +180,7 @@ export default function Navbar() {
           </div>
 
           {/* Right: Icons & Auth */}
-          <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
+          <div className="hidden lg:flex items-center gap-4 flex-shrink-0 ml-4">
             {session ? (
               <>
                 <NotificationBell />
@@ -343,15 +358,30 @@ export default function Navbar() {
               <Link href="/" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
                 Home
               </Link>
-              <Link href="/jobs" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
-                Find Jobs
-              </Link>
-              <Link href="/people" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
-                Community
-              </Link>
-              <Link href="/talent" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
-                Find Talent
-              </Link>
+              
+              {user?.role === "TEACHER" ? (
+                <>
+                  <Link href="/teacher/course" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
+                    Add Course
+                  </Link>
+                  <Link href="/teacher/dashboard" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
+                    Teacher Dashboard
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/jobs" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
+                    Find Jobs
+                  </Link>
+                  <Link href="/people" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
+                    Community
+                  </Link>
+                  <Link href="/talent" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
+                    Find Talent
+                  </Link>
+                </>
+              )}
+              
               <Link href="/courses" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
                 Skill Courses
               </Link>
@@ -365,6 +395,16 @@ export default function Navbar() {
                   </Link>
                   <Link href="/my-applications" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
                     My Applications
+                  </Link>
+                </>
+              )}
+
+              {user?.role === "TEACHER" && (
+                <>
+                  <div className="my-2 border-t border-gray-100"></div>
+                  <p className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Teacher</p>
+                  <Link href="/teacher/dashboard" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
+                    Teacher Dashboard
                   </Link>
                 </>
               )}

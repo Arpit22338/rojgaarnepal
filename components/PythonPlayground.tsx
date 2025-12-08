@@ -128,7 +128,7 @@ sys.stdout = _stdout_capture
   };
 
   return (
-    <div className="flex flex-col w-full border rounded-lg md:rounded-xl overflow-hidden bg-slate-900 text-white shadow-2xl ring-1 ring-slate-800 h-[400px] sm:h-[450px] md:h-[520px]">
+    <div className="flex flex-col w-full border rounded-lg md:rounded-xl overflow-hidden bg-slate-900 text-white shadow-2xl ring-1 ring-slate-800 h-[450px] sm:h-[500px] md:h-[580px]">
       
       {/* Challenge Info Section */}
       {(challengeTitle || challengeDescription || expectedOutput) && (
@@ -216,7 +216,7 @@ sys.stdout = _stdout_capture
       </div>
 
       {/* Output Panel */}
-      <div className="h-[140px] sm:h-[160px] md:h-[200px] bg-black border-t border-slate-700 flex flex-col shrink-0">
+      <div className="h-[180px] sm:h-[200px] md:h-[240px] bg-black border-t border-slate-700 flex flex-col shrink-0">
         <div className="px-2.5 sm:px-3 md:px-4 py-2 bg-slate-950 border-b border-slate-800 text-[10px] sm:text-xs font-mono flex justify-between items-center shrink-0">
           <span className="text-slate-500 font-semibold">OUTPUT</span>
           {status === "success" && (

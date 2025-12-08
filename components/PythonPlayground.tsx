@@ -77,36 +77,27 @@ export default function PythonPlayground({
     setStatus("idle");
 
     try {
-      // Setup output capture
-      pyodide.runPython(`
-        import sys
-        import io
-        sys.stdout = io.StringIO()
-        sys.stderr = io.StringIO()
-      `);
+      // Create a namespace for this execution
+      const namespace = pyodide.globals.get('dict')();
+      
+      // Setup output capture in the namespace
+      await pyodide.runPythonAsync(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+      `, { globals: namespace });
 
       // Run the user's code
-      try {
-        pyodide.runPython(code);
-      } catch (err) {
-        // Capture any runtime errors
-        const stderr = pyodide.runPython("sys.stderr.getvalue()");
-        if (stderr) {
-          throw new Error(stderr);
-        }
-        throw err;
-      }
+      await pyodide.runPythonAsync(code, { globals: namespace });
 
       // Get the output
-      const stdout = pyodide.runPython("sys.stdout.getvalue()");
-      const stderr = pyodide.runPython("sys.stderr.getvalue()");
+      const result = await pyodide.runPythonAsync(`sys.stdout.getvalue()`, { globals: namespace });
       
-      const fullOutput = stderr ? `${stdout}\n${stderr}` : stdout;
-      setOutput(fullOutput || "(No output)");
+      setOutput(result || "(No output)");
 
       if (expectedOutput) {
         // Normalize outputs (trim whitespace)
-        const cleanOutput = stdout.trim();
+        const cleanOutput = result.trim();
         const cleanExpected = expectedOutput.trim();
 
         if (cleanOutput === cleanExpected) {

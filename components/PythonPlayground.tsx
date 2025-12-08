@@ -79,24 +79,30 @@ export default function PythonPlayground({
     }
 
     setIsRunning(true);
-    setOutput("");
+    setOutput("Executing...");
     setStatus("idle");
 
     try {
       const pyodide = await pyodideReadyPromise;
 
-      // Reset stdout
-      pyodide.runPython(`
+      if (!pyodide || !pyodide.runPython) {
+        throw new Error("Pyodide not properly loaded");
+      }
+
+      // Setup stdout capture and run code in one go
+      const setupAndRun = `
 import sys
 from io import StringIO
 sys.stdout = StringIO()
-`);
 
-      // Run user code
-      pyodide.runPython(code);
+# User code starts here
+${code}
 
-      // Get output
-      const result = pyodide.runPython("sys.stdout.getvalue()");
+# Get output
+sys.stdout.getvalue()
+`;
+
+      const result = pyodide.runPython(setupAndRun);
       setOutput(result || "(No output)");
 
       // Check expected output
@@ -113,7 +119,8 @@ sys.stdout = StringIO()
       }
     } catch (err: any) {
       console.error("Execution error:", err);
-      setOutput(`Error: ${err.message || String(err)}`);
+      const errorMsg = err.message || String(err);
+      setOutput(`Error: ${errorMsg}`);
       setStatus("error");
     } finally {
       setIsRunning(false);

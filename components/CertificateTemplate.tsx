@@ -67,7 +67,7 @@ export default function CertificateTemplate({
       {/* Certificate Container */}
       <div
         ref={certificateRef}
-        className="relative w-[800px] h-[600px] bg-white text-gray-900 font-serif border-8 border-double border-gray-800 p-12 flex flex-col items-center justify-between shadow-2xl"
+        className="relative w-[800px] h-[600px] bg-white text-gray-900 font-serif border-8 border-double border-gray-800 p-8 flex flex-col items-center justify-between shadow-2xl"
         style={{
           backgroundImage: "radial-gradient(circle, #fdfbf7 0%, #f4f1ea 100%)",
         }}
@@ -109,26 +109,26 @@ export default function CertificateTemplate({
         </div>
 
         {/* Footer */}
-        <div className="w-full flex justify-between items-end mt-8 px-12">
+        <div className="w-full flex justify-between items-end px-4 pb-8">
           <div className="text-center">
-            <div className="w-48 border-b border-gray-400 mb-2 pb-1">
-              <p className="font-signature text-2xl text-blue-900">{instructorName}</p>
+            <div className="w-40 border-b border-gray-400 mb-2 pb-1">
+              <p className="font-signature text-xl text-blue-900">{instructorName}</p>
             </div>
-            <p className="text-sm text-gray-500 uppercase tracking-wider">Instructor</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wider">Instructor</p>
           </div>
 
           <div className="text-center">
              {/* Seal */}
-             <div className="w-24 h-24 rounded-full border-4 border-yellow-600 flex items-center justify-center text-yellow-700 font-bold text-xs uppercase tracking-widest text-center p-2 rotate-12 opacity-80">
+             <div className="w-20 h-20 rounded-full border-4 border-yellow-600 flex items-center justify-center text-yellow-700 font-bold text-[9px] uppercase tracking-widest text-center p-2 rotate-12 opacity-80">
                 Official<br/>Seal
              </div>
           </div>
 
           <div className="text-center">
-            <div className="w-48 border-b border-gray-400 mb-2 pb-1">
-              <p className="text-lg text-gray-800">{new Date(completionDate).toLocaleDateString()}</p>
+            <div className="w-40 border-b border-gray-400 mb-2 pb-1">
+              <p className="text-base text-gray-800">{new Date(completionDate).toLocaleDateString()}</p>
             </div>
-            <p className="text-sm text-gray-500 uppercase tracking-wider">Date</p>
+            <p className="text-xs text-gray-500 uppercase tracking-wider">Date</p>
           </div>
         </div>
 

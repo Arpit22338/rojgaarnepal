@@ -372,7 +372,7 @@ model KycRecord {
   documentType  String   // citizenship, passport, national_id
   frontImageUrl String
   backImageUrl  String
-  faceImageUrl  String   // Full face image for teacher authenticity verification
+  faceImageUrl  String?  // Full face image for teacher authenticity verification (optional)
   status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
   adminNote     String?
   createdAt     DateTime @default(now())

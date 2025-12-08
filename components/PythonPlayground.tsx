@@ -85,24 +85,24 @@ export default function PythonPlayground({
     try {
       const pyodide = await pyodideReadyPromise;
 
-      if (!pyodide || !pyodide.runPython) {
-        throw new Error("Pyodide not properly loaded");
-      }
-
-      // Setup stdout capture and run code in one go
-      const setupAndRun = `
+      // Capture stdout
+      pyodide.runPython(`
 import sys
 from io import StringIO
-sys.stdout = StringIO()
+_stdout_capture = StringIO()
+sys.stdout = _stdout_capture
+`);
 
-# User code starts here
-${code}
+      // Execute the user code
+      try {
+        pyodide.runPython(code);
+      } catch (e) {
+        throw e;
+      }
 
-# Get output
-sys.stdout.getvalue()
-`;
-
-      const result = pyodide.runPython(setupAndRun);
+      // Get captured output
+      const result = pyodide.runPython("_stdout_capture.getvalue()");
+      
       setOutput(result || "(No output)");
 
       // Check expected output

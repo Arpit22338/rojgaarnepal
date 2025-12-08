@@ -2,10 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search, Briefcase, GraduationCap, Users, Crown, MapPin } from "lucide-react";
 import { prisma } from "../lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
+  const session = await getServerSession(authOptions);
+  const user = session?.user as { role?: string } | undefined;
+  
   const jobCount = await prisma.job.count();
   const jobSeekerCount = await prisma.user.count({ where: { role: "JOBSEEKER" } });
   const courseCount = (await prisma.course.count()) + 1;
@@ -37,18 +42,45 @@ export default async function Home() {
           Connecting talented youth with top employers. Browse jobs, upgrade your skills, and build your career today.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
+          {user?.role === "TEACHER" ? (
+            <>
+              <Link
+                href="/teacher/course"
+                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                <Briefcase className="mr-2" size={20} />
+                Add Course
+              </Link>
+              <Link
+                href="/teacher/dashboard"
+                className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Teacher Dashboard
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/jobs"
+                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                <Search className="mr-2" size={20} />
+                Browse Jobs
+              </Link>
+              <Link
+                href="/talent"
+                className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Find Talent
+              </Link>
+            </>
+          )}
           <Link
-            href="/jobs"
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-          >
-            <Search className="mr-2" size={20} />
-            Browse Jobs
-          </Link>
-          <Link
-            href="/talent"
+            href="/courses"
             className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
-            Find Talent
+            <GraduationCap className="mr-2" size={20} />
+            Skill Courses
           </Link>
         </div>
       </section>

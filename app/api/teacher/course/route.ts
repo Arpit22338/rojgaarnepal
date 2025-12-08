@@ -9,8 +9,8 @@ const courseSchema = z.object({
   description: z.string().min(20),
   priceNpr: z.number().min(0),
   totalRequiredMinutes: z.number().min(0),
-  thumbnailUrl: z.string().url().optional().or(z.literal("")),
-  qrCodeUrl: z.string().url().optional().or(z.literal("")),
+  thumbnailImage: z.string().optional().or(z.literal("")),
+  qrCodeImage: z.string().optional().or(z.literal("")),
   isPublished: z.boolean().optional(),
 });
 
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { title, description, priceNpr, totalRequiredMinutes, thumbnailUrl, qrCodeUrl } = courseSchema.parse(body);
+    const { title, description, priceNpr, totalRequiredMinutes, thumbnailImage, qrCodeImage } = courseSchema.parse(body);
 
     const course = await prisma.course.create({
       data: {
@@ -74,8 +74,8 @@ export async function POST(req: Request) {
         description,
         priceNpr,
         totalRequiredMinutes,
-        thumbnailUrl,
-        qrCodeUrl,
+        thumbnailUrl: thumbnailImage,
+        qrCodeUrl: qrCodeImage,
       } as any,
     });
 
@@ -96,7 +96,7 @@ export async function PUT(req: Request) {
     }
 
     const body = await req.json();
-    const { title, description, priceNpr, totalRequiredMinutes, thumbnailUrl, qrCodeUrl, isPublished } = courseSchema.parse(body);
+    const { title, description, priceNpr, totalRequiredMinutes, thumbnailImage, qrCodeImage, isPublished } = courseSchema.parse(body);
 
     const course = await prisma.course.findFirst({
       where: { teacherId: session.user.id } as any
@@ -117,8 +117,8 @@ export async function PUT(req: Request) {
         description,
         priceNpr,
         totalRequiredMinutes,
-        thumbnailUrl,
-        qrCodeUrl,
+        thumbnailUrl: thumbnailImage,
+        qrCodeUrl: qrCodeImage,
         isPublished,
         editCount: { increment: 1 }
       } as any

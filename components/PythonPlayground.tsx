@@ -128,7 +128,7 @@ sys.stdout = _stdout_capture
   };
 
   return (
-    <div className="flex flex-col w-full border rounded-lg md:rounded-xl overflow-hidden bg-slate-900 text-white shadow-2xl ring-1 ring-slate-800 h-[500px] sm:h-[600px] md:h-[700px]">
+    <div className="flex flex-col w-full border rounded-lg md:rounded-xl overflow-hidden bg-slate-900 text-white shadow-2xl ring-1 ring-slate-800 h-[400px] sm:h-[450px] md:h-[520px]">
       
       {/* Challenge Info Section */}
       {(challengeTitle || challengeDescription || expectedOutput) && (
@@ -202,7 +202,7 @@ sys.stdout = _stdout_capture
       </div>
 
       {/* Editor Area */}
-      <div className="h-[250px] sm:h-[300px] md:h-[350px] relative overflow-hidden group shrink-0">
+      <div className="h-[160px] sm:h-[180px] md:h-[220px] relative overflow-hidden group shrink-0">
         <textarea
           value={code}
           onChange={(e) => setCode(e.target.value)}
@@ -216,8 +216,8 @@ sys.stdout = _stdout_capture
       </div>
 
       {/* Output Panel */}
-      <div className="h-[120px] sm:h-[140px] md:h-[180px] bg-black border-t border-slate-700 flex flex-col shrink-0">
-        <div className="px-2.5 sm:px-3 md:px-4 py-1.5 bg-slate-950 border-b border-slate-800 text-[9px] sm:text-[10px] font-mono flex justify-between items-center shrink-0">
+      <div className="h-[100px] sm:h-[120px] md:h-[160px] bg-black border-t border-slate-700 flex flex-col shrink-0">
+        <div className="px-2.5 sm:px-3 md:px-4 py-2 bg-slate-950 border-b border-slate-800 text-[10px] sm:text-xs font-mono flex justify-between items-center shrink-0">
           <span className="text-slate-500 font-semibold">OUTPUT</span>
           {status === "success" && (
             <span className="text-green-400 flex items-center gap-1 md:gap-1.5 bg-green-950/30 px-1.5 md:px-2 py-0.5 md:py-1 rounded-full border border-green-900/50 text-[8px] md:text-[10px]">
@@ -235,7 +235,7 @@ sys.stdout = _stdout_capture
           )}
         </div>
         <div className="flex-1 overflow-auto min-h-0">
-          <pre className={`p-2.5 sm:p-3 md:p-4 font-mono text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words transition-colors ${
+          <pre className={`p-3 sm:p-3 md:p-4 font-mono text-[12px] sm:text-sm md:text-base whitespace-pre-wrap break-words transition-colors ${
             status === 'error' ? 'text-red-300/90' : 'text-slate-300'
           }`}>
             {output || <span className="text-slate-600 italic text-[10px] sm:text-xs">Click &quot;Run&quot; to see output...</span>}

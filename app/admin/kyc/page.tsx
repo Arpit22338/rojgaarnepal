@@ -13,7 +13,7 @@ import {
 } from "../../../components/ui/table";
 import { Badge } from "../../../components/ui/badge";
 import { useToast } from "../../../components/ui/use-toast";
-import { Loader2, Check, X, Eye, QrCode } from "lucide-react";
+import { Loader2, Check, X, Eye } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,7 @@ interface KycRecord {
   documentType: string;
   frontImageUrl: string;
   backImageUrl: string;
+  faceImageUrl: string;
   createdAt: string;
   teacher: {
     name: string | null;
@@ -107,7 +108,7 @@ export default function AdminKycPage() {
               <TableHead>Contact Info</TableHead>
               <TableHead>Document Type</TableHead>
               <TableHead>Documents</TableHead>
-              <TableHead>Payment QR</TableHead>
+              <TableHead>Face Verification</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Actions</TableHead>
@@ -172,21 +173,21 @@ export default function AdminKycPage() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {record.teacher.qrCodeUrl ? (
+                  {record.faceImageUrl ? (
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="outline" size="sm">
-                          <QrCode className="w-3 h-3 mr-1" /> View QR
+                          <Eye className="w-3 h-3 mr-1" /> View Face
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-md">
                         <DialogHeader>
-                          <DialogTitle>Payment QR Code</DialogTitle>
+                          <DialogTitle>Face Verification Photo</DialogTitle>
                         </DialogHeader>
                         <div className="relative w-full h-[400px]">
                           <Image
-                            src={record.teacher.qrCodeUrl}
-                            alt="Payment QR"
+                            src={record.faceImageUrl}
+                            alt="Teacher Face"
                             fill
                             className="object-contain"
                           />
@@ -194,7 +195,7 @@ export default function AdminKycPage() {
                       </DialogContent>
                     </Dialog>
                   ) : (
-                    <span className="text-gray-400 text-sm">None</span>
+                    <span className="text-gray-400 text-sm">Not uploaded</span>
                   )}
                 </TableCell>
                 <TableCell>

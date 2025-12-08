@@ -6,10 +6,10 @@ import { z } from "zod";
 
 const kycSchema = z.object({
   documentType: z.enum(["citizenship", "passport", "national_id", "driving_license"]),
-  frontImageUrl: z.string().url(),
-  backImageUrl: z.string().url(),
+  frontImageUrl: z.string(),
+  backImageUrl: z.string(),
+  faceImageUrl: z.string(),
   phoneNumber: z.string().min(10),
-  qrCodeUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export async function POST(req: Request) {
@@ -20,14 +20,13 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { documentType, frontImageUrl, backImageUrl, phoneNumber, qrCodeUrl } = kycSchema.parse(body);
+    const { documentType, frontImageUrl, backImageUrl, faceImageUrl, phoneNumber } = kycSchema.parse(body);
 
-    // Update user profile with phone and QR
+    // Update user profile with phone
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
         phoneNumber,
-        qrCodeUrl: qrCodeUrl || undefined,
       },
     });
 
@@ -49,6 +48,7 @@ export async function POST(req: Request) {
         documentType,
         frontImageUrl,
         backImageUrl,
+        faceImageUrl,
         status: "PENDING",
       },
     });

@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { validateFileSize, validateImageType } from "@/lib/fileValidation";
 
 export default function CreateCoursePage() {
   const router = useRouter();
@@ -19,8 +21,8 @@ export default function CreateCoursePage() {
     description: "",
     priceNpr: 299,
     totalRequiredMinutes: 660, // 11 hours default
-    thumbnailUrl: "",
-    qrCodeUrl: "", // New field for teacher's payment QR
+    thumbnailImage: "",
+    qrCodeImage: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -31,8 +33,47 @@ export default function CreateCoursePage() {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: "thumbnail" | "qrCode") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!validateImageType(file)) {
+      setError("Please upload a valid image file (JPEG, PNG, WebP, or GIF)");
+      return;
+    }
+
+    // Validate file size
+    const validation = validateFileSize(file);
+    if (!validation.isValid) {
+      setError(validation.error || "File size exceeds limit");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (field === "thumbnail") {
+        setFormData(prev => ({ ...prev, thumbnailImage: reader.result as string }));
+      } else {
+        setFormData(prev => ({ ...prev, qrCodeImage: reader.result as string }));
+      }
+      setError(null);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.title.trim()) {
+      setError("Course title is required");
+      return;
+    }
+    if (!formData.description.trim()) {
+      setError("Course description is required");
+      return;
+    }
+    
     setLoading(true);
     setError(null);
 
@@ -40,7 +81,14 @@ export default function CreateCoursePage() {
       const res = await fetch("/api/teacher/course", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          priceNpr: formData.priceNpr,
+          totalRequiredMinutes: formData.totalRequiredMinutes,
+          thumbnailImage: formData.thumbnailImage,
+          qrCodeImage: formData.qrCodeImage,
+        }),
       });
 
       if (!res.ok) {
@@ -142,30 +190,45 @@ export default function CreateCoursePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="thumbnailUrl">Thumbnail URL</Label>
-              <Input
-                id="thumbnailUrl"
-                name="thumbnailUrl"
-                placeholder="https://..."
-                value={formData.thumbnailUrl}
-                onChange={handleChange}
-              />
-              <p className="text-xs text-gray-500">Link to an image for your course card.</p>
+              <Label htmlFor="thumbnailImage">Course Thumbnail (Image File)</Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors relative h-48 flex items-center justify-center">
+                <input
+                  type="file"
+                  id="thumbnailImage"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e, "thumbnail")}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                {formData.thumbnailImage ? (
+                  <Image src={formData.thumbnailImage} alt="Thumbnail" fill className="object-contain p-2" />
+                ) : (
+                  <div className="text-gray-400 text-center">
+                    <p className="text-sm">Upload Thumbnail</p>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-gray-500">Max 1.5 MB. Use an image compressor if needed.</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="qrCodeUrl">Payment QR Code URL</Label>
-              <Input
-                id="qrCodeUrl"
-                name="qrCodeUrl"
-                placeholder="https://..."
-                value={formData.qrCodeUrl}
-                onChange={handleChange}
-              />
-              <p className="text-xs text-gray-500">
-                Upload your payment QR code (eSewa/Khalti/Bank) to a hosting service and paste the link here. 
-                Students will scan this to pay you directly.
-              </p>
+              <Label htmlFor="qrCodeImage">Payment QR Code (Image File)</Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors relative h-48 flex items-center justify-center">
+                <input
+                  type="file"
+                  id="qrCodeImage"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e, "qrCode")}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                {formData.qrCodeImage ? (
+                  <Image src={formData.qrCodeImage} alt="QR Code" fill className="object-contain p-2" />
+                ) : (
+                  <div className="text-gray-400 text-center">
+                    <p className="text-sm">Upload QR Code</p>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-gray-500">Your payment QR code (eSewa/Khalti/Bank) for students to scan. Max 1.5 MB.</p>
             </div>
 
             <div className="pt-4 flex justify-end">

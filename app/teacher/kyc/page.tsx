@@ -5,13 +5,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Upload, Clock, AlertCircle, Shield } from "lucide-react";
 import Image from "next/image";
+import { validateFileSize, validateImageType } from "@/lib/fileValidation";
 
 export default function TeacherKycPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [frontImage, setFrontImage] = useState<string | null>(null);
   const [backImage, setBackImage] = useState<string | null>(null);
-  const [qrCodeImage, setQrCodeImage] = useState<string | null>(null);
+  const [faceImage, setFaceImage] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState("citizenship");
   const [contactNumber, setContactNumber] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,12 +51,20 @@ export default function TeacherKycPage() {
     }
   }, [status, session, router]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "front" | "back" | "qr") => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "front" | "back" | "face") => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError("File size too large (max 5MB)");
+    // Validate file type
+    if (!validateImageType(file)) {
+      setError("Please upload a valid image file (JPEG, PNG, WebP, or GIF)");
+      return;
+    }
+
+    // Validate file size
+    const validation = validateFileSize(file);
+    if (!validation.isValid) {
+      setError(validation.error || "File size exceeds limit");
       return;
     }
 
@@ -63,15 +72,15 @@ export default function TeacherKycPage() {
     reader.onloadend = () => {
       if (type === "front") setFrontImage(reader.result as string);
       else if (type === "back") setBackImage(reader.result as string);
-      else setQrCodeImage(reader.result as string);
+      else setFaceImage(reader.result as string);
       setError(null);
     };
     reader.readAsDataURL(file);
   };
 
   const handleSubmit = async () => {
-    if (!frontImage || !backImage) {
-      setError("Please upload both front and back images");
+    if (!frontImage || !backImage || !faceImage) {
+      setError("Please upload front document, back document, and full face image");
       return;
     }
     if (!contactNumber || contactNumber.length < 10) {
@@ -88,8 +97,8 @@ export default function TeacherKycPage() {
           documentType,
           frontImageUrl: frontImage,
           backImageUrl: backImage,
+          faceImageUrl: faceImage,
           phoneNumber: contactNumber,
-          qrCodeUrl: qrCodeImage || ""
         }),
       });
 
@@ -222,24 +231,25 @@ export default function TeacherKycPage() {
         </div>
 
         <div className="mb-8">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Payment QR Code (For receiving payments)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Full Face Image (Required)</label>
+          <p className="text-xs text-gray-600 mb-3">Upload a clear photo of your face to verify your authenticity as a teacher. This helps us maintain quality and build trust in our community.</p>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors relative h-48 flex items-center justify-center max-w-md mx-auto">
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => handleFileChange(e, "qr")}
+              onChange={(e) => handleFileChange(e, "face")}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
-            {qrCodeImage ? (
-              <Image src={qrCodeImage} alt="QR Code" fill className="object-contain p-2" />
+            {faceImage ? (
+              <Image src={faceImage} alt="Face" fill className="object-contain p-2" />
             ) : (
               <div className="text-gray-400">
                 <Upload className="mx-auto mb-2" />
-                <span className="text-sm">Upload QR Code</span>
+                <span className="text-sm">Upload Your Face</span>
               </div>
             )}
           </div>
-          <p className="text-xs text-gray-500 mt-2 text-center">Upload your personal QR code to receive payments from students.</p>
+          <p className="text-xs text-gray-500 mt-2 text-center">Max 1.5 MB. Use an image compressor if needed.</p>
         </div>
 
         {error && (
@@ -251,7 +261,7 @@ export default function TeacherKycPage() {
 
         <button
           onClick={handleSubmit}
-          disabled={loading || !frontImage || !backImage || !contactNumber}
+          disabled={loading || !frontImage || !backImage || !faceImage || !contactNumber}
           className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? "Submitting..." : "Submit KYC for Approval"}

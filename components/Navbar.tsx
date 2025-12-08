@@ -30,7 +30,7 @@ export default function Navbar() {
 
   const getLinkClass = (path: string) => {
     const isActive = path === "/" ? pathname === "/" : pathname.startsWith(path);
-    return `${isActive ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-600 font-medium"} text-[13px] transition-colors tracking-wide`;
+    return `${isActive ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-600 font-medium"} text-sm transition-colors tracking-wide`;
   };
 
   const router = useRouter();
@@ -116,7 +116,7 @@ export default function Navbar() {
           </div>
 
           {/* Center: Desktop Menu */}
-          <div className="hidden lg:flex items-center gap-4 ml-10">
+          <div className="hidden lg:flex items-center gap-3 flex-1">
             <Link href="/" className={`${getLinkClass("/")} whitespace-nowrap`}>
               Home
             </Link>
@@ -180,7 +180,7 @@ export default function Navbar() {
           </div>
 
           {/* Right: Icons & Auth */}
-          <div className="hidden lg:flex items-center gap-4 flex-shrink-0 ml-4">
+          <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
             {session ? (
               <>
                 <NotificationBell />

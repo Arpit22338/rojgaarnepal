@@ -128,20 +128,20 @@ sys.stdout = _stdout_capture
   };
 
   return (
-    <div className="flex flex-col w-full border rounded-xl overflow-hidden bg-slate-900 text-white shadow-2xl ring-1 ring-slate-800 h-[600px] md:h-[700px]">
+    <div className="flex flex-col w-full border rounded-lg md:rounded-xl overflow-hidden bg-slate-900 text-white shadow-2xl ring-1 ring-slate-800 h-[500px] sm:h-[600px] md:h-[700px]">
       
       {/* Challenge Info Section */}
       {(challengeTitle || challengeDescription || expectedOutput) && (
-        <div className="bg-slate-800/50 p-3 md:p-4 border-b border-slate-700 space-y-2 md:space-y-3 shrink-0">
+        <div className="bg-slate-800/50 p-2.5 sm:p-3 md:p-4 border-b border-slate-700 space-y-2 md:space-y-3 shrink-0">
           {challengeTitle && (
-            <div className="flex items-center gap-2 text-blue-400 font-semibold text-xs md:text-sm uppercase tracking-wider">
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+            <div className="flex items-center gap-2 text-blue-400 font-semibold text-[11px] sm:text-xs md:text-sm uppercase tracking-wider">
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-400 animate-pulse" />
               {challengeTitle}
             </div>
           )}
           
           {challengeDescription && (
-            <div className="text-slate-300 text-xs md:text-sm leading-relaxed">
+            <div className="text-slate-300 text-[11px] sm:text-xs md:text-sm leading-relaxed">
               <span className="font-bold text-slate-200">Goal: </span>
               {challengeDescription}
             </div>
@@ -150,7 +150,7 @@ sys.stdout = _stdout_capture
           {expectedOutput && (
             <div className="bg-slate-950/50 rounded p-2 md:p-3 border border-slate-800">
               <div className="text-[10px] md:text-xs font-mono text-slate-500 mb-1 uppercase">Expected Output:</div>
-              <pre className="text-green-400/90 font-mono text-[10px] md:text-xs whitespace-pre-wrap">{expectedOutput}</pre>
+              <pre className="text-green-400/90 font-mono text-[10px] md:text-xs whitespace-pre-wrap break-words">{expectedOutput}</pre>
             </div>
           )}
         </div>
@@ -202,11 +202,11 @@ sys.stdout = _stdout_capture
       </div>
 
       {/* Editor Area */}
-      <div className="flex-1 relative overflow-hidden group">
+      <div className="flex-1 relative overflow-hidden group min-h-0">
         <textarea
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className="w-full h-full p-3 md:p-4 bg-slate-900 text-slate-100 font-mono text-xs md:text-sm resize-none focus:outline-none leading-relaxed selection:bg-blue-500/30 overflow-auto"
+          className="w-full h-full p-2.5 sm:p-3 md:p-4 bg-slate-900 text-slate-100 font-mono text-[11px] sm:text-xs md:text-sm resize-none focus:outline-none leading-relaxed selection:bg-blue-500/30 overflow-auto"
           spellCheck={false}
           style={{ tabSize: 4 }}
         />
@@ -215,30 +215,32 @@ sys.stdout = _stdout_capture
         </div>
       </div>
 
-      {/* Output Area */}
-      <div className="h-[140px] md:h-[160px] bg-black border-t border-slate-700 flex flex-col shrink-0">
-        <div className="px-3 md:px-4 py-1.5 bg-slate-950 border-b border-slate-800 text-[9px] md:text-[10px] font-mono flex justify-between items-center shrink-0">
-          <span className="text-slate-500">OUTPUT</span>
+      {/* Output Panel */}
+      <div className="h-[120px] sm:h-[140px] md:h-[180px] bg-black border-t border-slate-700 flex flex-col shrink-0">
+        <div className="px-2.5 sm:px-3 md:px-4 py-1.5 bg-slate-950 border-b border-slate-800 text-[9px] sm:text-[10px] font-mono flex justify-between items-center shrink-0">
+          <span className="text-slate-500 font-semibold">OUTPUT</span>
           {status === "success" && (
-            <span className="text-green-400 flex items-center gap-1 md:gap-1.5 bg-green-950/30 px-1.5 md:px-2 py-0.5 rounded-full border border-green-900/50 text-[8px] md:text-[10px]">
+            <span className="text-green-400 flex items-center gap-1 md:gap-1.5 bg-green-950/30 px-1.5 md:px-2 py-0.5 md:py-1 rounded-full border border-green-900/50 text-[8px] md:text-[10px]">
               <CheckCircle className="w-2.5 h-2.5 md:w-3 md:h-3" /> 
               <span className="hidden sm:inline">Correct!</span>
               <span className="sm:hidden">✓</span>
             </span>
           )}
           {status === "error" && (
-            <span className="text-red-400 flex items-center gap-1 md:gap-1.5 bg-red-950/30 px-1.5 md:px-2 py-0.5 rounded-full border border-red-900/50 text-[8px] md:text-[10px]">
+            <span className="text-red-400 flex items-center gap-1 md:gap-1.5 bg-red-950/30 px-1.5 md:px-2 py-0.5 md:py-1 rounded-full border border-red-900/50 text-[8px] md:text-[10px]">
               <XCircle className="w-2.5 h-2.5 md:w-3 md:h-3" /> 
               <span className="hidden sm:inline">Wrong output</span>
               <span className="sm:hidden">✗</span>
             </span>
           )}
         </div>
-        <pre className={`flex-1 p-3 md:p-4 font-mono text-xs md:text-sm overflow-auto whitespace-pre-wrap transition-colors ${
-          status === 'error' ? 'text-red-300/90' : 'text-slate-300'
-        }`}>
-          {output || <span className="text-slate-700 italic text-[10px] md:text-xs">Click &quot;Run&quot; to see output...</span>}
-        </pre>
+        <div className="flex-1 overflow-auto min-h-0">
+          <pre className={`p-2.5 sm:p-3 md:p-4 font-mono text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words transition-colors ${
+            status === 'error' ? 'text-red-300/90' : 'text-slate-300'
+          }`}>
+            {output || <span className="text-slate-600 italic text-[10px] sm:text-xs">Click &quot;Run&quot; to see output...</span>}
+          </pre>
+        </div>
       </div>
     </div>
   );

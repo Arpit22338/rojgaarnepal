@@ -11,7 +11,7 @@ interface CertificateProps {
   courseName: string;
   completionDate: string;
   instructorName: string;
-  certificateId: string;
+  certificateId?: string; // Optional, kept for backward compatibility
 }
 
 export default function CertificateTemplate({
@@ -19,7 +19,6 @@ export default function CertificateTemplate({
   courseName,
   completionDate,
   instructorName,
-  certificateId,
 }: CertificateProps) {
   const certificateRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -61,16 +60,20 @@ export default function CertificateTemplate({
 
     try {
       setIsGenerating(true);
-      // Small delay to ensure rendering
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Longer delay to ensure all images and styles are fully rendered
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       const canvas = await html2canvas(certificateRef.current, {
-        scale: 2, // Higher quality
+        scale: 3, // Higher quality for better output
         logging: false,
         backgroundColor: '#ffffff',
+        useCORS: true, // Enable CORS for external images
+        allowTaint: true, // Allow cross-origin images
+        windowWidth: 800,
+        windowHeight: 600,
       });
       
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 1.0); // Max quality
       const link = document.createElement('a');
       link.href = imgData;
       link.download = `Certificate-${studentName}-${courseName}.png`;
@@ -85,22 +88,6 @@ export default function CertificateTemplate({
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="flex justify-end w-full max-w-4xl">
-        <Button onClick={handleDownload} disabled={isGenerating}>
-          {isGenerating ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Download className="mr-2 h-4 w-4" />
-              Download PNG
-            </>
-          )}
-        </Button>
-      </div>
-
       {/* Certificate Container */}
       <div 
         ref={certificateRef}
@@ -179,12 +166,24 @@ export default function CertificateTemplate({
               <div className="text-xs mt-1" style={{ color: '#6b7280' }}>CEO, RojgaarNepal</div>
             </div>
           </div>
-          
-          {/* Certificate ID */}
-          <div className="absolute bottom-2 right-4 text-[10px]" style={{ color: '#9ca3af' }}>
-            ID: {certificateId}
-          </div>
         </div>
+      </div>
+
+      {/* Download Button - Bottom Center */}
+      <div className="flex justify-center w-full max-w-4xl">
+        <Button onClick={handleDownload} disabled={isGenerating} className="px-8 py-3">
+          {isGenerating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Download className="mr-2 h-4 w-4" />
+              Download PNG
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );

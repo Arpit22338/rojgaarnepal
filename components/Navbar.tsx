@@ -385,6 +385,12 @@ export default function Navbar() {
               <Link href="/courses" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
                 Skill Courses
               </Link>
+              
+              {session && (
+                <Link href="/my-certificates" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setIsOpen(false)}>
+                  Certificates
+                </Link>
+              )}
 
               {user?.role === "JOBSEEKER" && (
                 <>

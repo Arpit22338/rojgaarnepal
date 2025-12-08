@@ -45,17 +45,29 @@ export default function CVCoursePage() {
     });
   }, []);
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     setShowCertificate(true);
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Call API to mark completion
-    fetch("/api/courses/complete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ courseId: "cv-building" }),
-    }).catch(err => console.error("Failed to mark completion", err));
+    try {
+      const response = await fetch("/api/courses/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId: "cv-building" }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Course completed successfully:", data);
+      } else {
+        const error = await response.json();
+        console.error("Failed to mark completion:", error);
+      }
+    } catch (err) {
+      console.error("Failed to mark completion", err);
+    }
   };
 
   const downloadCertificate = async () => {

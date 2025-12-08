@@ -1,15 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, BookOpen, Code, CheckCircle, Award, HelpCircle, Download, Clock } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { ArrowLeft, BookOpen, Code, CheckCircle, Award, HelpCircle, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import html2canvas from "html2canvas";
+import ReactMarkdown from "react-markdown";
 import { PaymentModal } from "@/components/PaymentModal";
+import CertificateTemplate from "@/components/CertificateTemplate";
 import PythonPlayground from "@/components/PythonPlayground";
 import { COURSE_MODULES, FINAL_EXAM_DATA } from "./data";
-import ReactMarkdown from "react-markdown";
 
 export default function PythonCoursePage() {
   const { data: session } = useSession();
@@ -29,12 +28,6 @@ export default function PythonCoursePage() {
   const [answers, setAnswers] = useState<number[]>(new Array(FINAL_EXAM_DATA.length).fill(-1));
   const [submitted, setSubmitted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  
-  // Certificate State
-  const certificateRef = useRef<HTMLDivElement>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [logoBase64, setLogoBase64] = useState<string>("");
-  const [signBase64, setSignBase64] = useState<string>("");
 
   useEffect(() => {
     if (session) {
@@ -50,31 +43,6 @@ export default function PythonCoursePage() {
     }
   }, [session]);
 
-  // Load images for certificate
-  useEffect(() => {
-    const getBase64FromUrl = async (url: string) => {
-      try {
-        const data = await fetch(url);
-        if (!data.ok) throw new Error(`Failed to fetch ${url}`);
-        const blob = await data.blob();
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onloadend = () => {
-            const base64data = reader.result;
-            resolve(base64data);
-          };
-        });
-      } catch (e) {
-        console.error("Error loading image:", url, e);
-        return "";
-      }
-    };
-
-    getBase64FromUrl('/logo.png').then((base64) => setLogoBase64(base64 as string));
-    getBase64FromUrl('/uploads/ceo-sign.png').then((base64) => setSignBase64(base64 as string));
-  }, []);
-
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const handleQuizSubmit = (answers: number[]) => {
     let score = 0;
@@ -84,29 +52,6 @@ export default function PythonCoursePage() {
     setQuizScore(score);
     if (score >= FINAL_EXAM_DATA.length * 0.7) { // 70% passing score
       setExamPassed(true);
-    }
-  };
-
-  const downloadCertificate = async () => {
-    if (!certificateRef.current) return;
-    setIsGenerating(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const canvas = await html2canvas(certificateRef.current, {
-        scale: 2,
-        logging: false,
-        backgroundColor: '#ffffff',
-      });
-      const imgData = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = imgData;
-      link.download = 'Rojgaar_Python_Basic_Certificate.png';
-      link.click();
-    } catch (error) {
-      console.error("Error generating certificate:", error);
-      alert("Failed to generate certificate.");
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -383,7 +328,17 @@ export default function PythonCoursePage() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ courseId: "basic-python" }),
-          }).catch(err => console.error("Failed to mark completion", err));
+          })
+            .then(async (response) => {
+              if (response.ok) {
+                const data = await response.json();
+                console.log("Course completed successfully:", data);
+              } else {
+                const error = await response.json();
+                console.error("Failed to mark completion:", error);
+              }
+            })
+            .catch(err => console.error("Failed to mark completion", err));
         } else {
           setCurrentQuestionIndex(prev => prev + 1);
         }
@@ -532,90 +487,13 @@ export default function PythonCoursePage() {
 
         {/* Certificate Preview */}
         <div className="flex justify-center mb-10 overflow-x-auto py-4">
-          <div 
-            ref={certificateRef}
-            className="min-w-[800px] w-[800px] min-h-[600px] h-[600px] p-8 relative text-center flex flex-col items-center justify-center shadow-2xl bg-white"
-            style={{ 
-              fontFamily: 'serif',
-              border: '24px double #1e3a8a',
-            }}
-          >
-            {/* Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-              {logoBase64 && <Image src={logoBase64} alt="Watermark" width={600} height={600} className="object-contain" unoptimized />}
-            </div>
-
-            <div className="relative z-10 w-full flex flex-col items-center h-full justify-between py-8">
-              <div className="flex flex-col items-center">
-                {logoBase64 && <Image src={logoBase64} alt="Rojgaar Logo" width={240} height={80} className="h-16 w-auto object-contain mb-4" unoptimized />}
-                <div className="font-bold tracking-[0.3em] uppercase text-sm text-blue-900">RojgaarNepal Skills Academy</div>
-              </div>
-              
-              <div className="flex flex-col items-center w-full">
-                <h1 className="text-5xl font-bold mb-6 font-serif text-blue-900">Certificate of Completion</h1>
-                
-                <p className="text-lg mb-4 italic text-gray-600">This is to certify that</p>
-                
-                <div className="text-4xl font-bold mb-4 border-b-2 border-gray-300 px-12 py-2 min-w-[400px] text-gray-900 font-serif">
-                  {session?.user?.name || "Student Name"}
-                </div>
-                
-                <p className="text-lg mt-4 mb-2 italic text-gray-600">
-                  has successfully completed the comprehensive course on
-                </p>
-                
-                <h2 className="text-3xl font-bold text-blue-800 mt-2">Basic Python Programming</h2>
-              </div>
-              
-              <div className="flex justify-between items-end w-full px-12 mt-8">
-                <div className="text-center flex flex-col items-center">
-                  <div className="text-lg font-bold border-b border-gray-400 px-6 pb-1 mb-2 min-w-[140px] text-gray-800">
-                    {new Date().toLocaleDateString()}
-                  </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider">Date</div>
-                </div>
-
-                <div className="flex flex-col items-center -mt-4">
-                    <div className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold shadow-xl border-4 border-yellow-600 bg-yellow-500">
-                      <Award size={40} />
-                    </div>
-                </div>
-                
-                <div className="text-center flex flex-col items-center relative">
-                  <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2 z-10">
-                    {signBase64 ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={signBase64} alt="Signature" style={{ height: '120px', width: 'auto', maxWidth: 'none' }} />
-                    ) : (
-                        <div className="text-6xl font-cursive text-blue-900 opacity-80" style={{ fontFamily: 'cursive' }}>Arpit</div>
-                      )}
-                  </div>
-                  
-                  <div className="text-lg font-bold border-t border-gray-400 pt-2 px-8 min-w-[220px] mt-12 relative z-0 text-gray-800">
-                    Arpit Kafle
-                  </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">CEO, RojgaarNepal</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={downloadCertificate}
-            disabled={isGenerating}
-            className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all flex items-center shadow-lg hover:shadow-blue-200 disabled:opacity-70 font-bold text-lg"
-          >
-            {isGenerating ? (
-              <span className="flex items-center">Generating...</span>
-            ) : (
-              <>
-                <Download size={24} className="mr-3" />
-                Download Certificate (PNG)
-              </>
-            )}
-          </button>
+          <CertificateTemplate 
+            studentName={session?.user?.name || "Student Name"}
+            courseName="Basic Python Programming"
+            completionDate={new Date().toISOString()}
+            instructorName="Arpit Kafle"
+            certificateId={`PYTHON-${Date.now()}`}
+          />
         </div>
       </div>
     </div>

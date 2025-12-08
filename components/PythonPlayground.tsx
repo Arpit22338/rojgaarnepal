@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Play, RefreshCw, CheckCircle, XCircle } from "lucide-react";
 
@@ -12,12 +12,7 @@ interface PythonPlaygroundProps {
   onSuccess?: () => void;
 }
 
-declare global {
-  interface Window {
-    loadPyodide: any;
-    pyodideInstance: any;
-  }
-}
+let pyodideReadyPromise: Promise<any> | null = null;
 
 export default function PythonPlayground({ 
   initialCode, 
@@ -31,7 +26,6 @@ export default function PythonPlayground({
   const [isRunning, setIsRunning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const pyodideRef = useRef<any>(null);
 
   useEffect(() => {
     setCode(initialCode);
@@ -40,98 +34,74 @@ export default function PythonPlayground({
   }, [initialCode]);
 
   useEffect(() => {
-    let isMounted = true;
+    const loadPyodide = async () => {
+      if (pyodideReadyPromise) {
+        await pyodideReadyPromise;
+        setIsLoading(false);
+        return;
+      }
 
-    const initPyodide = async () => {
-      try {
-        // Check if already initialized
-        if (window.pyodideInstance) {
-          pyodideRef.current = window.pyodideInstance;
-          if (isMounted) setIsLoading(false);
-          return;
-        }
+      pyodideReadyPromise = (async () => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js";
+        
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
 
-        // Load script if not present
-        if (!window.loadPyodide) {
-          const script = document.createElement("script");
-          script.src = "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js";
-          script.async = true;
-          
-          await new Promise((resolve, reject) => {
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-          });
-        }
-
-        // Initialize Pyodide
+        // @ts-expect-error - loadPyodide is loaded from external script
         const pyodide = await window.loadPyodide({
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/"
         });
-        
-        window.pyodideInstance = pyodide;
-        pyodideRef.current = pyodide;
-        
-        if (isMounted) setIsLoading(false);
+
+        return pyodide;
+      })();
+
+      try {
+        await pyodideReadyPromise;
+        setIsLoading(false);
       } catch (err) {
-        console.error("Failed to initialize Pyodide:", err);
-        if (isMounted) {
-          setIsLoading(false);
-          setOutput("Failed to load Python runtime. Please refresh the page.");
-        }
+        console.error("Failed to load Pyodide:", err);
+        setIsLoading(false);
+        setOutput("Failed to load Python runtime. Please refresh the page.");
       }
     };
 
-    initPyodide();
-
-    return () => {
-      isMounted = false;
-    };
+    loadPyodide();
   }, []);
 
   const runCode = async () => {
-    const pyodide = pyodideRef.current;
-    
-    if (!pyodide) {
-      setOutput("Python runtime not ready. Please wait or refresh the page.");
+    if (!pyodideReadyPromise) {
+      setOutput("Python runtime not initialized.");
       return;
     }
-    
+
     setIsRunning(true);
     setOutput("");
     setStatus("idle");
 
     try {
-      // Redirect stdout
-      await pyodide.runPythonAsync(`
+      const pyodide = await pyodideReadyPromise;
+
+      // Reset stdout
+      pyodide.runPython(`
 import sys
 from io import StringIO
 sys.stdout = StringIO()
-sys.stderr = StringIO()
 `);
 
-      // Execute user code
-      try {
-        await pyodide.runPythonAsync(code);
-      } catch (execError: any) {
-        // Check stderr for errors
-        const stderr = await pyodide.runPythonAsync("sys.stderr.getvalue()");
-        if (stderr) {
-          throw new Error(stderr);
-        }
-        throw execError;
-      }
+      // Run user code
+      pyodide.runPython(code);
 
       // Get output
-      const stdout = await pyodide.runPythonAsync("sys.stdout.getvalue()");
-      const stderr = await pyodide.runPythonAsync("sys.stderr.getvalue()");
-      
-      const result = stderr ? `${stdout}\n${stderr}` : stdout;
+      const result = pyodide.runPython("sys.stdout.getvalue()");
       setOutput(result || "(No output)");
 
       // Check expected output
       if (expectedOutput) {
-        const cleanOutput = (stdout || "").trim();
+        const cleanOutput = (result || "").trim();
         const cleanExpected = expectedOutput.trim();
 
         if (cleanOutput === cleanExpected) {

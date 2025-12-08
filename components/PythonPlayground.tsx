@@ -67,22 +67,28 @@ export default function PythonPlayground({
   }, []);
 
   const runCode = async () => {
-    if (!pyodide) return;
+    if (!pyodide) {
+      setOutput("Error: Python runtime not loaded yet. Please wait...");
+      return;
+    }
+    
     setIsRunning(true);
     setOutput("");
     setStatus("idle");
 
     try {
       // Redirect stdout to capture print statements
-      pyodide.runPython(`
+      await pyodide.runPythonAsync(`
         import sys
         from io import StringIO
         sys.stdout = StringIO()
       `);
 
+      // Run the user's code
       await pyodide.runPythonAsync(code);
 
-      const stdout = pyodide.runPython("sys.stdout.getvalue()");
+      // Get the output
+      const stdout = await pyodide.runPythonAsync("sys.stdout.getvalue()");
       setOutput(stdout);
 
       if (expectedOutput) {
@@ -98,7 +104,8 @@ export default function PythonPlayground({
         }
       }
     } catch (err: any) {
-      setOutput(`Error: ${err.message}`);
+      const errorMessage = err.message || String(err);
+      setOutput(`Error: ${errorMessage}`);
       setStatus("error");
     } finally {
       setIsRunning(false);

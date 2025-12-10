@@ -21,11 +21,28 @@ export default function CertificateTemplate({
   instructorName,
 }: CertificateProps) {
   const certificateRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [logoBase64, setLogoBase64] = useState<string>("");
   const [signBase64, setSignBase64] = useState<string>("");
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
+    // Responsive scaling: measure parent width and scale certificate to fit on small screens
+    const ro = new ResizeObserver(() => {
+      if (!containerRef.current) return;
+      const parentWidth = containerRef.current.clientWidth;
+      const maxWidth = 800; // certificate natural width
+      const newScale = Math.min(1, parentWidth / maxWidth);
+      setScale(newScale);
+    });
+    if (containerRef.current) ro.observe(containerRef.current);
+    // initial measure
+    if (containerRef.current) {
+      const parentWidth = containerRef.current.clientWidth;
+      setScale(Math.min(1, parentWidth / 800));
+    }
+
     // Convert logo to base64 to avoid CORS issues in html2canvas
     const getBase64FromUrl = async (url: string) => {
       try {
@@ -63,6 +80,15 @@ export default function CertificateTemplate({
       // Longer delay to ensure all images and styles are fully rendered
       await new Promise(resolve => setTimeout(resolve, 500));
 
+      // If we applied a visual scale via CSS transform, temporarily remove it for high-quality capture
+      const el = certificateRef.current as HTMLDivElement;
+      const prevTransform = el.style.transform;
+      const prevTransformOrigin = el.style.transformOrigin;
+      if (prevTransform) {
+        el.style.transform = "none";
+        el.style.transformOrigin = "initial";
+      }
+
       const canvas = await html2canvas(certificateRef.current, {
         scale: 3, // Higher quality for better output
         logging: false,
@@ -72,6 +98,12 @@ export default function CertificateTemplate({
         windowWidth: 800,
         windowHeight: 600,
       });
+
+      // restore transform
+      if (prevTransform) {
+        el.style.transform = prevTransform;
+        el.style.transformOrigin = prevTransformOrigin;
+      }
       
       const imgData = canvas.toDataURL('image/png', 1.0); // Max quality
       const link = document.createElement('a');
@@ -87,16 +119,21 @@ export default function CertificateTemplate({
   };
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div ref={containerRef} className="flex flex-col items-center gap-6 w-full">
       {/* Certificate Container */}
-      <div 
+      <div
         ref={certificateRef}
         className="min-w-[800px] w-[800px] min-h-[600px] h-[600px] p-8 relative text-center flex flex-col items-center justify-center shadow-2xl"
-        style={{ 
+        style={{
           fontFamily: 'serif',
           backgroundColor: '#ffffff',
           border: '20px double #1e3a8a',
-          color: '#111827'
+          color: '#111827',
+          transform: `scale(${scale})`,
+          transformOrigin: 'center top',
+          // Make sure scaled element still occupies layout space
+          width: `${800 * scale}px`,
+          height: `${600 * scale}px`,
         }}
       >
         {/* Watermark/Background */}

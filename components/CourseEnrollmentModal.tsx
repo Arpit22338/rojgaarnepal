@@ -2,6 +2,7 @@
 
 // Force refresh
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "./ui/button";
 // Force TS re-check
 import {
@@ -38,6 +39,7 @@ export function CourseEnrollmentModal({
 }: CourseEnrollmentModalProps) {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [paymentPhone, setPaymentPhone] = useState("");
   const [paymentScreenshot, setPaymentScreenshot] = useState<string | null>(null);
   const { toast } = useToast();
@@ -107,6 +109,7 @@ export function CourseEnrollmentModal({
   };
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-[425px]">
@@ -118,11 +121,20 @@ export function CourseEnrollmentModal({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex justify-center mb-4">
-             {/* Placeholder QR Code */}
-            <div className="w-48 h-48 bg-gray-200 flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300">
-              <span className="text-gray-500 text-sm text-center p-4">
-                QR Code Placeholder<br/>(eSewa/Khalti)
-              </span>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center cursor-pointer" onClick={() => setZoomedImage("/esewa-qr.jpg")}>
+                <div className="w-44 h-44 relative border rounded-lg overflow-hidden mx-auto">
+                  <Image src="/esewa-qr.jpg" alt="eSewa" fill className="object-contain" />
+                </div>
+                <div className="text-xs mt-2 font-medium text-green-600">eSewa (Tap to zoom)</div>
+              </div>
+
+              <div className="text-center cursor-pointer" onClick={() => setZoomedImage("/khalti-qr.jpg")}>
+                <div className="w-44 h-44 relative border rounded-lg overflow-hidden mx-auto">
+                  <Image src="/khalti-qr.jpg" alt="Khalti" fill className="object-contain" />
+                </div>
+                <div className="text-xs mt-2 font-medium text-purple-600">Khalti (Tap to zoom)</div>
+              </div>
             </div>
           </div>
           
@@ -178,6 +190,24 @@ export function CourseEnrollmentModal({
           </Button>
         </DialogFooter>
       </DialogContent>
-    </Dialog>
+      </Dialog>
+      {/* Zoom Modal */}
+      {zoomedImage && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] bg-black/90 flex flex-col items-center justify-center p-4 cursor-pointer pointer-events-auto"
+          onClick={(e) => {
+            e.stopPropagation();
+            setZoomedImage(null);
+          }}
+        >
+          <div className="relative w-full max-w-[500px] aspect-square bg-white p-2 rounded-lg shadow-2xl">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={zoomedImage} alt="Zoomed QR" className="w-full h-full object-contain" />
+          </div>
+          <p className="text-white mt-6 text-lg font-medium animate-pulse">Tap anywhere to go back</p>
+        </div>,
+        document.body
+      )}
+    </>
   );
 }

@@ -1,49 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, BookOpen, PenTool, CheckCircle, Star, AlertCircle, GraduationCap, Download, Award } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { ArrowLeft, BookOpen, CheckCircle, GraduationCap, AlertCircle, PenTool, Star } from "lucide-react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
-import html2canvas from "html2canvas";
+import CertificateTemplate from "@/components/CertificateTemplate";
 
 export default function CVCoursePage() {
   const { data: session } = useSession();
   const [showCertificate, setShowCertificate] = useState(false);
-  const certificateRef = useRef<HTMLDivElement>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [logoBase64, setLogoBase64] = useState<string>("");
-  const [signBase64, setSignBase64] = useState<string>("");
-
-  useEffect(() => {
-    // Convert logo to base64 to avoid CORS issues in html2canvas
-    const getBase64FromUrl = async (url: string) => {
-      try {
-        const data = await fetch(url);
-        if (!data.ok) throw new Error(`Failed to fetch ${url}`);
-        const blob = await data.blob();
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onloadend = () => {
-            const base64data = reader.result;
-            resolve(base64data);
-          };
-        });
-      } catch (e) {
-        console.error("Error loading image:", url, e);
-        return "";
-      }
-    };
-
-    getBase64FromUrl('/logo.png').then((base64) => {
-      setLogoBase64(base64 as string);
-    });
-
-    getBase64FromUrl('/uploads/ceo-sign.png').then((base64) => {
-      setSignBase64(base64 as string);
-    });
-  }, []);
 
   const handleComplete = async () => {
     setShowCertificate(true);
@@ -70,33 +35,7 @@ export default function CVCoursePage() {
     }
   };
 
-  const downloadCertificate = async () => {
-    if (!certificateRef.current) return;
-    
-    setIsGenerating(true);
-    try {
-      // Small delay to ensure rendering
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      const canvas = await html2canvas(certificateRef.current, {
-        scale: 2, // Higher quality
-        logging: false,
-        backgroundColor: '#ffffff',
-        // Removed useCORS as we are using Base64 images
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = imgData;
-      link.download = 'Rojgaar_CV_Masterclass_Certificate.png';
-      link.click();
-    } catch (error) {
-      console.error("Error generating certificate:", error);
-      alert(`Failed to generate certificate: ${error instanceof Error ? error.message : "Unknown error"}`);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  // Certificate download handled by shared `CertificateTemplate` component
 
   if (showCertificate) {
     return (
@@ -115,110 +54,14 @@ export default function CVCoursePage() {
             <p className="text-gray-600">Congratulations! You have successfully finished the CV Writing Masterclass.</p>
           </div>
 
-          {/* Certificate Preview */}
-          <div className="flex justify-center mb-8 overflow-auto">
-            <div 
-              ref={certificateRef}
-              className="min-w-[800px] w-[800px] min-h-[600px] h-[600px] p-8 relative text-center flex flex-col items-center justify-center shadow-2xl"
-              style={{ 
-                fontFamily: 'serif',
-                backgroundColor: '#ffffff',
-                border: '20px double #1e3a8a', // Explicit hex for blue-900
-                color: '#111827' // Explicit hex for gray-900
-              }}
-            >
-              {/* Watermark/Background */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-                {logoBase64 && <Image src={logoBase64} alt="Watermark" width={500} height={500} className="w-[500px] h-[500px] object-contain" unoptimized />}
-              </div>
-
-              <div className="relative z-10 w-full flex flex-col items-center">
-                {/* Logo at top */}
-                <div className="mb-1">
-                   {logoBase64 && <Image src={logoBase64} alt="Rojgaar Logo" width={200} height={64} className="h-12 w-auto object-contain" unoptimized />}
-                </div>
-                
-                <div className="mb-1 font-bold tracking-widest uppercase text-xs" style={{ color: '#1e3a8a' }}>RojgaarNepal Skills Academy</div>
-                <h1 className="text-3xl font-bold mb-3 font-serif" style={{ color: '#1e3a8a' }}>Certificate of Completion</h1>
-                
-                <p className="text-base mb-3 italic" style={{ color: '#4b5563' }}>This is to certify that</p>
-                
-                <div className="text-2xl font-bold mb-2 border-b-2 inline-block px-10 py-1 min-w-[300px]" style={{ color: '#111827', borderColor: '#d1d5db' }}>
-                  {session?.user?.name || "Student Name"}
-                </div>
-                
-                <p className="text-base mt-3 mb-3 italic" style={{ color: '#4b5563' }}>
-                  has successfully completed the comprehensive course on
-                </p>
-                
-                <h2 className="text-xl font-bold mb-6" style={{ color: '#1e40af' }}>CV Writing Masterclass</h2>
-                
-                <div className="flex justify-between items-end w-full px-8 mt-4">
-                  <div className="text-center flex flex-col items-center">
-                    <div className="text-base font-bold border-b px-4 pb-1 mb-1 min-w-[120px]" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
-                      {new Date().toLocaleDateString()}
-                    </div>
-                    <div className="text-xs" style={{ color: '#6b7280' }}>Date</div>
-                  </div>
-
-                  <div className="flex flex-col items-center">
-                     {/* Seal */}
-                     <div className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-4 mb-2" style={{ backgroundColor: '#eab308', borderColor: '#ca8a04' }}>
-                        <Award size={32} />
-                     </div>
-                  </div>
-                  
-                  <div className="text-center flex flex-col items-center relative">
-                    {/* Signature positioned absolutely to overlap the line */}
-                    <div className="absolute bottom-[10px] left-1/2 transform -translate-x-1/2 z-10">
-                      {signBase64 ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img 
-                          src={signBase64} 
-                          alt="Signature" 
-                          style={{ 
-                            height: '150px', 
-                            width: 'auto', 
-                            maxWidth: 'none' 
-                          }} 
-                        />
-                      ) : (
-                         <div className="text-9xl font-script font-cursive" style={{ fontFamily: 'cursive', color: '#1e3a8a' }}>Arpit</div>
-                       )}
-                    </div>
-                    
-                    {/* Name Line - Reduced margin to prevent overflow */}
-                    <div className="text-base font-bold border-t pt-2 px-8 min-w-[200px] mt-8 relative z-0" style={{ color: '#1f2937', borderColor: '#9ca3af' }}>
-                      Arpit Kafle
-                    </div>
-                    <div className="text-xs mt-1" style={{ color: '#6b7280' }}>CEO, RojgaarNepal</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={() => setShowCertificate(false)}
-              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              Back to Lesson
-            </button>
-            <button
-              onClick={downloadCertificate}
-              disabled={isGenerating}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-md disabled:opacity-70"
-            >
-              {isGenerating ? (
-                <span className="flex items-center">Generating...</span>
-              ) : (
-                <>
-                  <Download size={20} className="mr-2" />
-                  Download Certificate (PNG)
-                </>
-              )}
-            </button>
+          {/* Certificate Preview using shared CertificateTemplate */}
+          <div className="flex justify-center mb-8 overflow-auto py-4">
+            <CertificateTemplate
+              studentName={session?.user?.name || "Student Name"}
+              courseName="CV Writing Masterclass"
+              completionDate={new Date().toISOString()}
+              instructorName="Arpit Kafle"
+            />
           </div>
         </div>
       </div>

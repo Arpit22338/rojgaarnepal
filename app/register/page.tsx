@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import AvatarUpload from "@/components/AvatarUpload";
+import { getSetting } from "@/lib/settings";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -21,6 +22,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [teacherLoginEnabled, setTeacherLoginEnabled] = useState(true);
 
   const {
     register,
@@ -33,6 +35,11 @@ export default function RegisterPage() {
       role: "JOBSEEKER",
     },
   });
+  useEffect(() => {
+    getSetting("teacher_login_enabled").then((val) => {
+      setTeacherLoginEnabled(val !== "false");
+    });
+  }, []);
 
   const onSubmit = async (data: RegisterFormValues) => {
     setError(null);
@@ -122,7 +129,7 @@ export default function RegisterPage() {
           >
             <option value="JOBSEEKER">Job Seeker</option>
             <option value="EMPLOYER">Employer</option>
-            <option value="TEACHER">Skill Teacher</option>
+            {teacherLoginEnabled && <option value="TEACHER">Skill Teacher</option>}
           </select>
           {errors.role && (
             <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>

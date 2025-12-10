@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare } from "bcryptjs";
+import { getSetting } from "@/lib/settings";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -30,6 +31,14 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) {
           return null;
+        }
+
+        // Block Teacher login if disabled
+        if (user.role === "TEACHER") {
+          const teacherLoginEnabled = (await getSetting("teacher_login_enabled")) !== "false";
+          if (!teacherLoginEnabled) {
+            throw new Error("Teacher accounts are temporarily disabled by the administrator.");
+          }
         }
 
         const isPasswordValid = await compare(credentials.password, user.password);

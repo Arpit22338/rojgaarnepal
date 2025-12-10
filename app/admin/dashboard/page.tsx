@@ -6,6 +6,8 @@ import DeleteUserButton from "@/components/DeleteUserButton";
 import TogglePremiumButton from "@/components/TogglePremiumButton";
 import Link from "next/link";
 import { Users, FileText, GraduationCap, CreditCard } from "lucide-react";
+import TeacherLoginToggle from "@/app/admin/settings/TeacherLoginToggle";
+import { getSetting } from "@/lib/settings";
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
@@ -28,10 +30,12 @@ export default async function AdminDashboard() {
     orderBy: { createdAt: "desc" },
   });
 
+  const teacherLoginEnabled = (await getSetting("teacher_login_enabled")) !== "false";
+
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-
+      <TeacherLoginToggle initialValue={teacherLoginEnabled} />
       {/* Quick Actions / Management Links */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Link href="/admin/teacher-activation" className="block p-6 bg-white border rounded-lg shadow-sm hover:shadow-md transition group">

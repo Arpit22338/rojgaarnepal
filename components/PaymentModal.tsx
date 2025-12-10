@@ -105,9 +105,9 @@ export function PaymentModal({ isOpen, onClose, planName, amount, onSuccess }: P
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="relative group cursor-pointer" onClick={() => setZoomedQr("/esewa-qr.jpg")}>
+                <div className="relative group cursor-pointer" onClick={() => setZoomedQr("/esewa-qr-attached.png")}> 
                   <div className="aspect-square relative border rounded-lg overflow-hidden">
-                    <Image src="/esewa-qr.jpg" alt="eSewa QR" fill className="object-contain" />
+                    <Image src="/esewa-qr-attached.png" alt="eSewa QR" fill className="object-contain" />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                       <ZoomIn className="opacity-0 group-hover:opacity-100 text-white drop-shadow-md" />
                     </div>
@@ -115,9 +115,9 @@ export function PaymentModal({ isOpen, onClose, planName, amount, onSuccess }: P
                   <p className="text-center mt-2 font-medium text-green-600">eSewa (Tap to zoom)</p>
                 </div>
 
-                <div className="relative group cursor-pointer" onClick={() => setZoomedQr("/khalti-qr.jpg")}>
+                <div className="relative group cursor-pointer" onClick={() => setZoomedQr("/khalti-qr-attached.png")}> 
                   <div className="aspect-square relative border rounded-lg overflow-hidden">
-                    <Image src="/khalti-qr.jpg" alt="Khalti QR" fill className="object-contain" />
+                    <Image src="/khalti-qr-attached.png" alt="Khalti QR" fill className="object-contain" />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                       <ZoomIn className="opacity-0 group-hover:opacity-100 text-white drop-shadow-md" />
                     </div>

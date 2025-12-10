@@ -8,22 +8,22 @@ export default function TeacherLoginToggle({ initialValue }: { initialValue: boo
 
   async function handleToggle() {
     setLoading(true);
-    // Call server API to update setting (avoid importing server-only prisma in client)
     try {
-      const res = await fetch(`/api/settings/teacher-login`, {
+      const res = await fetch("/api/settings/teacher-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled: !enabled }),
+        body: JSON.stringify({ value: (!enabled).toString() }),
       });
-      if (!res.ok) throw new Error("Failed to update setting");
-      setEnabled(!enabled);
-      setMessage(`Teacher login is now ${!enabled ? "enabled" : "disabled"}`);
-    } catch (err) {
+      if (!res.ok) throw new Error("Failed to update");
+      const data = await res.json();
+      setEnabled(data.value === "true");
+      setMessage(`Teacher login is now ${data.value === "true" ? "enabled" : "disabled"}`);
+    } catch {
       setMessage("Failed to update setting");
-      console.error(err);
+    } finally {
+      setLoading(false);
+      setTimeout(() => setMessage(null), 2000);
     }
-    setLoading(false);
-    setTimeout(() => setMessage(null), 2000);
   }
 
   return (

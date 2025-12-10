@@ -1,10 +1,11 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import Image from "next/image";
+// Image not required here; CertificateLayout handles rendering
 import html2canvas from "html2canvas";
+import CertificateLayout from "@/components/CertificateLayout";
 import { Button } from "@/components/ui/button";
-import { Loader2, Download, Award } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
 
 interface CertificateProps {
   studentName: string;
@@ -21,28 +22,11 @@ export default function CertificateTemplate({
   instructorName,
 }: CertificateProps) {
   const certificateRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [logoBase64, setLogoBase64] = useState<string>("");
   const [signBase64, setSignBase64] = useState<string>("");
-  const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    // Responsive scaling: measure parent width and scale certificate to fit on small screens
-    const ro = new ResizeObserver(() => {
-      if (!containerRef.current) return;
-      const parentWidth = containerRef.current.clientWidth;
-      const maxWidth = 800; // certificate natural width
-      const newScale = Math.min(1, parentWidth / maxWidth);
-      setScale(newScale);
-    });
-    if (containerRef.current) ro.observe(containerRef.current);
-    // initial measure
-    if (containerRef.current) {
-      const parentWidth = containerRef.current.clientWidth;
-      setScale(Math.min(1, parentWidth / 800));
-    }
-
     // Convert logo to base64 to avoid CORS issues in html2canvas
     const getBase64FromUrl = async (url: string) => {
       try {
@@ -119,93 +103,17 @@ export default function CertificateTemplate({
   };
 
   return (
-    <div ref={containerRef} className="flex flex-col items-center gap-6 w-full">
+    <div className="flex flex-col items-center gap-6 w-full">
       {/* Certificate Container */}
-      <div
+      <CertificateLayout
         ref={certificateRef}
-        className="min-w-[800px] w-[800px] min-h-[600px] h-[600px] p-8 relative text-center flex flex-col items-center justify-center shadow-2xl"
-        style={{
-          fontFamily: 'serif',
-          backgroundColor: '#ffffff',
-          border: '20px double #1e3a8a',
-          color: '#111827',
-          transform: `scale(${scale})`,
-          transformOrigin: 'center top',
-          // Make sure scaled element still occupies layout space
-          width: `${800 * scale}px`,
-          height: `${600 * scale}px`,
-        }}
-      >
-        {/* Watermark/Background */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-          {logoBase64 && <Image src={logoBase64} alt="Watermark" width={500} height={500} className="w-[500px] h-[500px] object-contain" unoptimized />}
-        </div>
-
-        <div className="relative z-10 w-full flex flex-col items-center">
-          {/* Logo at top */}
-          <div className="mb-1">
-             {logoBase64 && <Image src={logoBase64} alt="Rojgaar Logo" width={200} height={64} className="h-12 w-auto object-contain" unoptimized />}
-          </div>
-          
-          <div className="mb-1 font-bold tracking-widest uppercase text-xs" style={{ color: '#1e3a8a' }}>RojgaarNepal Skills Academy</div>
-          <h1 className="text-3xl font-bold mb-3 font-serif" style={{ color: '#1e3a8a' }}>Certificate of Completion</h1>
-          
-          <p className="text-base mb-3 italic" style={{ color: '#4b5563' }}>This is to certify that</p>
-          
-          <div className="text-2xl font-bold mb-2 border-b-2 inline-block px-10 py-1 min-w-[300px]" style={{ color: '#111827', borderColor: '#d1d5db' }}>
-            {studentName}
-          </div>
-          
-          <p className="text-base mt-3 mb-3 italic" style={{ color: '#4b5563' }}>
-            has successfully completed the comprehensive course on
-          </p>
-          
-          <h2 className="text-xl font-bold mb-8" style={{ color: '#1e40af' }}>{courseName}</h2>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', paddingLeft: '60px', paddingRight: '60px', marginTop: '40px' }}>
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '24px' }}>
-              {/* Seal - Centered */}
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#eab308', border: '5px solid #ca8a04', marginBottom: '8px' }}>
-                  <Award size={40} style={{ color: '#ffffff' }} />
-                </div>
-              </div>
-
-              {/* Signature - Centered, Larger */}
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginTop: '8px', marginBottom: '0' }}>
-                {signBase64 ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img 
-                    src={signBase64} 
-                    alt="Signature" 
-                    style={{ height: '90px', width: 'auto', maxWidth: 'none', marginBottom: '-8px' }} 
-                  />
-                ) : (
-                  <div style={{ fontSize: '54px', fontFamily: 'cursive', color: '#1e3a8a', marginBottom: '-8px' }}>Arpit</div>
-                )}
-              </div>
-
-              {/* Date and Instructor Name - Row, Underlined */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', marginTop: '8px', paddingLeft: '60px', paddingRight: '60px' }}>
-                {/* Date */}
-                <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '180px' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', borderBottom: '2px solid #9ca3af', paddingLeft: '16px', paddingRight: '16px', paddingBottom: '4px', marginBottom: '4px', minWidth: '120px', color: '#1f2937' }}>
-                    {new Date(completionDate).toLocaleDateString()}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#6b7280' }}>Date</div>
-                </div>
-                {/* Instructor Name */}
-                <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '220px' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', borderBottom: '2px solid #9ca3af', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '4px', minWidth: '160px', color: '#1f2937' }}>
-                    {instructorName}
-                  </div>
-                  <div style={{ fontSize: '12px', marginTop: '4px', color: '#6b7280' }}>CEO, RojgaarNepal</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        studentName={studentName}
+        courseTitle={courseName}
+        completionDate={completionDate}
+        instructorName={instructorName}
+        logoSrc={logoBase64}
+        signSrc={signBase64}
+      />
 
       {/* Download Button - Bottom Center */}
       <div className="flex justify-center w-full max-w-4xl">

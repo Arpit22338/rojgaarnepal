@@ -6,7 +6,7 @@ import DeleteUserButton from "@/components/DeleteUserButton";
 import TogglePremiumButton from "@/components/TogglePremiumButton";
 import Link from "next/link";
 import { Users, FileText, GraduationCap, CreditCard } from "lucide-react";
-import TeacherLoginToggle from "@/app/admin/settings/TeacherLoginToggle";
+import TeacherLoginToggleClient from "@/app/admin/settings/TeacherLoginToggleClient";
 import { getSetting } from "@/lib/settings";
 
 export default async function AdminDashboard() {
@@ -37,7 +37,7 @@ export default async function AdminDashboard() {
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-4">
-          <TeacherLoginToggle initialValue={teacherLoginEnabled} />
+          <TeacherLoginToggleClient initialValue={teacherLoginEnabled} />
           <button
             className="px-3 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold border border-gray-300"
             onClick={() => window.location.reload()}

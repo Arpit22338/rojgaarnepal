@@ -1,4 +1,5 @@
 "use client";
+import { setSetting } from "@/lib/settings";
 import { useState } from "react";
 
 export default function TeacherLoginToggle({ initialValue }: { initialValue: boolean }) {
@@ -8,22 +9,11 @@ export default function TeacherLoginToggle({ initialValue }: { initialValue: boo
 
   async function handleToggle() {
     setLoading(true);
-    try {
-      const res = await fetch("/api/settings/teacher-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ value: (!enabled).toString() }),
-      });
-      if (!res.ok) throw new Error("Failed to update");
-      const data = await res.json();
-      setEnabled(data.value === "true");
-      setMessage(`Teacher login is now ${data.value === "true" ? "enabled" : "disabled"}`);
-    } catch {
-      setMessage("Failed to update setting");
-    } finally {
-      setLoading(false);
-      setTimeout(() => setMessage(null), 2000);
-    }
+    await setSetting("teacher_login_enabled", (!enabled).toString());
+    setEnabled(!enabled);
+    setMessage(`Teacher login is now ${!enabled ? "enabled" : "disabled"}`);
+    setLoading(false);
+    setTimeout(() => setMessage(null), 2000);
   }
 
   return (

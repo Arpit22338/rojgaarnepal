@@ -1,5 +1,4 @@
 "use client";
-import { setSetting } from "@/lib/settings";
 import { useState } from "react";
 
 export default function TeacherLoginToggle({ initialValue }: { initialValue: boolean }) {
@@ -9,9 +8,20 @@ export default function TeacherLoginToggle({ initialValue }: { initialValue: boo
 
   async function handleToggle() {
     setLoading(true);
-    await setSetting("teacher_login_enabled", (!enabled).toString());
-    setEnabled(!enabled);
-    setMessage(`Teacher login is now ${!enabled ? "enabled" : "disabled"}`);
+    // Call server API to update setting (avoid importing server-only prisma in client)
+    try {
+      const res = await fetch(`/api/settings/teacher-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: !enabled }),
+      });
+      if (!res.ok) throw new Error("Failed to update setting");
+      setEnabled(!enabled);
+      setMessage(`Teacher login is now ${!enabled ? "enabled" : "disabled"}`);
+    } catch (err) {
+      setMessage("Failed to update setting");
+      console.error(err);
+    }
     setLoading(false);
     setTimeout(() => setMessage(null), 2000);
   }

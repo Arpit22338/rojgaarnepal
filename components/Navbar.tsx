@@ -31,7 +31,7 @@ export default function Navbar() {
 
   const getLinkClass = (path: string) => {
     const isActive = path === "/" ? pathname === "/" : pathname.startsWith(path);
-    return `${isActive ? "text-primary font-bold" : "text-muted-foreground hover:text-primary font-medium"} text-sm transition-all duration-200 tracking-wide`;
+    return `${isActive ? "text-primary font-bold" : "text-secondary/70 hover:text-secondary font-medium"} text-sm transition-all duration-200 tracking-wide`;
   };
 
   const router = useRouter();
@@ -122,8 +122,8 @@ export default function Navbar() {
               <Link href="/" className="flex items-center gap-2 group transition-transform hover:scale-105 active:scale-95 duration-200">
                 <Image src="/logo.png" alt="Rojgaar Logo" width={36} height={36} className="object-contain" />
                 <div className="text-2xl font-black tracking-tighter whitespace-nowrap hidden sm:block">
-                  <span className="text-primary">Rojgaar</span>
-                  <span className="text-foreground">Nepal</span>
+                  <span className="text-secondary">Rojgaar</span>
+                  <span className="text-secondary/80 font-medium">Nepal</span>
                 </div>
               </Link>
             </div>

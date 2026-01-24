@@ -6,33 +6,33 @@
    LIGHT MODE (default)
    ======================== */
 :root {
-  --background: 0 0% 98%;      /* Near white */
-  --foreground: 222 47% 11%;    /* Slate 900 */
+  --background: 210 40% 96%;   /* Mist Blue #F1F5F9 */
+  --foreground: 215 19% 34%;   /* Charcoal #475569 - Body Text */
   
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
+  --card: 0 0% 100%;           /* Pure White #FFFFFF - Surface */
+  --card-foreground: 215 25% 27%; /* Deep Slate #334155 */
   
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
+  --popover-foreground: 215 25% 27%;
   
-  --primary: 162 76% 40%;       /* Teal 600 */
+  --primary: 175 84% 31%;      /* Calm Teal #0D9488 - Actions */
   --primary-foreground: 0 0% 100%;
   
-  --secondary: 210 40% 96%;     /* Slate 100 */
-  --secondary-foreground: 222 47% 11%;
+  --secondary: 215 25% 27%;    /* Deep Slate #334155 - Brand/Headers */
+  --secondary-foreground: 210 40% 96%;
   
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;   /* Slate 500 */
+  --muted: 210 40% 94%;
+  --muted-foreground: 215 16% 47%;
   
-  --accent: 162 76% 95%;         /* Teal 50 */
-  --accent-foreground: 162 76% 30%;
+  --accent: 175 84% 95%;       /* Light Teal */
+  --accent-foreground: 175 84% 31%;
   
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   
-  --border: 214 32% 91%;         /* Slate 200 */
+  --border: 214 32% 91%;
   --input: 214 32% 91%;
-  --ring: 162 76% 40%;
+  --ring: 175 84% 31%;
   
   --radius: 0.75rem;
 }
@@ -41,33 +41,33 @@
    DARK MODE
    ======================== */
 .dark {
-  --background: 222 47% 6%;      /* Near black */
-  --foreground: 210 40% 98%;     /* Near white */
+  --background: 222 47% 11%;    /* Deep Slate-ish background */
+  --foreground: 210 40% 98%;
   
-  --card: 222 47% 9%;
+  --card: 222 47% 14%;
   --card-foreground: 210 40% 98%;
   
-  --popover: 222 47% 9%;
+  --popover: 222 47% 14%;
   --popover-foreground: 210 40% 98%;
   
-  --primary: 162 76% 50%;        /* Brighter Teal */
+  --primary: 175 84% 45%;      /* Brighter Teal for Dark Mode */
   --primary-foreground: 222 47% 6%;
   
-  --secondary: 217 33% 17%;
+  --secondary: 217 33% 20%;
   --secondary-foreground: 210 40% 98%;
   
-  --muted: 217 33% 17%;
+  --muted: 217 33% 20%;
   --muted-foreground: 215 20% 65%;
   
-  --accent: 217 33% 17%;
-  --accent-foreground: 162 76% 60%;
+  --accent: 217 33% 20%;
+  --accent-foreground: 175 84% 60%;
   
   --destructive: 0 62% 50%;
   --destructive-foreground: 210 40% 98%;
   
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 162 76% 50%;
+  --border: 217 33% 20%;
+  --input: 217 33% 20%;
+  --ring: 175 84% 45%;
 }
 
 /* ========================
@@ -114,6 +114,10 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-secondary font-black tracking-tight;
   }
 }
 

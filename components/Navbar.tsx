@@ -122,7 +122,7 @@ export default function Navbar() {
             {/* Left: Logo */}
             <div className="flex-shrink-0 flex items-center mr-8">
               <Link href="/" className="flex items-center gap-2 group transition-transform hover:scale-105 active:scale-95 duration-200">
-                <div className="relative w-10 h-10 md:w-14 md:h-14">
+                <div className="hidden md:block relative w-10 h-10 md:w-14 md:h-14">
                   <Image src="/logo.png" alt="Rojgaar Logo" fill className="object-contain" />
                 </div>
                 <div className="text-xl md:text-2xl font-black tracking-tighter whitespace-nowrap">

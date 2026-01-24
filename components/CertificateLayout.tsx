@@ -92,10 +92,10 @@ const CertificateLayout = React.forwardRef<HTMLDivElement, CertificateLayoutProp
           />
 
           {/* Content Layer */}
-          <div style={{ zIndex: 10, width: "100%", height: "100%", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ zIndex: 10, width: "100%", flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
 
             {/* Header */}
-            <div style={{ textAlign: "center", marginBottom: 30 }}>
+            <div style={{ textAlign: "center", marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 12 }}>
                 {logoSrc ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -149,7 +149,7 @@ const CertificateLayout = React.forwardRef<HTMLDivElement, CertificateLayoutProp
             {/* Footer */}
             <div style={{
               width: "100%",
-              marginTop: 40,
+              marginTop: 0,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "flex-end",

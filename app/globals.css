@@ -141,5 +141,14 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  
+  .animate-heartbeat {
+    animation: heartbeat 2s infinite ease-in-out;
+  }
 }
 

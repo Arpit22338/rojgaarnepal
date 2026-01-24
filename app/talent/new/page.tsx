@@ -46,33 +46,33 @@ export default function NewTalentPostPage() {
   return (
     <div className="max-w-2xl mx-auto py-10">
       <h1 className="text-2xl font-bold mb-6 text-foreground">Create Talent Post</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white p-6 rounded-lg shadow">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-card p-6 rounded-lg shadow border border-border/50">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Title</label>
+          <label className="block text-sm font-medium text-foreground">Title</label>
           <input
             {...register("title")}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
             placeholder="e.g. Senior React Developer looking for new opportunities"
           />
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Bio</label>
+          <label className="block text-sm font-medium text-foreground">Bio</label>
           <textarea
             {...register("bio")}
             rows={4}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
             placeholder="Tell employers about yourself..."
           />
           {errors.bio && <p className="text-red-500 text-sm mt-1">{errors.bio.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Skills (comma separated)</label>
+          <label className="block text-sm font-medium text-foreground">Skills (comma separated)</label>
           <input
             {...register("skills")}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
             placeholder="React, Node.js, TypeScript"
           />
           {errors.skills && <p className="text-red-500 text-sm mt-1">{errors.skills.message}</p>}
@@ -81,7 +81,7 @@ export default function NewTalentPostPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 disabled:opacity-50 font-bold"
         >
           {isSubmitting ? "Posting..." : "Post Profile"}
         </button>

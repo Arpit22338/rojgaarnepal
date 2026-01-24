@@ -86,7 +86,7 @@ export default function PublicProfilePage() {
   if (!user) return <div className="p-8 text-center">User not found</div>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md my-8">
+    <div className="max-w-3xl mx-auto p-6 glass-card rounded-2xl border border-border/50 my-8">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
         <div className="relative w-32 h-32 flex-shrink-0">
           {user.image ? (
@@ -94,38 +94,38 @@ export default function PublicProfilePage() {
               src={user.image}
               alt={user.name}
               fill
-              className={`rounded-full object-cover border-4 ${user.isPremium ? 'border-yellow-500' : 'border-gray-100'}`}
+              className={`rounded-full object-cover border-4 ${user.isPremium ? 'border-yellow-500' : 'border-border'}`}
             />
           ) : (
-            <div className={`w-full h-full rounded-full flex items-center justify-center text-gray-500 text-4xl font-bold border-4 ${user.isPremium ? 'border-yellow-500 bg-yellow-50' : 'border-gray-100 bg-gray-200'}`}>
+            <div className={`w-full h-full rounded-full flex items-center justify-center text-muted-foreground text-4xl font-bold border-4 ${user.isPremium ? 'border-yellow-500 bg-yellow-50' : 'border-border bg-accent'}`}>
               {user.name.charAt(0).toUpperCase()}
             </div>
           )}
         </div>
-        
+
         <div className="flex-1 text-center md:text-left">
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
             <div className="flex items-center justify-center md:justify-start gap-2">
-              <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
+              <h1 className="text-3xl font-bold text-foreground">{user.name}</h1>
               {user.isPremium && (
                 <BadgeCheck className="text-blue-500" size={24} fill="currentColor" color="white" />
               )}
             </div>
           </div>
-          
+
           <div className="flex items-center justify-center md:justify-start gap-6 mb-4">
             <div className="text-center md:text-left">
-              <span className="block text-xl font-bold text-gray-900">{trustCount}</span>
-              <span className="text-sm text-gray-500">Trusted</span>
+              <span className="block text-xl font-bold text-foreground">{trustCount}</span>
+              <span className="text-sm text-muted-foreground">Trusted</span>
             </div>
             <div className="text-center md:text-left">
-              <span className="block text-xl font-bold text-gray-900 capitalize">{user.role.toLowerCase()}</span>
-              <span className="text-sm text-gray-500">Role</span>
+              <span className="block text-xl font-bold text-foreground capitalize">{user.role.toLowerCase()}</span>
+              <span className="text-sm text-muted-foreground">Role</span>
             </div>
           </div>
 
           {profile?.location && (
-            <p className="text-gray-500 mt-1 flex items-center justify-center md:justify-start gap-1 mb-4">
+            <p className="text-muted-foreground mt-1 flex items-center justify-center md:justify-start gap-1 mb-4">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -133,22 +133,21 @@ export default function PublicProfilePage() {
               {profile.location}
             </p>
           )}
-          
+
           {session?.user?.id !== user.id && (
             <div className="mt-4 flex gap-3 justify-center md:justify-start">
               <button
                 onClick={handleTrust}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                  isTrusted
-                    ? "bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300"
-                    : "bg-blue-600 text-white hover:bg-blue-700 border border-transparent"
-                }`}
+                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${isTrusted
+                    ? "bg-accent text-foreground hover:bg-accent/80 border border-border"
+                    : "bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent shadow-lg shadow-primary/20"
+                  }`}
               >
                 {isTrusted ? "Trusted" : "Trust"}
               </button>
               <Link
                 href={`/messages/${user.id}`}
-                className="inline-flex items-center px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                className="inline-flex items-center px-6 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-accent focus:outline-none"
               >
                 Message
               </Link>
@@ -157,13 +156,13 @@ export default function PublicProfilePage() {
         </div>
       </div>
 
-      <div className="border-t pt-6 space-y-6">
+      <div className="border-t border-border/50 pt-6 space-y-6">
         {user.role === "EMPLOYER" && profile?.companyName && (
           <div>
             <h2 className="text-xl font-semibold mb-2">Company</h2>
-            <p className="text-gray-700">{profile.companyName}</p>
+            <p className="text-muted-foreground">{profile.companyName}</p>
             {profile.website && (
-              <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm mt-1 block">
+              <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-sm mt-1 block">
                 Visit Website
               </a>
             )}
@@ -173,14 +172,14 @@ export default function PublicProfilePage() {
         {profile?.bio && (
           <div>
             <h2 className="text-xl font-semibold mb-2">About</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{profile.bio}</p>
+            <p className="text-muted-foreground whitespace-pre-wrap">{profile.bio}</p>
           </div>
         )}
 
         {profile?.description && (
           <div>
             <h2 className="text-xl font-semibold mb-2">Description</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{profile.description}</p>
+            <p className="text-muted-foreground whitespace-pre-wrap">{profile.description}</p>
           </div>
         )}
 
@@ -196,13 +195,13 @@ export default function PublicProfilePage() {
                       {skills.map((skill: { name: string; level: number }, idx: number) => (
                         <div key={idx} className="flex items-center gap-4">
                           <span className="w-32 font-medium truncate">{skill.name}</span>
-                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-blue-600 rounded-full" 
+                          <div className="flex-1 h-2 bg-accent rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-blue-600 rounded-full"
                               style={{ width: `${skill.level}%` }}
                             />
                           </div>
-                          <span className="text-xs text-gray-500 w-8">{skill.level}%</span>
+                          <span className="text-xs text-muted-foreground w-8">{skill.level}%</span>
                         </div>
                       ))}
                     </div>
@@ -214,35 +213,35 @@ export default function PublicProfilePage() {
                 // Handle missing commas between objects or properties
                 // Pattern: {"name":"HMML" "level":100} or {"name":"HMML","level":100}
                 if (profile.skills.includes('"name":')) {
-                   const extractedSkills = [];
-                   // Split by '}' to separate objects roughly
-                   const parts = profile.skills.split('}');
-                   for (const part of parts) {
-                      const n = /"name"\s*:\s*"([^"]+)"/.exec(part);
-                      const l = /"level"\s*:\s*(\d+)/.exec(part);
-                      if (n) {
-                        extractedSkills.push({ name: n[1], level: l ? parseInt(l[1]) : 50 });
-                      }
-                   }
-                   
-                   if (extractedSkills.length > 0) {
-                      return (
-                        <div className="space-y-2 mt-2">
-                          {extractedSkills.map((skill, idx) => (
-                            <div key={idx} className="flex items-center gap-4">
-                              <span className="w-32 font-medium truncate">{skill.name}</span>
-                              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-blue-600 rounded-full" 
-                                  style={{ width: `${skill.level}%` }}
-                                />
-                              </div>
-                              <span className="text-xs text-gray-500 w-8">{skill.level}%</span>
+                  const extractedSkills = [];
+                  // Split by '}' to separate objects roughly
+                  const parts = profile.skills.split('}');
+                  for (const part of parts) {
+                    const n = /"name"\s*:\s*"([^"]+)"/.exec(part);
+                    const l = /"level"\s*:\s*(\d+)/.exec(part);
+                    if (n) {
+                      extractedSkills.push({ name: n[1], level: l ? parseInt(l[1]) : 50 });
+                    }
+                  }
+
+                  if (extractedSkills.length > 0) {
+                    return (
+                      <div className="space-y-2 mt-2">
+                        {extractedSkills.map((skill, idx) => (
+                          <div key={idx} className="flex items-center gap-4">
+                            <span className="w-32 font-medium truncate">{skill.name}</span>
+                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-blue-600 rounded-full"
+                                style={{ width: `${skill.level}%` }}
+                              />
                             </div>
-                          ))}
-                        </div>
-                      );
-                   }
+                            <span className="text-xs text-gray-500 w-8">{skill.level}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
                 }
 
                 // Fallback for comma-separated or cleanup
@@ -252,7 +251,7 @@ export default function PublicProfilePage() {
                       const cleanSkill = skill.trim().replace(/[\[\]"{}]/g, '').replace(/name:/g, '').replace(/level:\d+/g, '');
                       if (!cleanSkill) return null;
                       return (
-                        <span key={index} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                        <span key={index} className="bg-accent text-foreground px-3 py-1 rounded-full text-sm">
                           {cleanSkill}
                         </span>
                       );
@@ -267,32 +266,32 @@ export default function PublicProfilePage() {
         {profile?.experience && (
           <div>
             <h2 className="text-xl font-semibold mb-2">Experience</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{profile.experience}</p>
+            <p className="text-muted-foreground whitespace-pre-wrap">{profile.experience}</p>
           </div>
         )}
 
         {profile?.education && (
           <div>
             <h2 className="text-xl font-semibold mb-2">Education</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{profile.education}</p>
+            <p className="text-muted-foreground whitespace-pre-wrap">{profile.education}</p>
           </div>
         )}
-        
+
         {profile?.resumeUrl && (
-           <div>
+          <div>
             <h2 className="text-xl font-semibold mb-2">Resume</h2>
-            <a 
-              href={profile.resumeUrl} 
-              target="_blank" 
+            <a
+              href={profile.resumeUrl}
+              target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline flex items-center gap-2"
+              className="text-primary hover:underline flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               View Resume
             </a>
-           </div>
+          </div>
         )}
       </div>
     </div>

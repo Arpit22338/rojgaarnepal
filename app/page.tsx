@@ -70,7 +70,7 @@ export default async function Home() {
               <>
                 <Link
                   href="/jobs"
-                  className="inline-flex h-14 items-center justify-center px-8 py-3 text-lg font-bold text-primary-foreground bg-primary rounded-full hover:bg-primary/90 shadow-lg hover:shadow-primary/30 transition-all hover:scale-105 active:scale-95 group animate-heartbeat hover:animate-none"
+                  className="inline-flex h-14 items-center justify-center px-8 py-3 text-lg font-bold text-primary-foreground bg-primary rounded-full hover:bg-primary/90 shadow-lg hover:shadow-primary/30 transition-all hover:scale-105 active:scale-95 group"
                 >
                   <Search className="mr-2 group-hover:rotate-12 transition-transform" size={22} />
                   Browse Jobs

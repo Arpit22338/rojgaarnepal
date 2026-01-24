@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import MobileFooter from "../components/MobileFooter";
 import Footer from "../components/Footer";
 import CursorGlow from "../components/CursorGlow";
-import AnimatedShaderBackground from "@/components/ui/animated-shader-background";
+import GlobalParticles from "../components/GlobalParticles";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -86,7 +86,7 @@ export default function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         <Providers>
-          <AnimatedShaderBackground />
+          <GlobalParticles />
           <CursorGlow />
           <div className="min-h-screen flex flex-col bg-background relative">
             <Navbar />

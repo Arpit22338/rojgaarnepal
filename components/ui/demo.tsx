@@ -1,4 +1,7 @@
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { useState, useEffect } from "react"
+import { ToastSave } from "@/components/ui/toast-save"
+import { Particles } from "@/components/ui/particles"
 
 function DefaultToggle() {
     return (
@@ -23,9 +26,6 @@ const DemoOne = () => {
         </div>
     );
 };
-
-import { useState } from "react"
-import { ToastSave } from "@/components/ui/toast-save"
 
 function ToastSaveDemo() {
     const [state, setState] = useState<"initial" | "loading" | "success">("initial")
@@ -56,4 +56,28 @@ function ToastSaveDemo() {
     )
 }
 
-export { DefaultToggle, DemoOne, ToastSaveDemo }
+const ParticlesDemo = () => {
+    const [color, setColor] = useState("#ffffff")
+
+    useEffect(() => {
+        const isDark = document.documentElement.classList.contains("dark")
+        setColor(isDark ? "#ffffff" : "#000000")
+    }, [])
+
+    return (
+        <div className="relative flex h-[400px] w-full flex-col items-center justify-center overflow-hidden rounded-[40px] border border-border/50 bg-background md:shadow-xl">
+            <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-primary to-primary/20 bg-clip-text text-center text-8xl font-black leading-none text-transparent">
+                Particles
+            </span>
+            <Particles
+                className="absolute inset-0"
+                quantity={150}
+                ease={80}
+                color={color}
+                refresh
+            />
+        </div>
+    )
+}
+
+export { DefaultToggle, DemoOne, ToastSaveDemo, ParticlesDemo }

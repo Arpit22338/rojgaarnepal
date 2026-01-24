@@ -6,32 +6,32 @@
    LIGHT MODE (default)
    ======================== */
 :root {
-  --background: 210 40% 96%;   /* Mist Blue #F1F5F9 */
-  --foreground: 215 19% 34%;   /* Charcoal #475569 - Body Text */
+  --background: 210 40% 90%;   /* Darkened Mist Blue */
+  --foreground: 215 19% 34%;
   
-  --card: 0 0% 100%;           /* Pure White #FFFFFF - Surface */
-  --card-foreground: 215 25% 27%; /* Deep Slate #334155 */
+  --card: 0 0% 100%;
+  --card-foreground: 215 25% 27%;
   
   --popover: 0 0% 100%;
   --popover-foreground: 215 25% 27%;
   
-  --primary: 175 84% 31%;      /* Calm Teal #0D9488 - Actions */
+  --primary: 175 84% 31%;
   --primary-foreground: 0 0% 100%;
   
-  --secondary: 215 25% 27%;    /* Deep Slate #334155 - Brand/Headers */
+  --secondary: 215 25% 27%;
   --secondary-foreground: 210 40% 96%;
   
-  --muted: 210 40% 94%;
+  --muted: 210 40% 88%;        /* Darkened muted */
   --muted-foreground: 215 16% 47%;
   
-  --accent: 175 84% 95%;       /* Light Teal */
+  --accent: 175 84% 90%;       /* Darkened accent */
   --accent-foreground: 175 84% 31%;
   
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
+  --border: 214 32% 85%;       /* Darkened border */
+  --input: 214 32% 85%;
   --ring: 175 84% 31%;
   
   --radius: 0.75rem;
@@ -41,7 +41,7 @@
    DARK MODE
    ======================== */
 .dark {
-  --background: 222 47% 11%;    /* Deep Slate-ish background */
+  --background: 222 47% 5%;    /* Deepest Slate - Darkened from 11% */
   --foreground: 210 40% 98%;
   
   --card: 222 47% 14%;

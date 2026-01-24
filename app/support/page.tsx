@@ -90,7 +90,7 @@ export default function SupportPage() {
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     className="w-full bg-background/50 border border-input rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-muted-foreground/50 font-medium"
-                    placeholder="मुद्दाको संक्षिप्त सारांश (Brief summary)"
+                    placeholder="Brief summary of the issue"
                     required
                   />
                 </div>
@@ -101,7 +101,7 @@ export default function SupportPage() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     className="w-full bg-background/50 border border-input rounded-xl px-4 py-3 h-40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none placeholder:text-muted-foreground/50 font-medium"
-                    placeholder="आफ्नो समस्याको विस्तारमा वर्णन गर्नुहोस्..."
+                    placeholder="Describe your issue in detail..."
                     required
                   />
                 </div>

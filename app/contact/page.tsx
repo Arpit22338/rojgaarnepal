@@ -100,7 +100,7 @@ export default function ContactPage() {
                                     {...register("message", { required: true })}
                                     rows={4}
                                     className="w-full px-4 py-3 rounded-xl border border-input bg-background/50 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none"
-                                    placeholder="हामीलाई कसरी मद्दत गर्न सक्छौं, बताउनुहोस्..."
+                                    placeholder="Tell us how we can help you..."
                                 />
                                 {errors.message && <span className="text-xs text-red-500">Required</span>}
                             </div>

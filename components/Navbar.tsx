@@ -148,6 +148,15 @@ export default function Navbar() {
                   Admin Panel
                 </Link>
               )}
+
+              {user?.role === "EMPLOYER" && (
+                <Link
+                  href="/employer/dashboard"
+                  className="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all shadow-sm"
+                >
+                  Employer Dashboard
+                </Link>
+              )}
             </div>
 
             {/* Right: Icons & Auth */}
@@ -203,6 +212,11 @@ export default function Navbar() {
                           <Link href="/profile/edit" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-primary rounded-xl transition-colors" onClick={closeMenus}>
                             <Settings size={16} className="text-muted-foreground" /> Settings
                           </Link>
+                          {user?.role === "EMPLOYER" && (
+                            <Link href="/employer/dashboard" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-accent hover:text-primary rounded-xl transition-colors" onClick={closeMenus}>
+                              <LayoutDashboard size={16} className="text-muted-foreground" /> Employer Dashboard
+                            </Link>
+                          )}
                           {user?.role === "ADMIN" && (
                             <Link href="/admin/dashboard" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors font-bold" onClick={closeMenus}>
                               <LayoutDashboard size={16} className="text-red-500" /> Admin Panel

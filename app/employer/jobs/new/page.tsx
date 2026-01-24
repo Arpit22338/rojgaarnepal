@@ -58,7 +58,7 @@ export default function NewJobPage() {
           <input
             {...register("title")}
             className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
-            placeholder="उदा. वरिष्ठ प्रोग्रामर (Senior Programmer)"
+            placeholder="e.g. Senior Software Engineer"
           />
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
@@ -69,7 +69,7 @@ export default function NewJobPage() {
             {...register("description")}
             rows={5}
             className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
-            placeholder="कामको जिम्मेवारी, आवश्यक योग्यता, आदि"
+            placeholder="Describe job responsibilities, requirements, etc."
           />
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
         </div>
@@ -80,7 +80,7 @@ export default function NewJobPage() {
             <input
               {...register("location")}
               className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
-              placeholder="काठमाडौं, रिमोट, ललितपुर"
+              placeholder="Kathmandu, Remote, Lalitpur"
             />
             {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>}
           </div>
@@ -107,7 +107,7 @@ export default function NewJobPage() {
           <input
             {...register("salary")}
             className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
-            placeholder="उदा. NRs. ५०,००० - ८०,००० / महिना"
+            placeholder="e.g. NRs. 50,000 - 80,000 / month"
           />
         </div>
 

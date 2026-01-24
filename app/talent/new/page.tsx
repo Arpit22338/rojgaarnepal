@@ -52,7 +52,7 @@ export default function NewTalentPostPage() {
           <input
             {...register("title")}
             className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
-            placeholder="उदा. वरिष्ठ डिजाइनर (Senior Designer) नयाँ अवसरको खोजीमा"
+            placeholder="e.g. Senior Designer looking for new opportunities"
           />
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
@@ -63,7 +63,7 @@ export default function NewTalentPostPage() {
             {...register("bio")}
             rows={4}
             className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
-            placeholder="आफ्नो बारेमा रोजगारदाताहरूलाई केही रोचक कुरा बताउनुहोस्..."
+            placeholder="Tell employers something interesting about yourself..."
           />
           {errors.bio && <p className="text-red-500 text-sm mt-1">{errors.bio.message}</p>}
         </div>

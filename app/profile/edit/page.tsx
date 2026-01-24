@@ -42,7 +42,7 @@ export default function EditProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  
+
   // Skills State
   const [skillInput, setSkillInput] = useState("");
   const [skillsList, setSkillsList] = useState<Skill[]>([]);
@@ -81,7 +81,7 @@ export default function EditProfilePage() {
           if (data.profile.image) {
             setValue("image", data.profile.image);
           }
-          
+
           // Handle Skills (Parse JSON or split string)
           if (data.profile.skills) {
             try {
@@ -104,7 +104,7 @@ export default function EditProfilePage() {
 
           Object.keys(data.profile).forEach((key) => {
             if (key !== 'skills' && key !== 'image') {
-               setValue(key as keyof ProfileFormData, data.profile[key]);
+              setValue(key as keyof ProfileFormData, data.profile[key]);
             }
           });
         }
@@ -126,13 +126,13 @@ export default function EditProfilePage() {
     if (!skillInput.trim()) return;
     // Split by comma if user pasted a list
     const newSkills = skillInput.split(",").map(s => s.trim()).filter(s => s);
-    
+
     const uniqueNewSkills = newSkills.filter(
       ns => !skillsList.some(existing => existing.name.toLowerCase() === ns.toLowerCase())
     );
 
     const skillsToAdd = uniqueNewSkills.map(name => ({ name, level: 50 }));
-    
+
     setSkillsList([...skillsList, ...skillsToAdd]);
     setSkillInput("");
   };
@@ -196,57 +196,57 @@ export default function EditProfilePage() {
   if (loading) return <div className="p-8 text-center">Loading...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="max-w-2xl mx-auto p-6 bg-card rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6">Edit Profile</h1>
       <form onSubmit={handleSubmit(onSubmit, (errors) => console.error("Form validation errors:", errors))} className="space-y-6">
-        
+
         {/* Avatar Upload Section */}
         <div className="flex justify-center mb-6">
-          <AvatarUpload 
-            currentImage={currentImage || undefined} 
-            onImageChange={(base64) => setValue("image", base64)} 
+          <AvatarUpload
+            currentImage={currentImage || undefined}
+            onImageChange={(base64) => setValue("image", base64)}
           />
         </div>
 
         {role === "EMPLOYER" ? (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Company Name</label>
+              <label className="block text-sm font-medium text-foreground">Company Name</label>
               <input
                 {...register("companyName", { required: "Company Name is required" })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
               />
               {getError("companyName") && <p className="text-red-500 text-sm">{getError("companyName")}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Description</label>
+              <label className="block text-sm font-medium text-foreground">Description</label>
               <textarea
                 {...register("description", { required: "Description is required" })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
                 rows={4}
               />
               {getError("description") && <p className="text-red-500 text-sm">{getError("description")}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Location</label>
+              <label className="block text-sm font-medium text-foreground">Location</label>
               <input
                 {...register("location", { required: "Location is required" })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
               />
               {getError("location") && <p className="text-red-500 text-sm">{getError("location")}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Website</label>
+              <label className="block text-sm font-medium text-foreground">Website</label>
               <input
                 {...register("website")}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Portfolio/Company Deck URL</label>
+              <label className="block text-sm font-medium text-foreground">Portfolio/Company Deck URL</label>
               <input
                 {...register("portfolioUrl")}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
                 placeholder="https://drive.google.com/..."
               />
             </div>
@@ -254,23 +254,23 @@ export default function EditProfilePage() {
         ) : (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Bio</label>
+              <label className="block text-sm font-medium text-foreground">Bio</label>
               <textarea
                 {...register("bio")}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
                 rows={3}
               />
             </div>
 
             {/* Skills Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Skills & Proficiency</label>
+              <label className="block text-sm font-medium text-foreground mb-2">Skills & Proficiency</label>
               <div className="flex gap-2 mb-3">
                 <input
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="flex-1 rounded-md border-gray-300 shadow-sm border p-2"
+                  className="flex-1 rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
                   placeholder="Type a skill (e.g. React) and press Enter"
                 />
                 <button
@@ -281,19 +281,19 @@ export default function EditProfilePage() {
                   <Plus size={20} />
                 </button>
               </div>
-              
+
               {/* Skills List */}
               <div className="space-y-3">
                 {skillsList.map((skill, index) => (
-                  <div key={index} className="bg-gray-50 p-3 rounded-md border flex items-center gap-4">
+                  <div key={index} className="bg-accent/50 p-3 rounded-md border flex items-center gap-4">
                     <div className="flex-1 font-medium">{skill.name}</div>
                     <div className="flex items-center gap-2 w-1/2">
-                      <span className="text-xs text-gray-500 w-8">{skill.level}%</span>
-                      <input 
-                        type="range" 
-                        min="0" 
-                        max="100" 
-                        value={skill.level} 
+                      <span className="text-xs text-muted-foreground w-8">{skill.level}%</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={skill.level}
                         onChange={(e) => handleLevelChange(index, parseInt(e.target.value))}
                         className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                       />
@@ -308,7 +308,7 @@ export default function EditProfilePage() {
                   </div>
                 ))}
                 {skillsList.length === 0 && (
-                  <p className="text-sm text-gray-500 italic">No skills added yet.</p>
+                  <p className="text-sm text-muted-foreground italic">No skills added yet.</p>
                 )}
               </div>
               {/* Hidden input to satisfy validation if needed, though we handle it manually */}
@@ -316,34 +316,34 @@ export default function EditProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Location</label>
+              <label className="block text-sm font-medium text-foreground">Location</label>
               <input
                 {...register("location", { required: "Location is required" })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
               />
               {getError("location") && <p className="text-red-500 text-sm">{getError("location")}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Experience</label>
+              <label className="block text-sm font-medium text-foreground">Experience</label>
               <input
                 {...register("experience", { required: "Experience is required" })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
                 placeholder="2 years as Frontend Dev"
               />
               {getError("experience") && <p className="text-red-500 text-sm">{getError("experience")}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Education</label>
+              <label className="block text-sm font-medium text-foreground">Education</label>
               <input
                 {...register("education")}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Portfolio URL</label>
+              <label className="block text-sm font-medium text-foreground">Portfolio URL</label>
               <input
                 {...register("portfolioUrl")}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2"
+                className="mt-1 block w-full rounded-md border-input bg-background shadow-sm border p-2 text-foreground"
                 placeholder="https://drive.google.com/..."
               />
             </div>

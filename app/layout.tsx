@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import Navbar from "../components/Navbar";
 import MobileFooter from "../components/MobileFooter";
+import Footer from "../components/Footer";
 import CursorGlow from "../components/CursorGlow";
 
 const inter = Inter({
@@ -43,26 +44,7 @@ export default function RootLayout({
             </main>
 
             {/* Static Footer - Desktop only */}
-            <footer className="hidden md:block border-t border-border py-8 mt-auto bg-card/50">
-              <div className="container mx-auto px-4">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                  <div className="text-center md:text-left">
-                    <div className="text-lg font-bold tracking-tight mb-1">
-                      <span className="text-primary">Rojgaar</span>
-                      <span className="text-foreground">Nepal</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      &copy; {new Date().getFullYear()} RojgaarNepal. Connecting talent with opportunity.
-                    </p>
-                  </div>
-                  <div className="text-center md:text-right">
-                    <p className="text-sm text-muted-foreground">
-                      Developed by <span className="font-medium text-foreground">Arpit Kafle</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </footer>
+            <Footer />
 
             {/* Mobile Footer Navigation */}
             <MobileFooter />

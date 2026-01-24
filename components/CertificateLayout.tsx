@@ -42,7 +42,7 @@ const CertificateLayout = React.forwardRef<HTMLDivElement, CertificateLayoutProp
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            padding: "40px",
+            padding: "50px 50px 60px 50px",
           }}
         >
           {/* Decorative Border */}
@@ -149,7 +149,7 @@ const CertificateLayout = React.forwardRef<HTMLDivElement, CertificateLayoutProp
             {/* Footer */}
             <div style={{
               width: "100%",
-              marginTop: 50,
+              marginTop: 40,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "flex-end",
@@ -192,7 +192,7 @@ const CertificateLayout = React.forwardRef<HTMLDivElement, CertificateLayoutProp
                 <div style={{ minWidth: 150, display: "flex", flexDirection: "column", alignItems: "center", borderBottom: "2px solid #9ca3af", paddingBottom: 4, marginBottom: 8 }}>
                   {signSrc ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={signSrc} alt="Signature" style={{ height: 80, width: "auto" }} />
+                    <img src={signSrc} alt="Signature" style={{ height: 160, width: "auto", marginBottom: -40, marginTop: -30, position: 'relative', zIndex: 20 }} />
                   ) : (
                     <div style={{ fontFamily: "cursive", fontSize: 24, color: "#1e3a8a" }}>{instructorName}</div>
                   )}

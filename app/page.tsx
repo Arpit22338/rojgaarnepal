@@ -13,7 +13,7 @@ export default async function Home() {
 
   const jobCount = await prisma.job.count();
   const jobSeekerCount = await prisma.user.count({ where: { role: "JOBSEEKER" } });
-  const courseCount = (await prisma.course.count()) + 1;
+  const courseCount = (await prisma.course.count()) + 2;
 
   // Fetch Latest Jobs (Instead of Premium)
   const latestJobs = await prisma.job.findMany({
@@ -85,20 +85,7 @@ export default async function Home() {
             )}
           </div>
 
-          <div className="pt-8 flex flex-wrap justify-center gap-8 md:gap-16 text-muted-foreground opacity-70">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-              <span className="font-semibold">500+ New Jobs/Week</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-              <span className="font-semibold">Verified Employers</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
-              <span className="font-semibold">Free Skill Courses</span>
-            </div>
-          </div>
+
         </div>
       </section>
 

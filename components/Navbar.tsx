@@ -194,7 +194,7 @@ export default function Navbar() {
                     </button>
 
                     {isProfileOpen && (
-                      <div className="absolute right-0 mt-3 w-64 glass rounded-2xl shadow-2xl border border-white/20 py-2 z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right backdrop-blur-xl">
+                      <div className="absolute right-0 mt-3 w-64 glass-card rounded-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
                         <div className="px-4 py-4 border-b border-border/40 mb-1 bg-accent/20">
                           <p className="font-bold text-foreground truncate text-sm">{user?.name}</p>
                           <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
@@ -287,9 +287,12 @@ export default function Navbar() {
           >
             <div className="p-4 border-b border-border/50 flex items-center justify-between bg-accent/20">
               <span className="font-bold text-lg text-foreground">Menu</span>
-              <button onClick={closeMenus} className="p-2 text-muted-foreground hover:bg-accent rounded-full text-foreground/80">
-                <X size={20} />
-              </button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <button onClick={closeMenus} className="p-2 text-muted-foreground hover:bg-accent rounded-full text-foreground/80">
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">

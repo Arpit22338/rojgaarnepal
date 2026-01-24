@@ -45,7 +45,7 @@ export default function NewTalentPostPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-6">Create Talent Post</h1>
+      <h1 className="text-2xl font-bold mb-6 text-foreground">Create Talent Post</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white p-6 rounded-lg shadow">
         <div>
           <label className="block text-sm font-medium text-gray-700">Title</label>

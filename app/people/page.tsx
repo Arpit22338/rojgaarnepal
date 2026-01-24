@@ -116,7 +116,7 @@ export default function PeoplePage() {
                   )}
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 line-clamp-1 flex items-center gap-1">
+                  <h2 className="text-lg font-bold text-foreground line-clamp-1 flex items-center gap-1">
                     <Link href={`/profile/${user.id}`} className="hover:text-primary transition-colors">
                       {user.name}
                     </Link>

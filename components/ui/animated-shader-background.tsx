@@ -3,148 +3,107 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-const AnimatedShaderBackground = () => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [isDark, setIsDark] = useState(false);
+const AnimatedParticleBackground = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDark, setIsDark] = useState(false);
 
-    useEffect(() => {
-        // Initial check
-        const checkDark = () => {
-            setIsDark(document.documentElement.classList.contains('dark'));
-        };
-        checkDark();
+  useEffect(() => {
+    const checkDark = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    checkDark();
 
-        // Observe changes to the 'dark' class on <html>
-        const observer = new MutationObserver(checkDark);
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class'],
-        });
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
 
-        return () => observer.disconnect();
-    }, []);
+    return () => observer.disconnect();
+  }, []);
 
-    useEffect(() => {
-        if (!isDark || !containerRef.current) return;
+  useEffect(() => {
+    if (!isDark || !containerRef.current) return;
 
-        const container = containerRef.current;
-        const scene = new THREE.Scene();
-        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const container = containerRef.current;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
 
-        const material = new THREE.ShaderMaterial({
-            uniforms: {
-                iTime: { value: 0 },
-                iResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
-            },
-            vertexShader: `
-        void main() {
-          gl_Position = vec4(position, 1.0);
-        }
-      `,
-            fragmentShader: `
-        uniform float iTime;
-        uniform vec2 iResolution;
+    // Create Particles
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 1500;
+    const posArray = new Float32Array(particlesCount * 3);
 
-        #define NUM_OCTAVES 3
+    for (let i = 0; i < particlesCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 10;
+    }
 
-        float rand(vec2 n) {
-          return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
-        }
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
-        float noise(vec2 p) {
-          vec2 ip = floor(p);
-          vec2 u = fract(p);
-          u = u*u*(3.0-2.0*u);
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.005,
+      color: '#0D9488', // Primary Teal
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending
+    });
 
-          float res = mix(
-            mix(rand(ip), rand(ip + vec2(1.0, 0.0)), u.x),
-            mix(rand(ip + vec2(0.0, 1.0)), rand(ip + vec2(1.0, 1.0)), u.x), u.y);
-          return res * res;
-        }
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
 
-        float fbm(vec2 x) {
-          float v = 0.0;
-          float a = 0.3;
-          vec2 shift = vec2(100);
-          mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
-          for (int i = 0; i < NUM_OCTAVES; ++i) {
-            v += a * noise(x);
-            x = rot * x * 2.0 + shift;
-            a *= 0.4;
-          }
-          return v;
-        }
+    camera.position.z = 3;
 
-        void main() {
-          vec2 shake = vec2(sin(iTime * 1.2) * 0.005, cos(iTime * 2.1) * 0.005);
-          vec2 p = ((gl_FragCoord.xy + shake * iResolution.xy) - iResolution.xy * 0.5) / iResolution.y * mat2(6.0, -4.0, 4.0, 6.0);
-          vec2 v;
-          vec4 o = vec4(0.0);
+    let frameId: number;
+    const animate = () => {
+      particlesMesh.rotation.y += 0.001;
+      particlesMesh.rotation.x += 0.0005;
+      renderer.render(scene, camera);
+      frameId = requestAnimationFrame(animate);
+    };
+    animate();
 
-          float f = 2.0 + fbm(p + vec2(iTime * 5.0, 0.0)) * 0.5;
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
 
-          for (float i = 0.0; i < 35.0; i++) {
-            v = p + cos(i * i + (iTime + p.x * 0.08) * 0.025 + i * vec2(13.0, 11.0)) * 3.5 + vec2(sin(iTime * 3.0 + i) * 0.003, cos(iTime * 3.5 - i) * 0.003);
-            float tailNoise = fbm(v + vec2(iTime * 0.5, i)) * 0.3 * (1.0 - (i / 35.0));
-            vec4 auroraColors = vec4(
-              0.1 + 0.3 * sin(i * 0.2 + iTime * 0.4),
-              0.3 + 0.5 * cos(i * 0.3 + iTime * 0.5),
-              0.7 + 0.3 * sin(i * 0.4 + iTime * 0.3),
-              1.0
-            );
-            vec4 currentContribution = auroraColors * exp(sin(i * i + iTime * 0.8)) / length(max(v, vec2(v.x * f * 0.015, v.y * 1.5)));
-            float thinnessFactor = smoothstep(0.0, 1.0, i / 35.0) * 0.6;
-            o += currentContribution * (1.0 + tailNoise * 0.8) * thinnessFactor;
-          }
+    // Interaction
+    const handleMouse = (event: MouseEvent) => {
+      const mouseX = (event.clientX / window.innerWidth) - 0.5;
+      const mouseY = (event.clientY / window.innerHeight) - 0.5;
+      particlesMesh.rotation.y += mouseX * 0.05;
+      particlesMesh.rotation.x -= mouseY * 0.05;
+    };
+    window.addEventListener('mousemove', handleMouse);
 
-          o = tanh(pow(o / 100.0, vec4(1.6)));
-          gl_FragColor = o * 1.5;
-        }
-      `
-        });
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouse);
+      if (container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
+      }
+      particlesGeometry.dispose();
+      particlesMaterial.dispose();
+      renderer.dispose();
+    };
+  }, [isDark]);
 
-        const geometry = new THREE.PlaneGeometry(2, 2);
-        const mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
+  if (!isDark) return null;
 
-        let frameId: number;
-        const animate = () => {
-            material.uniforms.iTime.value += 0.016;
-            renderer.render(scene, camera);
-            frameId = requestAnimationFrame(animate);
-        };
-        animate();
-
-        const handleResize = () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight);
-        };
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            cancelAnimationFrame(frameId);
-            window.removeEventListener('resize', handleResize);
-            if (container.contains(renderer.domElement)) {
-                container.removeChild(renderer.domElement);
-            }
-            geometry.dispose();
-            material.dispose();
-            renderer.dispose();
-        };
-    }, [isDark]);
-
-    if (!isDark) return null;
-
-    return (
-        <div
-            ref={containerRef}
-            className="fixed inset-0 -z-10 bg-black pointer-events-none"
-        />
-    );
+  return (
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-0 pointer-events-none opacity-40"
+    />
+  );
 };
 
-export default AnimatedShaderBackground;
+export default AnimatedParticleBackground;

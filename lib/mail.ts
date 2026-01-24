@@ -20,10 +20,10 @@ export async function sendVerificationEmail(email: string, otp: string) {
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
     to: email,
     subject: "Verify your email - RojgaarNepal",
-    text: `Your verification code is: ${otp}`,
+    text: `Your verification code is: ${otp} Don't share this code with anyone. rojgaarnepal.com`,
     html: `
       <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2563eb;">Verify your email</h2>
@@ -31,8 +31,9 @@ export async function sendVerificationEmail(email: string, otp: string) {
         <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
           <span style="font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #1f2937;">${otp}</span>
         </div>
-        <p>This code will expire in 1 hour.</p>
+        <p>This code will expire in 5 minutes.</p>
         <p>If you didn't request this, please ignore this email.</p>
+        <a href="https://rojgaarnepal.com">RojgaarNepal</a>
       </div>
     `,
   });
@@ -57,7 +58,7 @@ export async function sendPasswordResetEmail(email: string, otp: string) {
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
     to: email,
     subject: "Reset Your Password - RojgaarNepal",
     text: `Your password reset code is: ${otp}`,
@@ -68,7 +69,7 @@ export async function sendPasswordResetEmail(email: string, otp: string) {
         <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
           <span style="font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #1f2937;">${otp}</span>
         </div>
-        <p>This code will expire in 15 minutes.</p>
+        <p>This code will expire in 5 minutes.</p>
         <p>If you didn't request this, please ignore this email.</p>
       </div>
     `,
@@ -91,7 +92,7 @@ export async function sendUntrustEmail(trustedEmail: string, trusterName: string
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
     to: trustedEmail,
     subject: "Trust Update - RojgaarNepal",
     text: `${trusterName} removed their trust.`,
@@ -121,7 +122,7 @@ export async function sendApplicationEmail(employerEmail: string, jobTitle: stri
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
     to: employerEmail,
     subject: `New Application for ${jobTitle}`,
     html: `
@@ -150,7 +151,7 @@ export async function sendApplicationStatusEmail(applicantEmail: string, jobTitl
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
     to: applicantEmail,
     subject: `Application Status Update: ${jobTitle}`,
     html: `
@@ -164,8 +165,8 @@ export async function sendApplicationStatusEmail(applicantEmail: string, jobTitl
 }
 
 export async function sendNotificationEmail(
-  email: string, 
-  content: string, 
+  email: string,
+  content: string,
   type: string = "INFO",
   link?: string
 ) {
@@ -211,7 +212,7 @@ export async function sendNotificationEmail(
   }
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <rojgaarnepall@gmail.com>',
+    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
     to: email,
     subject,
     html: `

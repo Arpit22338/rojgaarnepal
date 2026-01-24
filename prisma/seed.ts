@@ -5,12 +5,12 @@ const prisma = new PrismaClient()
 
 async function main() {
   const password = await hash('Arpit@2065', 12)
-  
+
   await prisma.user.upsert({
-    where: { email: 'rojgaarnepall@gmail.com' },
+    where: { email: 'arpitkafle468@gmail.com' },
     update: {},
     create: {
-      email: 'rojgaarnepall@gmail.com',
+      email: 'arpitkafle468@gmail.com',
       name: 'Arpit Kafle',
       password,
       role: 'ADMIN',

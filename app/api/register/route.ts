@@ -29,10 +29,10 @@ export async function POST(req: Request) {
     }
 
     const hashedPassword = await hash(password, 10);
-    
+
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = new Date(Date.now() + 3600000); // 1 hour from now
+    const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
     const userData = JSON.stringify({
       name,
@@ -44,27 +44,27 @@ export async function POST(req: Request) {
 
     // Check/Update TempRegistration
     const existingTemp = await (prisma as any).tempRegistration.findUnique({
-        where: { email }
+      where: { email }
     });
 
     if (existingTemp) {
-        await (prisma as any).tempRegistration.update({
-            where: { email },
-            data: {
-                otp,
-                otpExpires,
-                data: userData
-            }
-        });
+      await (prisma as any).tempRegistration.update({
+        where: { email },
+        data: {
+          otp,
+          otpExpires,
+          data: userData
+        }
+      });
     } else {
-        await (prisma as any).tempRegistration.create({
-            data: {
-                email,
-                otp,
-                otpExpires,
-                data: userData
-            }
-        });
+      await (prisma as any).tempRegistration.create({
+        data: {
+          email,
+          otp,
+          otpExpires,
+          data: userData
+        }
+      });
     }
 
     // Send verification email

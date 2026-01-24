@@ -90,7 +90,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-center gap-3 text-muted-foreground">
                                 <Mail size={20} className="text-primary flex-shrink-0" />
-                                <a href="mailto:rojgaarnepall@gmail.com" className="hover:text-primary transition-colors">rojgaarnepall@gmail.com</a>
+                                <a href="mailto:arpitkafle468@gmail.com" className="hover:text-primary transition-colors">arpitkafle468@gmail.com</a>
                             </li>
                             <li className="flex items-center gap-3 text-muted-foreground">
                                 <Phone size={20} className="text-primary flex-shrink-0" />

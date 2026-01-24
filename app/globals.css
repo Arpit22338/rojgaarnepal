@@ -3,48 +3,66 @@
 @plugin "tailwindcss-animate";
 
 :root {
-  --background: #ffffff;
-  --foreground: #09090b;
+  /* Vibrant Palette - Violet/Indigo/Pink */
+  --background: #f8fafc; /* Slate 50 */
+  --foreground: #0f172a; /* Slate 900 */
+  
   --card: #ffffff;
-  --card-foreground: #09090b;
+  --card-foreground: #0f172a;
+  
   --popover: #ffffff;
-  --popover-foreground: #09090b;
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
+  --popover-foreground: #0f172a;
+  
+  --primary: #7c3aed; /* Violet 600 */
+  --primary-foreground: #ffffff;
+  
+  --secondary: #e0e7ff; /* Indigo 100 */
+  --secondary-foreground: #3730a3; /* Indigo 800 */
+  
+  --muted: #f1f5f9; /* Slate 100 */
+  --muted-foreground: #64748b; /* Slate 500 */
+  
+  --accent: #f5f3ff; /* Violet 50 */
+  --accent-foreground: #7c3aed; /* Violet 600 */
+  
   --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #18181b;
-  --radius: 0.5rem;
+  --destructive-foreground: #ffffff;
+  
+  --border: #e2e8f0; /* Slate 200 */
+  --input: #e2e8f0;
+  --ring: #7c3aed;
+  
+  --radius: 0.75rem; /* More rounded */
 }
 
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #09090b;
-  --card-foreground: #fafafa;
-  --popover: #09090b;
-  --popover-foreground: #fafafa;
-  --primary: #fafafa;
-  --primary-foreground: #18181b;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
+  --background: #020617; /* Slate 950 */
+  --foreground: #f8fafc; /* Slate 50 */
+  
+  --card: #0f172a; /* Slate 900 */
+  --card-foreground: #f8fafc;
+  
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+  
+  --primary: #8b5cf6; /* Violet 500 */
+  --primary-foreground: #ffffff;
+  
+  --secondary: #1e1b4b; /* Indigo 950 */
+  --secondary-foreground: #c7d2fe; /* Indigo 200 */
+  
+  --muted: #1e293b; /* Slate 800 */
+  --muted-foreground: #94a3b8; /* Slate 400 */
+  
+  --accent: #1e293b;
+  --accent-foreground: #8b5cf6;
+  
   --destructive: #7f1d1d;
-  --destructive-foreground: #fafafa;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #d4d4d8;
+  --destructive-foreground: #f8fafc;
+  
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #8b5cf6;
 }
 
 @theme inline {
@@ -70,17 +88,15 @@
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
 }
 
 @layer base {
   body {
-    @apply font-sans text-base leading-relaxed text-gray-800 antialiased bg-white;
+    @apply font-sans text-base leading-relaxed text-foreground antialiased bg-background selection:bg-primary/20 selection:text-primary;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight text-gray-900;
+    @apply font-bold tracking-tight text-foreground;
   }
 
   h1 { @apply text-4xl mb-6 mt-2; }
@@ -89,46 +105,20 @@
   h4 { @apply text-xl mb-2 mt-4; }
 
   p {
-    @apply mb-4 leading-7 text-gray-700;
-  }
-
-  ul {
-    @apply list-disc pl-6 mb-4 space-y-2 text-gray-700;
-  }
-
-  ol {
-    @apply list-decimal pl-6 mb-4 space-y-2 text-gray-700;
-  }
-
-  li {
-    @apply leading-7;
-  }
-  
-  strong {
-    @apply font-semibold text-gray-900;
-  }
-
-  /* Code blocks */
-  pre {
-    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-6 font-mono text-sm;
-  }
-  
-  code {
-    @apply font-mono text-sm bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded;
-  }
-  
-  pre code {
-    @apply bg-transparent text-inherit p-0;
-  }
-
-  /* Blockquotes */
-  blockquote {
-    @apply border-l-4 border-gray-200 pl-4 italic text-gray-700 my-6;
+    @apply mb-4 leading-7 text-muted-foreground;
   }
 }
 
 @layer utilities {
-  .question-text {
-    @apply text-lg font-semibold text-gray-900 mb-2 flex items-start gap-2;
+  .glass {
+    @apply bg-white/70 dark:bg-black/50 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm;
+  }
+  
+  .glass-card {
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-800/50 shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-linear-to-r from-violet-600 to-indigo-600 dark:from-violet-400 dark:to-indigo-400;
   }
 }

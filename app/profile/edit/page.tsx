@@ -7,8 +7,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import AvatarUpload from "@/components/AvatarUpload";
-import { X, Plus, ArrowLeft } from "lucide-react";
-import { ToastSave } from "@/components/ui/toast-save";
+import { X, Plus } from "lucide-react";
 
 const jobSeekerSchema = z.object({
   bio: z.string().nullable().optional(),
@@ -60,8 +59,7 @@ export default function EditProfilePage() {
     handleSubmit,
     setValue,
     control,
-    reset,
-    formState: { errors, isSubmitting, isDirty },
+    formState: { errors, isSubmitting },
   } = useForm<ProfileFormData>({
     resolver: async (data, _context, _options) => {
       const currentRole = roleRef.current;
@@ -158,9 +156,6 @@ export default function EditProfilePage() {
     }
   };
 
-  // Success state for toast
-  const [saveSuccess, setSaveSuccess] = useState(false);
-
   const onSubmit = async (data: ProfileFormData) => {
     try {
       // Prepare skills data
@@ -179,13 +174,9 @@ export default function EditProfilePage() {
       });
 
       if (res.ok) {
-        setSaveSuccess(true);
-        // Refresh form state so it's no longer dirty
-        reset(data);
-        // Refresh to update server components
+        alert("Profile updated successfully!");
+        router.push("/profile");
         router.refresh();
-        // Clear success after 3 seconds
-        setTimeout(() => setSaveSuccess(false), 3000);
       } else {
         const errorData = await res.json();
         console.error("Profile update failed:", errorData);
@@ -202,17 +193,11 @@ export default function EditProfilePage() {
     return (errors as any)[field]?.message;
   };
 
-  if (loading) return <div className="p-8 text-center font-bold opacity-50">Loading Profile...</div>;
+  if (loading) return <div className="p-8 text-center">Loading...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-6 mb-32 relative">
-      <div className="flex items-center gap-4 mb-8">
-        <button onClick={() => router.back()} className="p-2 rounded-xl hover:bg-accent transition-colors">
-          <ArrowLeft size={20} />
-        </button>
-        <h1 className="text-3xl font-black tracking-tight">Edit Profile</h1>
-      </div>
-
+    <div className="max-w-2xl mx-auto p-6 bg-card rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-6">Edit Profile</h1>
       <form onSubmit={handleSubmit(onSubmit, (errors) => console.error("Form validation errors:", errors))} className="space-y-6">
 
         {/* Avatar Upload Section */}
@@ -365,17 +350,17 @@ export default function EditProfilePage() {
           </>
         )}
 
-        {/* Floating Save Bar */}
-        {(isDirty || isSubmitting || saveSuccess) && (
-          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-bottom-5 duration-300">
-            <ToastSave
-              state={isSubmitting ? "loading" : saveSuccess ? "success" : "initial"}
-              onSave={handleSubmit(onSubmit)}
-              onReset={() => reset()}
-              className="bg-card dark:bg-card border-primary/20 shadow-2xl scale-110"
-            />
-          </div>
-        )}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="premium-button w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale transition-all"
+        >
+          {isSubmitting ? (
+            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          ) : (
+            "Save Profile"
+          )}
+        </button>
       </form>
     </div>
   );

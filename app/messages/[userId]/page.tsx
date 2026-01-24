@@ -229,7 +229,7 @@ export default function ChatPage() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 bg-background/50 scroll-smooth" ref={messagesContainerRef}>
+      <div className="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-background/50 scroll-smooth custom-scrollbar" ref={messagesContainerRef}>
         <div className="flex flex-col gap-4 pb-4">
           {messages.map((msg) => {
             const isMe = msg.senderId === (session?.user as any)?.id;
@@ -327,17 +327,21 @@ export default function ChatPage() {
           <input
             type="text"
             value={newMessage}
+            onFocus={() => {
+              // Ensure we scroll to bottom when keyboard comes up
+              setTimeout(scrollToBottom, 300);
+            }}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-background border border-input rounded-full px-5 py-3 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none placeholder:text-muted-foreground text-foreground"
+            className="flex-1 bg-background border border-input rounded-2xl md:rounded-full px-4 md:px-5 py-3 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none placeholder:text-muted-foreground text-foreground min-h-[44px]"
           />
           <Button
             type="submit"
             size="icon"
             disabled={!newMessage.trim()}
-            className="rounded-full size-10 shrink-0 transition-all hover:scale-105 active:scale-95"
+            className="rounded-full size-11 shrink-0 transition-all hover:scale-105 active:scale-95 shadow-md"
           >
-            <Send className="size-4 ml-0.5" />
+            <Send className="size-5 ml-0.5" />
           </Button>
         </form>
       </div>

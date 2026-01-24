@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Plus } from "lucide-react";
 
 interface Skill {
   name: string;
@@ -89,9 +90,10 @@ export default function ProfilePage() {
         </div>
         <Link
           href="/profile/edit"
-          className="text-blue-600 hover:underline"
+          className="premium-button flex items-center gap-2 group"
         >
           Edit Profile
+          <Plus size={14} className="group-hover:rotate-90 transition-transform" />
         </Link>
       </div>
 

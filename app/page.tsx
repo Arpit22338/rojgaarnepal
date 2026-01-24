@@ -246,7 +246,7 @@ export default async function Home() {
                 <>
                   <Link
                     href="/register"
-                    className="premium-button text-lg group"
+                    className="premium-button text-lg group inline-flex items-center justify-center"
                   >
                     Get Started Free
                     <ArrowRight className="ml-2 size-5 group-hover:translate-x-1 transition-transform" />
@@ -261,7 +261,7 @@ export default async function Home() {
               ) : (
                 <Link
                   href="/jobs"
-                  className="premium-button text-lg group"
+                  className="premium-button text-lg group inline-flex items-center justify-center"
                 >
                   Browse Opportunities
                   <ArrowRight className="ml-2 size-5 group-hover:translate-x-1 transition-transform" />

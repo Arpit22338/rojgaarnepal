@@ -12,11 +12,7 @@ export default async function Home() {
   const session = await getServerSession(authOptions);
   const user = session?.user as { role?: string } | undefined;
 
-  const jobCount = await prisma.job.count();
-  const jobSeekerCount = await prisma.user.count({ where: { role: "JOBSEEKER" } });
-  const courseCount = (await prisma.course.count()) - 1;
-
-  // Fetch Latest Jobs (Instead of Premium)
+  // Fetch Latest Jobs
   const latestJobs = await prisma.job.findMany({
     take: 6,
     orderBy: { createdAt: "desc" },
@@ -245,27 +241,27 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Stats Cards - Modern Design */}
+            {/* Feature Highlights - No fake data */}
             <div className="grid grid-cols-2 gap-6">
               <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center hover:scale-105 transition-transform duration-300 shadow-lg">
-                <div className="text-5xl font-black text-primary mb-2">500+</div>
-                <div className="text-foreground font-semibold">Active Jobs</div>
-                <p className="text-muted-foreground text-sm mt-2">Updated daily</p>
+                <div className="text-4xl mb-3">🆓</div>
+                <div className="text-foreground font-bold text-lg">100% Free</div>
+                <p className="text-muted-foreground text-sm mt-2">No hidden fees ever</p>
               </div>
               <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center hover:scale-105 transition-transform duration-300 shadow-lg">
-                <div className="text-5xl font-black text-primary mb-2">1K+</div>
-                <div className="text-foreground font-semibold">Professionals</div>
-                <p className="text-muted-foreground text-sm mt-2">Growing community</p>
+                <div className="text-4xl mb-3">🔒</div>
+                <div className="text-foreground font-bold text-lg">Secure</div>
+                <p className="text-muted-foreground text-sm mt-2">Your data is protected</p>
               </div>
               <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center hover:scale-105 transition-transform duration-300 shadow-lg">
-                <div className="text-5xl font-black text-primary mb-2">50+</div>
-                <div className="text-foreground font-semibold">Companies</div>
-                <p className="text-muted-foreground text-sm mt-2">Trusted partners</p>
+                <div className="text-4xl mb-3">🇳🇵</div>
+                <div className="text-foreground font-bold text-lg">Made for Nepal</div>
+                <p className="text-muted-foreground text-sm mt-2">Local talent focused</p>
               </div>
               <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center hover:scale-105 transition-transform duration-300 shadow-lg">
-                <div className="text-5xl font-black text-primary mb-2">Free</div>
-                <div className="text-foreground font-semibold">Courses</div>
-                <p className="text-muted-foreground text-sm mt-2">Skill development</p>
+                <div className="text-4xl mb-3">⚡</div>
+                <div className="text-foreground font-bold text-lg">Fast & Easy</div>
+                <p className="text-muted-foreground text-sm mt-2">Apply in seconds</p>
               </div>
             </div>
           </div>

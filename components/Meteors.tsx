@@ -14,10 +14,10 @@ export default function Meteors({ number = 20 }: MeteorProps) {
       return [...Array(number)].map((_, idx) => ({
         id: idx,
         style: {
-          top: `${Math.random() * 50}%`,
-          left: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 3}s`,
-          animationDuration: `${Math.random() * 2 + 2}s`,
+          top: `${Math.random() * 40}%`,
+          left: `${Math.random() * 60}%`,
+          animationDelay: `${Math.random() * 8}s`,
+          animationDuration: `${Math.random() * 4 + 5}s`, // Slower: 5-9 seconds
         },
       }));
     };

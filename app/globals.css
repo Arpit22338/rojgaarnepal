@@ -192,28 +192,36 @@
 }
 
 /* ========================
-   METEOR ANIMATION
+   METEOR ANIMATION (Dark mode only)
    ======================== */
-.meteor {
+.dark .meteor {
   position: absolute;
   width: 2px;
   height: 80px;
-  background: linear-gradient(to bottom, hsl(var(--primary)), transparent);
+  background: linear-gradient(to top, hsl(var(--primary)), transparent);
   border-radius: 50%;
   animation: meteor-fall linear infinite;
   opacity: 0;
 }
 
-.meteor::before {
+.meteor {
+  display: none;
+}
+
+.dark .meteor {
+  display: block;
+}
+
+.dark .meteor::before {
   content: '';
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: hsl(var(--primary));
-  box-shadow: 0 0 10px 2px hsl(var(--primary) / 0.6);
-  top: 0;
-  left: -1px;
+  box-shadow: 0 0 12px 3px hsl(var(--primary) / 0.7);
+  bottom: 0;
+  left: -1.5px;
 }
 
 @keyframes meteor-fall {
@@ -222,13 +230,13 @@
     opacity: 0;
   }
   10% {
-    opacity: 1;
+    opacity: 0.8;
   }
   80% {
-    opacity: 1;
+    opacity: 0.8;
   }
   100% {
-    transform: translateY(600px) translateX(600px) rotate(-45deg);
+    transform: translateY(700px) translateX(700px) rotate(-45deg);
     opacity: 0;
   }
 }

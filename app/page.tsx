@@ -100,34 +100,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="container mx-auto px-4 -mt-10 relative z-10">
-        <div className="glass-card rounded-3xl p-8 md:p-12 shadow-2xl border-white/50">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-border/50">
-            <div className="p-4 space-y-2 group cursor-default">
-              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform duration-300 shadow-inner">
-                <Briefcase size={32} />
-              </div>
-              <h3 className="text-4xl font-black text-foreground">{jobCount}+</h3>
-              <p className="text-muted-foreground font-medium uppercase tracking-wide text-sm">Active Job Listings</p>
-            </div>
-            <div className="p-4 space-y-2 group cursor-default">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 mb-4 group-hover:scale-110 transition-transform duration-300 shadow-inner">
-                <Users size={32} />
-              </div>
-              <h3 className="text-4xl font-black text-foreground">{jobSeekerCount}+</h3>
-              <p className="text-muted-foreground font-medium uppercase tracking-wide text-sm">Talented Individuals</p>
-            </div>
-            <div className="p-4 space-y-2 group cursor-default">
-              <div className="mx-auto w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 mb-4 group-hover:scale-110 transition-transform duration-300 shadow-inner">
-                <GraduationCap size={32} />
-              </div>
-              <h3 className="text-4xl font-black text-foreground">{courseCount}+</h3>
-              <p className="text-muted-foreground font-medium uppercase tracking-wide text-sm">Skill Courses Available</p>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Mission Section (Search Engine Optimized) */}
       <section className="container mx-auto px-4 py-10">

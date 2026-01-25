@@ -241,12 +241,12 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Feature Highlights - No fake data */}
+            {/* Feature Highlights */}
             <div className="grid grid-cols-2 gap-6">
               <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center hover:scale-105 transition-transform duration-300 shadow-lg">
-                <div className="text-4xl mb-3">🆓</div>
-                <div className="text-foreground font-bold text-lg">100% Free</div>
-                <p className="text-muted-foreground text-sm mt-2">No hidden fees ever</p>
+                <div className="text-4xl mb-3">💼</div>
+                <div className="text-foreground font-bold text-lg">Free Job Posting</div>
+                <p className="text-muted-foreground text-sm mt-2">Post & apply for free</p>
               </div>
               <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center hover:scale-105 transition-transform duration-300 shadow-lg">
                 <div className="text-4xl mb-3">🔒</div>
@@ -259,9 +259,9 @@ export default async function Home() {
                 <p className="text-muted-foreground text-sm mt-2">Local talent focused</p>
               </div>
               <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 text-center hover:scale-105 transition-transform duration-300 shadow-lg">
-                <div className="text-4xl mb-3">⚡</div>
-                <div className="text-foreground font-bold text-lg">Fast & Easy</div>
-                <p className="text-muted-foreground text-sm mt-2">Apply in seconds</p>
+                <div className="text-4xl mb-3">📚</div>
+                <div className="text-foreground font-bold text-lg">Skill Courses</div>
+                <p className="text-muted-foreground text-sm mt-2">Learn & get certified</p>
               </div>
             </div>
           </div>

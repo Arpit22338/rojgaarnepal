@@ -88,7 +88,7 @@ export default async function Home() {
           <div className="lg:col-span-2 relative hidden lg:block animate-in fade-in slide-in-from-right-5 duration-700">
             <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/50 dark:border-white/10 aspect-[4/5]">
               <Image
-                src="/professional_nepal_workforce_1769273895813.png"
+                src="https://imgs.search.brave.com/xGJjDtq3G6jABED-2yJUY7Ql2Rih7b_RcdKszqSyRic/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNjkx/NTc0NjA1L3Bob3Rv/L2VtcHR5LW9mZmlj/ZS1jb25mZXJlbmNl/LXJvb20uanBnP3M9/NjEyeDYxMiZ3PTAm/az0yMCZjPTBsOC1t/aHBzSlNXcU1zRC1j/aE12N3M4N1Z2enJh/SVNadHZRSlBuTkQ3/Nm89"
                 alt="Professional Workspace in Nepal"
                 fill
                 className="object-cover"

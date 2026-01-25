@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import Navbar from "../components/Navbar";
 import MobileFooter from "../components/MobileFooter";
 import Footer from "../components/Footer";
 import CursorGlow from "../components/CursorGlow";
+import ParticlesBackground from "../components/ParticlesBackground";
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-sans",
 });
 
@@ -83,9 +85,10 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        className={`${poppins.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         <Providers>
+          <ParticlesBackground />
           <CursorGlow />
           <div className="min-h-screen flex flex-col bg-background relative">
             <Navbar />

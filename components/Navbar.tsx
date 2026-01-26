@@ -554,9 +554,10 @@ function DesktopBottomNav() {
   const isActive = (path: string) => pathname === path || (path !== "/" && pathname.startsWith(path));
   
   const navItems = [
+    { href: "/jobs", icon: "bx-briefcase", label: "Jobs" },
     { href: "/my-certificates", icon: "bx-award", label: "Certs" },
     { href: "/saved-jobs", icon: "bx-bookmark", label: "Saved" },
-    { href: "/my-applications", icon: "bx-file", label: "Apps" },
+    { href: "/my-applications", icon: "bx-file", label: "Applications" },
     { href: "/messages", icon: "bx-message-rounded-dots", label: "Chat" },
     { href: "/messages/rojgaar-ai", icon: "bx-bot", label: "RojgaarAI", highlight: true },
   ];

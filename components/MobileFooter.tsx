@@ -62,7 +62,7 @@ export default function MobileFooter() {
     };
 
     const navItems = [
-        { href: "/my-certificates", icon: Award, label: "Certs" },
+        { href: "/", icon: Home, label: "Home" },
         { href: "/saved-jobs", icon: Bookmark, label: "Saved" },
         { icon: PlusCircle, label: "Post", isPrimary: true },
         { href: "/messages", icon: MessageCircle, label: "Chat" },
@@ -165,16 +165,6 @@ export default function MobileFooter() {
                         <div className="p-2 space-y-1">
                             {/* Navigation Links */}
                             <Link
-                                href="/"
-                                onClick={() => setShowMoreMenu(false)}
-                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors text-left"
-                            >
-                                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
-                                    <Home size={20} className="text-foreground" />
-                                </div>
-                                <span className="font-medium text-foreground">Home</span>
-                            </Link>
-                            <Link
                                 href="/jobs"
                                 onClick={() => setShowMoreMenu(false)}
                                 className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors text-left"
@@ -183,6 +173,16 @@ export default function MobileFooter() {
                                     <Briefcase size={20} className="text-foreground" />
                                 </div>
                                 <span className="font-medium text-foreground">Find Jobs</span>
+                            </Link>
+                            <Link
+                                href="/my-certificates"
+                                onClick={() => setShowMoreMenu(false)}
+                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors text-left"
+                            >
+                                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                    <Award size={20} className="text-amber-500" />
+                                </div>
+                                <span className="font-medium text-foreground">My Certificates</span>
                             </Link>
                             
                             <div className="border-t border-border my-2"></div>

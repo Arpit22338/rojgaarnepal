@@ -459,14 +459,23 @@ export default function SkillsGapPage() {
               </h3>
               <div className="space-y-4">
                 {results.skillGaps.slice(0, 8).map((gap, idx) => (
-                  <div key={idx}>
-                    <div className="flex justify-between text-sm mb-1">
+                  <div key={idx} className="p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-colors">
+                    <div className="flex justify-between text-sm mb-2">
                       <span className="font-medium text-foreground">{gap.skill}</span>
-                      <span className="text-muted-foreground">
-                        {gap.currentLevel}/10 → {gap.requiredLevel}/10
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          gap.priority === 'high' ? 'bg-red-500/10 text-red-500' :
+                          gap.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-500' :
+                          'bg-green-500/10 text-green-500'
+                        }`}>
+                          {gap.priority}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          {gap.currentLevel}/10 → {gap.requiredLevel}/10
+                        </span>
+                      </div>
                     </div>
-                    <div className="h-3 bg-accent rounded-full overflow-hidden relative">
+                    <div className="h-2 bg-accent rounded-full overflow-hidden relative mb-2">
                       <div
                         className="absolute inset-y-0 left-0 bg-primary/30 rounded-full transition-all"
                         style={{ width: `${(gap.requiredLevel / 10) * 100}%` }}
@@ -475,6 +484,19 @@ export default function SkillsGapPage() {
                         className="absolute inset-y-0 left-0 bg-primary rounded-full transition-all"
                         style={{ width: `${(gap.currentLevel / 10) * 100}%` }}
                       />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock size={12} /> {gap.timeToLearn}
+                      </span>
+                      <a
+                        href={`https://www.google.com/search?q=learn+${encodeURIComponent(gap.skill)}+tutorial`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline flex items-center gap-1"
+                      >
+                        Learn this skill <ArrowRight size={10} />
+                      </a>
                     </div>
                   </div>
                 ))}
@@ -550,6 +572,62 @@ export default function SkillsGapPage() {
                 <GraduationCap size={20} className="text-primary" />
                 Recommended Learning Resources
               </h3>
+              
+              {/* Quick Links to Learning Platforms */}
+              <div className="mb-6 p-4 rounded-xl bg-linear-to-r from-primary/5 to-primary/10 border border-primary/20">
+                <p className="text-sm font-medium text-foreground mb-3">🎓 Popular Learning Platforms</p>
+                <div className="flex flex-wrap gap-2">
+                  <a 
+                    href={`https://www.coursera.org/search?query=${encodeURIComponent(formData.targetRole)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-sm font-medium hover:bg-blue-500/20 transition-colors"
+                  >
+                    <i className="bx bx-link-external text-xs"></i> Coursera
+                  </a>
+                  <a 
+                    href={`https://www.udemy.com/courses/search/?q=${encodeURIComponent(formData.targetRole)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 text-sm font-medium hover:bg-purple-500/20 transition-colors"
+                  >
+                    <i className="bx bx-link-external text-xs"></i> Udemy
+                  </a>
+                  <a 
+                    href={`https://www.linkedin.com/learning/search?keywords=${encodeURIComponent(formData.targetRole)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 text-sm font-medium hover:bg-sky-500/20 transition-colors"
+                  >
+                    <i className="bx bx-link-external text-xs"></i> LinkedIn Learning
+                  </a>
+                  <a 
+                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(formData.targetRole + ' tutorial')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-500/20 transition-colors"
+                  >
+                    <i className="bx bx-link-external text-xs"></i> YouTube
+                  </a>
+                  <a 
+                    href={`https://www.freecodecamp.org/news/search/?query=${encodeURIComponent(formData.targetRole)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium hover:bg-green-500/20 transition-colors"
+                  >
+                    <i className="bx bx-link-external text-xs"></i> freeCodeCamp
+                  </a>
+                  <a 
+                    href={`https://www.edx.org/search?q=${encodeURIComponent(formData.targetRole)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400 text-sm font-medium hover:bg-orange-500/20 transition-colors"
+                  >
+                    <i className="bx bx-link-external text-xs"></i> edX
+                  </a>
+                </div>
+              </div>
+
               <div className="grid md:grid-cols-2 gap-4">
                 {results.resources.map((resource, idx) => (
                   <div

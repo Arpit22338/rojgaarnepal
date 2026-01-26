@@ -28,6 +28,26 @@ export default function RojgaarAIPopup() {
   const [showFeatures, setShowFeatures] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setShowFeatures(false);
+        setShowBubble(false);
+      }
+    };
+
+    if (isOpen || showFeatures || showBubble) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, showFeatures, showBubble]);
 
   // Fetch random tip on mount
   useEffect(() => {
@@ -142,7 +162,7 @@ export default function RojgaarAIPopup() {
   return (
     <>
       {/* Floating Button with Cloud Bubble */}
-      <div className="fixed bottom-6 right-6 z-50 hidden md:block">
+      <div ref={popupRef} className="fixed bottom-6 right-6 z-50 hidden md:block">
         {/* Cloud Tip Bubble */}
         {showBubble && !isOpen && (
           <div 
@@ -230,114 +250,114 @@ export default function RojgaarAIPopup() {
             <i className="bx bx-bot text-white text-2xl"></i>
           )}
         </button>
-      </div>
 
-      {/* Chat Window */}
-      {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-50 hidden md:flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-300">
-          {/* Header */}
-          <div className="p-4 border-b border-border bg-linear-to-r from-primary/10 to-primary/5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-              <i className="bx bx-bot text-primary text-xl"></i>
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-foreground">RojgaarAI</h3>
-              <p className="text-xs text-muted-foreground">Your career assistant</p>
-            </div>
-            <button
-              onClick={() => setShowFeatures(!showFeatures)}
-              className="p-2 rounded-lg hover:bg-accent transition-colors"
-              title="AI Tools"
-            >
-              <Sparkles size={18} className="text-primary" />
-            </button>
-          </div>
-
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.length === 0 && (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <i className="bx bx-bot text-primary text-3xl"></i>
-                </div>
-                <h4 className="font-bold text-foreground mb-2">Hi! I&apos;m RojgaarAI 👋</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  I can help you navigate RojgaarNepal and boost your career.
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {["What can you do?", "AI Tools", "Help with my profile"].map((q, i) => (
-                    <button
-                      key={i}
-                      onClick={() => { setInput(q); setTimeout(handleSend, 100); }}
-                      className="px-3 py-1.5 bg-accent rounded-full text-xs font-medium hover:bg-accent/80 transition-colors"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
+        {/* Chat Window */}
+        {isOpen && (
+          <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-50 hidden md:flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-300">
+            {/* Header */}
+            <div className="p-4 border-b border-border bg-linear-to-r from-primary/10 to-primary/5 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                <i className="bx bx-bot text-primary text-xl"></i>
               </div>
-            )}
-            
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
-                    msg.role === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-md"
-                      : "bg-accent text-foreground rounded-bl-md"
-                  }`}
-                >
-                  {msg.role === "assistant" && (
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <i className="bx bx-bot text-primary text-sm"></i>
-                      <span className="text-xs font-semibold text-primary">RojgaarAI</span>
-                    </div>
-                  )}
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-foreground">RojgaarAI</h3>
+                <p className="text-xs text-muted-foreground">Your career assistant</p>
               </div>
-            ))}
-            
-            {loading && (
-              <div className="flex justify-start">
-                <div className="bg-accent rounded-2xl rounded-bl-md px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <Loader2 size={16} className="animate-spin text-primary" />
-                    <span className="text-sm text-muted-foreground">Thinking...</span>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input */}
-          <div className="p-4 border-t border-border">
-            <div className="flex gap-2">
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask me anything..."
-                className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                maxLength={500}
-              />
               <button
-                onClick={handleSend}
-                disabled={!input.trim() || loading}
-                className="p-2.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                onClick={() => setShowFeatures(!showFeatures)}
+                className="p-2 rounded-lg hover:bg-accent transition-colors"
+                title="AI Tools"
               >
-                <Send size={18} />
+                <Sparkles size={18} className="text-primary" />
               </button>
             </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.length === 0 && (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <i className="bx bx-bot text-primary text-3xl"></i>
+                  </div>
+                  <h4 className="font-bold text-foreground mb-2">Hi! I&apos;m RojgaarAI 👋</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    I can help you navigate RojgaarNepal and boost your career.
+                  </p>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {["What can you do?", "AI Tools", "Help with my profile"].map((q, i) => (
+                      <button
+                        key={i}
+                        onClick={() => { setInput(q); setTimeout(handleSend, 100); }}
+                        className="px-3 py-1.5 bg-accent rounded-full text-xs font-medium hover:bg-accent/80 transition-colors"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
+                      msg.role === "user"
+                        ? "bg-primary text-primary-foreground rounded-br-md"
+                        : "bg-accent text-foreground rounded-bl-md"
+                    }`}
+                  >
+                    {msg.role === "assistant" && (
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <i className="bx bx-bot text-primary text-sm"></i>
+                        <span className="text-xs font-semibold text-primary">RojgaarAI</span>
+                      </div>
+                    )}
+                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  </div>
+                </div>
+              ))}
+              
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-accent rounded-2xl rounded-bl-md px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Loader2 size={16} className="animate-spin text-primary" />
+                      <span className="text-sm text-muted-foreground">Thinking...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="p-4 border-t border-border">
+              <div className="flex gap-2">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask me anything..."
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  maxLength={500}
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim() || loading}
+                  className="p-2.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Send size={18} />
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }

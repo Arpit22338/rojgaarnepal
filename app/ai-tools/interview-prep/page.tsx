@@ -36,6 +36,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
   RadarChart,
   Radar,
@@ -1787,9 +1788,9 @@ export default function InterviewPrepPage() {
                           ]}
                           cx="50%"
                           cy="50%"
-                          innerRadius={35}
-                          outerRadius={70}
-                          paddingAngle={5}
+                          innerRadius={40}
+                          outerRadius={80}
+                          paddingAngle={3}
                           dataKey="value"
                           label={false}
                           labelLine={false}
@@ -1798,9 +1799,43 @@ export default function InterviewPrepPage() {
                             <Cell key={`cell-${index}`} fill={color} />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip 
+                          formatter={(value) => [`${Math.round((value as number) * 10)}%`, "Score"]}
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--card))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                            color: 'hsl(var(--foreground))'
+                          }}
+                        />
+                        <Legend 
+                          layout="vertical" 
+                          align="right" 
+                          verticalAlign="middle"
+                          wrapperStyle={{ fontSize: '12px', paddingLeft: '10px' }}
+                          formatter={(value: string) => <span style={{ color: 'hsl(var(--foreground))' }}>{value}</span>}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
+                  </div>
+                  
+                  {/* Score Legend with Values */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+                    {[
+                      { name: "Technical", value: analysis.categoryScores.technical, color: CHART_COLORS[0] },
+                      { name: "Behavioral", value: analysis.categoryScores.behavioral, color: CHART_COLORS[1] },
+                      { name: "Communication", value: analysis.categoryScores.communication, color: CHART_COLORS[2] },
+                      { name: "Problem Solving", value: analysis.categoryScores.problemSolving, color: CHART_COLORS[3] },
+                      { name: "Culture Fit", value: analysis.categoryScores.cultureFit, color: CHART_COLORS[4] },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-accent/50">
+                        <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground truncate">{item.name}</p>
+                          <p className="text-sm font-bold text-foreground">{Math.round(item.value * 10)}%</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>

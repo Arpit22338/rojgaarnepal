@@ -133,6 +133,8 @@ export default function InterviewPrepPage() {
   const [micStatus, setMicStatus] = useState<
     "prompt" | "granted" | "denied" | "checking"
   >("prompt");
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [sttError, setSttError] = useState<string | null>(null);
 
   // Timer state
   const [, setTimeLimit] = useState(0);
@@ -150,6 +152,9 @@ export default function InterviewPrepPage() {
   const recordedChunksRef = useRef<Blob[]>([]);
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
+  const audioRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioStreamRef = useRef<MediaStream | null>(null);
 
   const experienceLevels = ["Entry Level", "Mid-Level", "Senior", "Executive"];
   const questionCounts = [5, 10, 15, 20];
@@ -264,6 +269,13 @@ export default function InterviewPrepPage() {
     // Stop speech recognition
     if (recognitionRef.current) {
       recognitionRef.current.stop();
+    }
+    // Stop audio recording for Groq STT
+    if (audioRecorderRef.current && audioRecorderRef.current.state !== "inactive") {
+      audioRecorderRef.current.stop();
+    }
+    if (audioStreamRef.current) {
+      audioStreamRef.current.getTracks().forEach((track) => track.stop());
     }
     // Stop video stream
     if (stream) {
@@ -426,7 +438,134 @@ export default function InterviewPrepPage() {
   };
 
   // =====================
-  // Speech-to-Text
+  // Audio Recording for Groq STT
+  // =====================
+  const startAudioRecording = useCallback(async () => {
+    if (isAISpeaking) {
+      console.log("AI is speaking, waiting...");
+      return;
+    }
+
+    try {
+      // Stop any existing recording
+      if (audioRecorderRef.current && audioRecorderRef.current.state !== "inactive") {
+        audioRecorderRef.current.stop();
+      }
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 16000,
+        },
+      });
+
+      audioStreamRef.current = mediaStream;
+      audioChunksRef.current = [];
+
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : "audio/webm";
+
+      const recorder = new MediaRecorder(mediaStream, { mimeType });
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      recorder.onstart = () => {
+        console.log("🎤 Audio recording started for Groq STT");
+        setIsListening(true);
+        setSttError(null);
+      };
+
+      recorder.onstop = async () => {
+        console.log("🎤 Audio recording stopped, sending to Groq...");
+        setIsListening(false);
+        
+        // Stop the audio stream tracks
+        if (audioStreamRef.current) {
+          audioStreamRef.current.getTracks().forEach(track => track.stop());
+        }
+
+        // Send to Groq STT
+        if (audioChunksRef.current.length > 0) {
+          await transcribeWithGroq();
+        }
+      };
+
+      audioRecorderRef.current = recorder;
+      recorder.start(1000); // Record in 1-second chunks
+
+    } catch (error: any) {
+      console.error("Failed to start audio recording:", error);
+      if (error.name === "NotAllowedError") {
+        setMicStatus("denied");
+      }
+      setIsListening(false);
+    }
+  }, [isAISpeaking]);
+
+  const stopAudioRecording = useCallback(() => {
+    if (audioRecorderRef.current && audioRecorderRef.current.state !== "inactive") {
+      audioRecorderRef.current.stop();
+    }
+    setIsListening(false);
+  }, []);
+
+  const transcribeWithGroq = async () => {
+    if (audioChunksRef.current.length === 0) return;
+
+    setIsTranscribing(true);
+    setSttError(null);
+
+    try {
+      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      
+      // Only transcribe if we have meaningful audio (> 1KB)
+      if (audioBlob.size < 1000) {
+        console.log("Audio too short, skipping transcription");
+        setIsTranscribing(false);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("audio", audioBlob, "recording.webm");
+
+      const response = await fetch("/api/interview/speech-to-text", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Transcription failed");
+      }
+
+      const data = await response.json();
+      
+      if (data.transcript && data.transcript.trim()) {
+        console.log("✅ Groq transcript:", data.transcript);
+        setUserAnswer((prev) => {
+          const newAnswer = prev ? prev + " " + data.transcript : data.transcript;
+          return newAnswer.trim();
+        });
+        setTranscript(""); // Clear any interim display
+      }
+    } catch (error: any) {
+      console.error("Groq STT error:", error);
+      setSttError(error.message || "Failed to transcribe audio");
+    } finally {
+      setIsTranscribing(false);
+      audioChunksRef.current = [];
+    }
+  };
+
+  // =====================
+  // Browser Speech-to-Text (Fallback for real-time interim results)
   // =====================
   const startListening = useCallback(() => {
     // Check browser support
@@ -434,7 +573,9 @@ export default function InterviewPrepPage() {
       !("webkitSpeechRecognition" in window) &&
       !("SpeechRecognition" in window)
     ) {
-      console.error("Speech recognition not supported");
+      // Fall back to audio recording for Groq STT
+      console.log("Browser STT not supported, using Groq STT");
+      startAudioRecording();
       return;
     }
 
@@ -536,13 +677,15 @@ export default function InterviewPrepPage() {
       console.error("Failed to start speech recognition:", error);
       setIsListening(false);
     }
-  }, [interviewMode, isAISpeaking, step]);
+  }, [interviewMode, isAISpeaking, step, startAudioRecording]);
 
   const stopListening = () => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
     }
+    // Also stop audio recording if active
+    stopAudioRecording();
   };
 
   // =====================
@@ -862,23 +1005,70 @@ export default function InterviewPrepPage() {
 
     setIsAnalyzing(true);
     try {
-      const response = await fetch("/api/ai/interview/analyze", {
+      // Prepare answers with questions for the new Groq API
+      const answersWithQuestions = questions.map((q, i) => ({
+        question: q.question,
+        answer: answers[i] || "(No answer provided)",
+        category: q.category || "general",
+      }));
+
+      // Try the new Groq-powered analysis API first
+      let response = await fetch("/api/interview/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          questions,
-          answers,
           jobTitle,
-          experienceLevel,
+          answers: answersWithQuestions,
         }),
       });
 
-      const data = await response.json();
-      if (data.success) {
-        setAnalysis(data.analysis);
-        setStep("results");
+      let data = await response.json();
+
+      // If new API fails, fallback to old API
+      if (!response.ok || data.error) {
+        console.log("Falling back to old analysis API...");
+        response = await fetch("/api/ai/interview/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            questions,
+            answers,
+            jobTitle,
+            experienceLevel,
+          }),
+        });
+        data = await response.json();
+        if (data.success) {
+          setAnalysis(data.analysis);
+          setStep("results");
+        } else {
+          throw new Error(data.error);
+        }
       } else {
-        throw new Error(data.error);
+        // Transform new API response to match expected format
+        setAnalysis({
+          overallScore: data.overallScore || 0,
+          summary: data.summary || "",
+          categoryScores: data.categoryScores || {
+            technical: 5,
+            behavioral: 5,
+            communication: 5,
+            problemSolving: 5,
+            cultureFit: 5,
+          },
+          questionScores: (data.questionScores || []).map((q: { questionIndex?: number; score?: number; feedback?: string }, i: number) => ({
+            questionNumber: (q.questionIndex ?? i) + 1,
+            question: questions[q.questionIndex ?? i]?.question || "",
+            score: q.score || 5,
+            feedback: q.feedback || "",
+          })),
+          strengths: data.strengths || [],
+          improvements: data.improvements || [],
+          recommendations: data.recommendations || [],
+          hireRecommendation: data.hireRecommendation || "Maybe",
+          keyTakeaways: data.keyTakeaways || "",
+        });
+        setStep("results");
       }
     } catch (error) {
       console.error("Error analyzing interview:", error);
@@ -1433,13 +1623,23 @@ export default function InterviewPrepPage() {
 
                   <button
                     onClick={isListening ? stopListening : startListening}
+                    disabled={isTranscribing}
                     className={`p-6 rounded-full transition-all transform hover:scale-105 ${
                       isListening
                         ? "bg-red-500 text-white animate-pulse"
-                        : "bg-primary text-primary-foreground"
+                        : isTranscribing
+                          ? "bg-yellow-500 text-white"
+                          : "bg-primary text-primary-foreground"
                     }`}
+                    title={isListening ? "Stop Recording" : "Start Recording"}
                   >
-                    {isListening ? <MicOff size={32} /> : <Mic size={32} />}
+                    {isTranscribing ? (
+                      <Loader2 size={32} className="animate-spin" />
+                    ) : isListening ? (
+                      <MicOff size={32} />
+                    ) : (
+                      <Mic size={32} />
+                    )}
                   </button>
 
                   <button
@@ -1454,22 +1654,65 @@ export default function InterviewPrepPage() {
                   </button>
                 </div>
 
+                {/* Status Messages */}
+                {isAISpeaking && (
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    <div className="flex gap-1">
+                      <span className="w-1 h-4 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="w-1 h-4 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <span className="w-1 h-4 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                    </div>
+                    <span className="text-primary font-medium">AI is speaking...</span>
+                  </div>
+                )}
+
                 {isListening && (
                   <p className="text-center text-green-500 font-medium animate-pulse">
                     🎤 Listening... Speak your answer
                   </p>
                 )}
 
+                {isTranscribing && (
+                  <p className="text-center text-yellow-500 font-medium">
+                    ⏳ Transcribing with AI... Please wait
+                  </p>
+                )}
+
+                {sttError && (
+                  <p className="text-center text-red-500 text-sm mt-2">
+                    ❌ {sttError}
+                  </p>
+                )}
+
+                {/* Live Answer Display */}
                 {(transcript || userAnswer) && (
                   <div className="mt-4 p-4 rounded-xl bg-accent/50 border border-border">
-                    <h4 className="text-sm font-medium text-muted-foreground mb-2">
-                      Your Answer (Live):
+                    <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                      Your Answer:
+                      {isListening && (
+                        <span className="inline-flex items-center gap-1 text-xs text-green-500">
+                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                          Live
+                        </span>
+                      )}
                     </h4>
-                    <p className="text-foreground">
-                      {userAnswer || transcript || "Start speaking..."}
+                    <p className="text-foreground whitespace-pre-wrap">
+                      {userAnswer}
+                      {transcript && (
+                        <span className="text-muted-foreground italic"> {transcript}</span>
+                      )}
+                      {!userAnswer && !transcript && "Start speaking..."}
                     </p>
                   </div>
                 )}
+
+                {/* Tips */}
+                <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm">
+                  <p className="text-muted-foreground">
+                    <span className="font-medium text-primary">Tip:</span> Click the microphone to start/stop recording. 
+                    Your speech will be transcribed using AI for better accuracy.
+                  </p>
+                </div>
               </div>
             )}
 

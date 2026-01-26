@@ -371,7 +371,6 @@ export default function InterviewPrepPage() {
       return true;
     } catch (error) {
       console.error("Microphone permission denied:", error);
-      alert("Microphone access is required for voice mode. Please allow microphone access in your browser and try again.");
       return false;
     }
   };

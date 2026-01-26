@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X, User, LogOut, MessageSquare, ChevronDown, Settings, HelpCircle, LayoutDashboard, UserMinus, Sparkles, FileText, MessageCircle, Target, TrendingUp } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import NotificationBell from "./NotificationBell";
 import { ThemeToggle } from "./ui/theme-toggle";
 import { getCurrentUserImage } from "@/app/actions";
@@ -620,12 +620,36 @@ function DesktopBottomNav() {
 function FloatingAIButton() {
   const [isExpanded, setIsExpanded] = useState(false);
   const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close when clicking outside the floating menu
+  useEffect(() => {
+    if (!isExpanded) return;
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(event.target as Node)) {
+        setIsExpanded(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isExpanded]);
 
   // Hide on AI tools pages
   if (pathname.startsWith('/ai-tools')) return null;
 
+  const isMessages = pathname.startsWith("/messages");
+
   return (
-    <div className="fixed bottom-6 right-6 z-50 lg:hidden">
+    // Offset upward so it stays above the mobile bottom nav/footer
+    <div
+      ref={containerRef}
+      className={`fixed right-6 z-50 lg:hidden ${isMessages ? "bottom-28" : "bottom-20"}`}
+    >
       {/* Expanded Menu */}
       {isExpanded && (
         <div className="absolute bottom-16 right-0 mb-2 bg-card/95 backdrop-blur-xl border border-border/50 rounded-2xl py-2 px-2 min-w-[220px] shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200">

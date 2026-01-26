@@ -40,6 +40,64 @@ interface AnalysisResult {
   recommendations: string[];
 }
 
+const normalizeAnalysis = (analysis: any): AnalysisResult => {
+  const missingSkills = Array.isArray(analysis?.missingSkills) ? analysis.missingSkills : [];
+  const roadmap = Array.isArray(analysis?.roadmap) ? analysis.roadmap : [];
+  const transferableSkills = Array.isArray(analysis?.transferableSkills) ? analysis.transferableSkills : [];
+  const tips = Array.isArray(analysis?.tips) ? analysis.tips : [];
+
+  const skillGaps: SkillLevel[] = missingSkills.map((gap: any) => ({
+    skill: gap?.skill || "Unknown Skill",
+    currentLevel: typeof gap?.currentLevel === "number" ? gap.currentLevel : 0,
+    requiredLevel: typeof gap?.requiredLevel === "number" ? gap.requiredLevel : 5,
+    priority: (gap?.priority as SkillLevel["priority"]) || "medium",
+    timeToLearn: gap?.learningTime || gap?.timeToLearn || "Varies"
+  }));
+
+  const resources: LearningResource[] = Array.isArray(analysis?.resources)
+    ? analysis.resources
+    : missingSkills.flatMap((gap: any) => {
+        const gapResources = Array.isArray(gap?.resources) ? gap.resources : [];
+        return gapResources.map((resource: any) => {
+          if (typeof resource === "string") {
+            return {
+              title: resource,
+              type: "Resource",
+              duration: "Self-paced",
+              priority: "recommended"
+            } as LearningResource;
+          }
+          return {
+            title: resource?.title || resource?.name || "Resource",
+            type: resource?.type || "Resource",
+            url: resource?.url,
+            duration: resource?.duration || "Self-paced",
+            priority: (resource?.priority as LearningResource["priority"]) || "recommended"
+          } as LearningResource;
+        });
+      });
+
+  const learningPath = roadmap.map((phase: any) => ({
+    phase: typeof phase?.phase === "number"
+      ? `Phase ${phase.phase}${phase?.title ? `: ${phase.title}` : ""}`
+      : phase?.title || phase?.phase || "Phase",
+    duration: phase?.duration || "Varies",
+    skills: Array.isArray(phase?.skills) ? phase.skills : [],
+    milestones: Array.isArray(phase?.milestones) ? phase.milestones : []
+  }));
+
+  return {
+    overallReadiness: typeof analysis?.matchPercentage === "number" ? analysis.matchPercentage : 50,
+    skillGaps,
+    strengths: transferableSkills,
+    learningPath,
+    resources,
+    estimatedTimeToGoal: analysis?.estimatedTimeToGoal || analysis?.timeline || "6 months",
+    quickWins: Array.isArray(analysis?.quickWins) ? analysis.quickWins : [],
+    recommendations: tips
+  };
+};
+
 export default function SkillsGapPage() {
   const [step, setStep] = useState<"input" | "results">("input");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -103,7 +161,8 @@ export default function SkillsGapPage() {
 
       const data = await response.json();
       if (data.success) {
-        setResults(data);
+        const analysis = data.analysis || data;
+        setResults(normalizeAnalysis(analysis));
         setStep("results");
       } else {
         throw new Error(data.error);

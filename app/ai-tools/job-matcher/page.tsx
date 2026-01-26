@@ -83,7 +83,11 @@ export default function JobMatcherPage() {
 
       const data = await response.json();
       if (data.success) {
-        setResults(data);
+        setResults({
+          matches: Array.isArray(data.matches) ? data.matches : [],
+          recommendations: Array.isArray(data.recommendations) ? data.recommendations : [],
+          skillsToLearn: Array.isArray(data.skillsToLearn) ? data.skillsToLearn : []
+        });
         setStep("results");
       } else {
         throw new Error(data.error);

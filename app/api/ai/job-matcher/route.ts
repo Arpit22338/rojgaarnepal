@@ -4,6 +4,21 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+// Helper to safely parse JSON from AI responses
+function parseAIResponse(result: string) {
+  const cleaned = result
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/gi, "")
+    .trim();
+
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    return JSON.parse(jsonMatch[0]);
+  }
+
+  throw new Error("No valid JSON found in response");
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Session can be used for authenticated matching in the future
@@ -76,6 +91,7 @@ For each relevant job (top 10 matches), provide:
 4. Why this job is a good fit
 5. Any concerns or growth areas
 
+IMPORTANT: Return ONLY a valid JSON object (no markdown, no code blocks, no extra text).
 Return JSON array:
 {
   "matches": [
@@ -94,7 +110,7 @@ Return JSON array:
 `;
 
     const messages = [
-      { role: "system" as const, content: AI_PROMPTS.jobMatcher },
+      { role: "system" as const, content: `${AI_PROMPTS.jobMatcher}\n\nIMPORTANT: Always return ONLY valid JSON without markdown code blocks or any other text.` },
       { role: "user" as const, content: prompt }
     ];
 
@@ -103,12 +119,7 @@ Return JSON array:
     // Parse AI response
     let aiMatches;
     try {
-      const jsonMatch = result.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        aiMatches = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found");
-      }
+      aiMatches = parseAIResponse(result);
     } catch {
       // Fallback with basic matching
       aiMatches = {
@@ -126,7 +137,8 @@ Return JSON array:
     }
 
     // Combine AI analysis with actual job data
-    const matchedJobs = aiMatches.matches?.map((match: any) => {
+    const safeMatches = Array.isArray(aiMatches.matches) ? aiMatches.matches : [];
+    const matchedJobs = safeMatches.map((match: any) => {
       const job = jobSummaries[match.jobIndex];
       if (!job) return null;
       const fullJob = jobs[match.jobIndex];
@@ -147,7 +159,7 @@ Return JSON array:
     return NextResponse.json({
       success: true,
       matches: matchedJobs.sort((a: any, b: any) => b.matchScore - a.matchScore),
-      recommendations: aiMatches.overallRecommendations || [],
+      recommendations: aiMatches.overallRecommendations || aiMatches.recommendations || [],
       skillsToLearn: aiMatches.skillsToLearn || []
     });
   } catch (error) {

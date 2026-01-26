@@ -1,6 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { callGroqAI, AI_PROMPTS } from "@/lib/groq";
 
+// Helper to safely parse JSON from AI responses
+function parseAIResponse(result: string) {
+  const cleaned = result
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/gi, "")
+    .trim();
+
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    return JSON.parse(jsonMatch[0]);
+  }
+
+  throw new Error("No valid JSON found in response");
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -50,11 +65,12 @@ Provide a comprehensive analysis including:
 
 Be specific, practical, and encouraging. Focus on actionable steps.
 
+IMPORTANT: Return ONLY a valid JSON object (no markdown, no code blocks, no extra text).
 Return in JSON format.
 `;
 
     const messages = [
-      { role: "system" as const, content: AI_PROMPTS.skillsGap },
+      { role: "system" as const, content: `${AI_PROMPTS.skillsGap}\n\nIMPORTANT: Always return ONLY valid JSON without markdown code blocks or any other text.` },
       { role: "user" as const, content: prompt }
     ];
 
@@ -63,12 +79,7 @@ Return in JSON format.
     // Parse JSON response
     let analysis;
     try {
-      const jsonMatch = result.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        analysis = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error("No JSON found");
-      }
+      analysis = parseAIResponse(result);
     } catch {
       analysis = {
         matchPercentage: 50,

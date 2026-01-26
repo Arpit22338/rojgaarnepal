@@ -132,7 +132,7 @@ ${personalInfo.portfolio ? `- Portfolio: ${personalInfo.portfolio}` : ''}
 PROFESSIONAL SUMMARY:
 ${summary}
 
-${hasWorkExperience && experience?.length > 0 ? `
+${hasWorkExperience && experience && experience.length > 0 ? `
 WORK EXPERIENCE:
 ${experience.map((exp: any, i: number) => `
 Experience ${i + 1}:
@@ -160,11 +160,11 @@ ${edu.achievements ? `- Academic Achievements: ${edu.achievements}` : ''}
 SKILLS:
 - Technical Skills: ${skills.technical}
 ${skills.soft ? `- Soft Skills: ${skills.soft}` : ''}
-${skills.languages?.length > 0 ? `- Languages: ${skills.languages.map((l: any) => `${l.language} (${l.proficiency})`).join(', ')}` : ''}
+${skills.languages && skills.languages.length > 0 ? `- Languages: ${skills.languages.map((l: any) => `${l.language} (${l.proficiency})`).join(', ')}` : ''}
 ${skills.tools ? `- Tools & Technologies: ${skills.tools}` : ''}
 ${skills.certifications ? `- Certifications: ${skills.certifications}` : ''}
 
-${hasProjects && projects?.length > 0 ? `
+${hasProjects && projects && projects.length > 0 ? `
 PROJECTS:
 ${projects.map((proj: any, i: number) => `
 Project ${i + 1}:
@@ -176,7 +176,7 @@ ${proj.duration ? `- Duration: ${proj.duration}` : ''}
 `).join('\n')}
 ` : ''}
 
-${hasVolunteer && volunteer?.length > 0 ? `
+${hasVolunteer && volunteer && volunteer.length > 0 ? `
 VOLUNTEER WORK:
 ${volunteer.map((vol: any, i: number) => `
 Volunteer ${i + 1}:
@@ -187,7 +187,7 @@ Volunteer ${i + 1}:
 `).join('\n')}
 ` : ''}
 
-${hasAwards && awards?.length > 0 ? `
+${hasAwards && awards && awards.length > 0 ? `
 AWARDS & ACHIEVEMENTS:
 ${awards.map((award: any) => `
 - ${award.title}${award.issuer ? ` from ${award.issuer}` : ''}${award.date ? ` (${award.date})` : ''}

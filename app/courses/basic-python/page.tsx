@@ -80,9 +80,9 @@ export default function PythonCoursePage() {
     const isFirstLessonInModule = activeLessonIndex === 0;
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900">
         {/* Hero Header */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 py-12">
+        <div className="relative overflow-hidden bg-linear-to-r from-yellow-500 via-amber-500 to-orange-500 py-12">
           <div className="absolute inset-0 bg-black/20" />
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
           <div className="relative max-w-7xl mx-auto px-4">
@@ -166,9 +166,9 @@ export default function PythonCoursePage() {
                               }`}
                             >
                               {completedLessons.includes(lesson.id) ? (
-                                <CheckCircle size={14} className="text-green-500 flex-shrink-0" />
+                                <CheckCircle size={14} className="text-green-500 shrink-0" />
                               ) : (
-                                <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-600 flex-shrink-0" />
+                                <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-600 shrink-0" />
                               )}
                               <span className="truncate">{lesson.title}</span>
                             </button>
@@ -186,7 +186,7 @@ export default function PythonCoursePage() {
                       setActiveTab("exam");
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-4 rounded-xl font-bold hover:from-green-500 hover:to-emerald-500 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-linear-to-r from-green-600 to-emerald-600 text-white py-3 px-4 rounded-xl font-bold hover:from-green-500 hover:to-emerald-500 transition-all flex items-center justify-center gap-2"
                   >
                     <Trophy size={20} />
                     Take Final Exam
@@ -200,7 +200,7 @@ export default function PythonCoursePage() {
               {/* Current Lesson Card */}
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 overflow-hidden">
                 {/* Lesson Header */}
-                <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-6 border-b border-slate-600">
+                <div className="bg-linear-to-r from-slate-800 to-slate-700 p-6 border-b border-slate-600">
                   <div className="flex items-center gap-2 text-yellow-400 text-sm font-medium mb-2">
                     <Zap size={16} />
                     Module {activeModuleIndex + 1} • Lesson {activeLessonIndex + 1}
@@ -250,7 +250,7 @@ export default function PythonCoursePage() {
                         ),
                         li: ({children}) => (
                           <li className="text-slate-300 flex items-start gap-2">
-                            <ChevronRight size={16} className="text-yellow-500 mt-1 flex-shrink-0" />
+                            <ChevronRight size={16} className="text-yellow-500 mt-1 shrink-0" />
                             <span>{children}</span>
                           </li>
                         ),
@@ -266,7 +266,7 @@ export default function PythonCoursePage() {
                   {/* Interactive Playground */}
                   {activeLesson.challenge && (
                     <div className="mt-8 bg-slate-900/50 rounded-xl border border-slate-600 overflow-hidden">
-                      <div className="bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-3 flex items-center justify-between">
+                      <div className="bg-linear-to-r from-emerald-600 to-green-600 px-4 py-3 flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white font-bold">
                           <Play size={18} />
                           Interactive Challenge
@@ -294,13 +294,13 @@ export default function PythonCoursePage() {
                   {/* Quick Quiz */}
                   {activeLesson.quiz && (
                     <div className="mt-8 bg-slate-900/50 rounded-xl border border-slate-600 overflow-hidden">
-                      <div className="bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-3 flex items-center gap-2">
+                      <div className="bg-linear-to-r from-purple-600 to-violet-600 px-4 py-3 flex items-center gap-2">
                         <HelpCircle size={18} className="text-white" />
                         <span className="text-white font-bold">Quick Quiz</span>
                       </div>
                       <div className="p-6">
                         <p className="text-lg font-bold text-white mb-6 flex gap-3">
-                          <Brain size={24} className="text-purple-400 flex-shrink-0" />
+                          <Brain size={24} className="text-purple-400 shrink-0" />
                           {activeLesson.quiz.question}
                         </p>
                         <div className="space-y-3">
@@ -372,7 +372,7 @@ export default function PythonCoursePage() {
                         }
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-amber-500 text-slate-900 px-6 py-3 rounded-xl font-bold hover:from-yellow-400 hover:to-amber-400 transition-all"
+                      className="flex items-center gap-2 bg-linear-to-r from-yellow-500 to-amber-500 text-slate-900 px-6 py-3 rounded-xl font-bold hover:from-yellow-400 hover:to-amber-400 transition-all"
                     >
                       {isLastLessonInModule && !nextModule ? (
                         <>Take Final Exam <Trophy size={20} /></>
@@ -454,13 +454,13 @@ export default function PythonCoursePage() {
 
     if (submitted && examPassed) {
       return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-8">
+        <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 py-8">
           <div className="max-w-3xl mx-auto px-4">
             <Link href="/courses" className="inline-flex items-center text-slate-400 hover:text-yellow-400 mb-8 transition-colors">
               <ArrowLeft size={20} className="mr-2" /> Back to Classroom
             </Link>
             <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-12 text-center">
-              <div className="w-24 h-24 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+              <div className="w-24 h-24 bg-linear-to-br from-yellow-500 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
                 <Trophy size={48} className="text-slate-900" />
               </div>
               <h2 className="text-4xl font-bold text-white mb-4">🎉 Congratulations!</h2>
@@ -469,7 +469,7 @@ export default function PythonCoursePage() {
               </p>
               <button 
                 onClick={() => setActiveTab("certificate")}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-10 py-4 rounded-xl font-bold hover:from-green-500 hover:to-emerald-500 shadow-xl transition-all hover:scale-105 flex items-center gap-2 mx-auto"
+                className="bg-linear-to-r from-green-600 to-emerald-600 text-white px-10 py-4 rounded-xl font-bold hover:from-green-500 hover:to-emerald-500 shadow-xl transition-all hover:scale-105 flex items-center gap-2 mx-auto"
               >
                 <Award size={20} />
                 Claim Your Certificate
@@ -481,7 +481,7 @@ export default function PythonCoursePage() {
     }
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-8">
+      <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 py-8">
         <div className="max-w-3xl mx-auto px-4">
           <Link href="/courses" className="inline-flex items-center text-slate-400 hover:text-yellow-400 mb-8 transition-colors">
             <ArrowLeft size={20} className="mr-2" /> Back to Classroom
@@ -489,7 +489,7 @@ export default function PythonCoursePage() {
 
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 overflow-hidden">
             {/* Exam Header */}
-            <div className="bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 p-8 text-center relative">
+            <div className="bg-linear-to-r from-purple-600 via-violet-600 to-indigo-600 p-8 text-center relative">
               <div className="absolute inset-0 bg-black/20" />
               <div className="relative">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-4">
@@ -508,7 +508,7 @@ export default function PythonCoursePage() {
                 </span>
                 <div className="flex-1 mx-4 bg-slate-700 rounded-full h-2">
                   <div 
-                    className="bg-gradient-to-r from-purple-500 to-violet-500 h-full rounded-full transition-all duration-500" 
+                    className="bg-linear-to-r from-purple-500 to-violet-500 h-full rounded-full transition-all duration-500" 
                     style={{ width: `${((currentQuestionIndex + 1) / FINAL_EXAM_DATA.length) * 100}%` }}
                   />
                 </div>
@@ -520,7 +520,7 @@ export default function PythonCoursePage() {
               {/* Question */}
               <div className="mb-10">
                 <p className="font-bold text-xl md:text-2xl mb-8 text-white leading-relaxed flex gap-3">
-                  <Target size={28} className="text-purple-400 flex-shrink-0 mt-1" />
+                  <Target size={28} className="text-purple-400 shrink-0 mt-1" />
                   {currentQuestion.question}
                 </p>
                 <div className="space-y-4">
@@ -566,7 +566,7 @@ export default function PythonCoursePage() {
                 <button 
                   onClick={handleNextQuestion}
                   disabled={answers[currentQuestionIndex] === -1}
-                  className="bg-gradient-to-r from-purple-600 to-violet-600 text-white px-8 py-4 rounded-xl font-bold hover:from-purple-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
+                  className="bg-linear-to-r from-purple-600 to-violet-600 text-white px-8 py-4 rounded-xl font-bold hover:from-purple-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
                 >
                   {isLastQuestion ? "Finish Exam" : "Next Question"}
                   <ChevronRight size={20} />
@@ -580,7 +580,7 @@ export default function PythonCoursePage() {
   };
 
   const renderCertificate = () => (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-8">
+    <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 py-8">
       <div className="max-w-5xl mx-auto px-4">
         <Link href="/courses" className="inline-flex items-center text-slate-400 hover:text-yellow-400 mb-8 transition-colors">
           <ArrowLeft size={20} className="mr-2" /> Back to Classroom
@@ -588,7 +588,7 @@ export default function PythonCoursePage() {
 
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-8 md:p-12 text-center">
           <div className="mb-10">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 bg-linear-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle size={40} className="text-white" />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -618,7 +618,7 @@ export default function PythonCoursePage() {
     <>
       {/* Enrollment Gate */}
       {enrollmentStatus !== "APPROVED" && (
-        <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-12">
+        <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 py-12">
           <div className="max-w-5xl mx-auto px-4">
             <Link href="/courses" className="inline-flex items-center text-slate-400 hover:text-yellow-400 mb-8 transition-colors">
               <ArrowLeft size={20} className="mr-2" /> Back to Classroom
@@ -626,7 +626,7 @@ export default function PythonCoursePage() {
             
             <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 overflow-hidden">
               {/* Hero */}
-              <div className="relative bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 p-12 md:p-16 text-center overflow-hidden">
+              <div className="relative bg-linear-to-r from-yellow-500 via-amber-500 to-orange-500 p-12 md:p-16 text-center overflow-hidden">
                 <div className="absolute inset-0 bg-black/20" />
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
                 <div className="relative">

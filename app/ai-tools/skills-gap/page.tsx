@@ -38,13 +38,49 @@ interface AnalysisResult {
   estimatedTimeToGoal: string;
   quickWins: string[];
   recommendations: string[];
+  warnings: string[];
 }
+
+// Detect potential hallucinations in the analysis
+const detectHallucinations = (analysis: any): string[] => {
+  const warnings: string[] = [];
+  
+  // Check if all skills have same time estimate (sign of lazy generation)
+  const times = (analysis?.missingSkills || []).map((s: any) => s?.learningTime || s?.timeToLearn);
+  const uniqueTimes = new Set(times);
+  if (times.length > 3 && uniqueTimes.size === 1) {
+    warnings.push("Time estimates appear uniform - verify individual skill durations");
+  }
+  
+  // Check for too many prerequisites
+  const avgPrereqs = (analysis?.missingSkills || []).reduce((sum: number, s: any) => 
+    sum + (Array.isArray(s?.prerequisites) ? s.prerequisites.length : 0), 0) / 
+    Math.max((analysis?.missingSkills || []).length, 1);
+  
+  if (avgPrereqs > 3) {
+    warnings.push("Prerequisites seem excessive - verify before following this path");
+  }
+  
+  // Check for unrealistic total time
+  const totalTime = (analysis?.estimatedTimeToGoal || "").toLowerCase();
+  if (totalTime.includes("year") || totalTime.includes("18 month") || totalTime.includes("24 month")) {
+    warnings.push("Total time estimate seems high - most transitions take 3-6 months with focused effort");
+  }
+  
+  // Include backend-generated warnings
+  if (Array.isArray(analysis?.warnings)) {
+    warnings.push(...analysis.warnings);
+  }
+  
+  return warnings;
+};
 
 const normalizeAnalysis = (analysis: any): AnalysisResult => {
   const missingSkills = Array.isArray(analysis?.missingSkills) ? analysis.missingSkills : [];
   const roadmap = Array.isArray(analysis?.roadmap) ? analysis.roadmap : [];
   const transferableSkills = Array.isArray(analysis?.transferableSkills) ? analysis.transferableSkills : [];
   const tips = Array.isArray(analysis?.tips) ? analysis.tips : [];
+  const warnings = detectHallucinations(analysis);
 
   const skillGaps: SkillLevel[] = missingSkills.map((gap: any) => ({
     skill: gap?.skill || "Unknown Skill",
@@ -94,7 +130,8 @@ const normalizeAnalysis = (analysis: any): AnalysisResult => {
     resources,
     estimatedTimeToGoal: analysis?.estimatedTimeToGoal || analysis?.timeline || "6 months",
     quickWins: Array.isArray(analysis?.quickWins) ? analysis.quickWins : [],
-    recommendations: tips
+    recommendations: tips,
+    warnings
   };
 };
 
@@ -346,6 +383,27 @@ export default function SkillsGapPage() {
       {/* Step 2: Results */}
       {step === "results" && results && (
         <div className="space-y-6">
+          {/* Warning Banner for Detected Issues */}
+          {results.warnings && results.warnings.length > 0 && (
+            <div className="rounded-xl p-4 border border-amber-500/30 bg-amber-500/10">
+              <h4 className="font-bold text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-2">
+                <AlertCircle size={18} />
+                Analysis Notice
+              </h4>
+              <ul className="space-y-1 text-sm text-amber-700 dark:text-amber-300">
+                {results.warnings.map((warning, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="shrink-0">•</span>
+                    {warning}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                Please verify recommendations with industry resources and job postings before following this path.
+              </p>
+            </div>
+          )}
+
           {/* Overall Readiness */}
           <div className="glass-card rounded-2xl p-8 border border-border/50 text-center">
             <div className="relative w-40 h-40 mx-auto mb-4">

@@ -70,7 +70,7 @@ Job Title/Role: ${jobTitle}
 Experience Level: ${experienceLevel}
 ${industry ? `Industry: ${industry}` : ''}
 ${companyName ? `Company: ${companyName}` : ''}
-${focusTopics?.length > 0 ? `Focus Topics/Skills: ${focusTopics.join(', ')}` : ''}
+${focusTopics && focusTopics.length > 0 ? `Focus Topics/Skills: ${focusTopics.join(', ')}` : ''}
 
 Requirements:
 - Generate 15-20 high-quality interview questions

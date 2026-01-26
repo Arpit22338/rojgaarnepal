@@ -131,10 +131,11 @@ export default function InterviewPrepPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [showMicPrompt, setShowMicPrompt] = useState(false);
   const [micStatus, setMicStatus] = useState<
-    "prompt" | "granted" | "denied" | "checking"
+    "prompt" | "granted" | "denied" | "checking" | "blocked"
   >("prompt");
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [sttError, setSttError] = useState<string | null>(null);
+  const [browserType, setBrowserType] = useState<"chrome" | "safari" | "firefox" | "edge" | "other">("other");
 
   // Timer state
   const [, setTimeLimit] = useState(0);
@@ -693,7 +694,22 @@ export default function InterviewPrepPage() {
   // =====================
   const requestMicrophonePermission = async (): Promise<boolean> => {
     setMicStatus("checking");
+    setSttError(null);
+    
     try {
+      // First check if permission is already blocked at browser level
+      if (navigator.permissions) {
+        try {
+          const permissionStatus = await navigator.permissions.query({ name: "microphone" as PermissionName });
+          if (permissionStatus.state === "denied") {
+            setMicStatus("blocked");
+            return false;
+          }
+        } catch {
+          // Some browsers don't support permission query for microphone
+        }
+      }
+
       // Request microphone access to trigger browser permission prompt
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -713,14 +729,111 @@ export default function InterviewPrepPage() {
         error.name === "NotAllowedError" ||
         error.name === "PermissionDeniedError"
       ) {
+        // User dismissed the prompt or it's blocked
+        // Check if it's blocked at browser level
+        if (navigator.permissions) {
+          try {
+            const permissionStatus = await navigator.permissions.query({ name: "microphone" as PermissionName });
+            if (permissionStatus.state === "denied") {
+              setMicStatus("blocked");
+              return false;
+            }
+          } catch {
+            // Fallback to denied state
+          }
+        }
         setMicStatus("denied");
       } else if (error.name === "NotFoundError") {
         setMicStatus("denied");
-        console.error("No microphone found on this device");
+        setSttError("No microphone found on this device. Please connect a microphone and try again.");
+      } else if (error.name === "NotReadableError") {
+        setMicStatus("denied");
+        setSttError("Microphone is being used by another application. Please close other apps using the microphone.");
       } else {
         setMicStatus("denied");
+        setSttError("Could not access microphone. Please check your device settings.");
       }
       return false;
+    }
+  };
+
+  // Switch to text mode as fallback
+  const switchToTextMode = () => {
+    setInterviewMode("text");
+    setShowMicPrompt(false);
+    setMicStatus("prompt");
+    setSttError(null);
+  };
+
+  // Detect browser type
+  useEffect(() => {
+    const ua = navigator.userAgent.toLowerCase();
+    if (ua.includes("edg/")) {
+      setBrowserType("edge");
+    } else if (ua.includes("chrome") && !ua.includes("edg/")) {
+      setBrowserType("chrome");
+    } else if (ua.includes("safari") && !ua.includes("chrome")) {
+      setBrowserType("safari");
+    } else if (ua.includes("firefox")) {
+      setBrowserType("firefox");
+    } else {
+      setBrowserType("other");
+    }
+  }, []);
+
+  // Get browser-specific permission instructions
+  const getBrowserInstructions = () => {
+    switch (browserType) {
+      case "chrome":
+        return {
+          title: "Enable in Chrome",
+          steps: [
+            "Click the lock/tune icon in the address bar",
+            "Find 'Microphone' in the site settings",
+            "Change it from 'Block' to 'Allow'",
+            "Refresh the page"
+          ]
+        };
+      case "safari":
+        return {
+          title: "Enable in Safari",
+          steps: [
+            "Go to Safari → Settings → Websites",
+            "Click 'Microphone' in the left sidebar",
+            "Find this website and select 'Allow'",
+            "Refresh the page"
+          ]
+        };
+      case "firefox":
+        return {
+          title: "Enable in Firefox",
+          steps: [
+            "Click the lock icon in the address bar",
+            "Click 'Connection secure' → 'More information'",
+            "Go to Permissions tab",
+            "Find Microphone and select 'Allow'"
+          ]
+        };
+      case "edge":
+        return {
+          title: "Enable in Edge",
+          steps: [
+            "Click the lock icon in the address bar",
+            "Click 'Permissions for this site'",
+            "Find 'Microphone' and select 'Allow'",
+            "Refresh the page"
+          ]
+        };
+      default:
+        return {
+          title: "Enable Microphone",
+          steps: [
+            "Open your browser settings",
+            "Go to Privacy & Security",
+            "Allow microphone access for this site",
+            "Refresh the page"
+          ]
+        };
     }
   };
 
@@ -735,8 +848,16 @@ export default function InterviewPrepPage() {
             if (result.state === "granted") {
               setMicStatus("granted");
             } else if (result.state === "denied") {
-              setMicStatus("denied");
+              setMicStatus("blocked");
             }
+            // Listen for permission changes
+            result.addEventListener("change", () => {
+              if (result.state === "granted") {
+                setMicStatus("granted");
+              } else if (result.state === "denied") {
+                setMicStatus("blocked");
+              }
+            });
           })
           .catch(() => {});
       }
@@ -1120,14 +1241,21 @@ export default function InterviewPrepPage() {
   // =====================
   // RENDER
   // =====================
+  const browserInstructions = getBrowserInstructions();
+  
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 pb-24">
       {showMicPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-card rounded-2xl shadow-2xl border border-border max-w-md w-full overflow-hidden">
             <div className="p-4 border-b border-border flex items-center justify-between">
-              <h3 className="font-semibold text-foreground">
-                Allow Microphone Access
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                {micStatus === "blocked" ? (
+                  <MicOff size={18} className="text-red-500" />
+                ) : (
+                  <Mic size={18} className="text-primary" />
+                )}
+                {micStatus === "blocked" ? "Microphone Blocked" : "Allow Microphone Access"}
               </h3>
               <button
                 onClick={() => setShowMicPrompt(false)}
@@ -1137,46 +1265,186 @@ export default function InterviewPrepPage() {
               </button>
             </div>
             <div className="p-5 space-y-4">
-              <div className="flex items-start gap-3">
-                <Mic size={20} className="text-primary mt-0.5" />
-                <div>
-                  <p className="text-sm text-foreground font-medium">
-                    RojgaarAI needs your microphone
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Click “Allow” to enable voice interview. You can change this
-                    anytime in your browser site settings.
-                  </p>
-                </div>
-              </div>
-
-              {micStatus === "denied" && (
-                <div className="text-sm text-red-500">
-                  Permission blocked. Please allow the microphone in your
-                  browser settings and try again.
+              {/* Initial Prompt State */}
+              {(micStatus === "prompt" || micStatus === "checking") && (
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Mic size={20} className="text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-foreground font-medium">
+                      RojgaarAI needs your microphone
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Voice interview requires microphone access for speech recognition. 
+                      Click &quot;Allow&quot; when your browser asks for permission.
+                    </p>
+                  </div>
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-2">
-                <button
-                  onClick={() => setShowMicPrompt(false)}
-                  className="px-4 py-2 rounded-lg border border-border text-foreground hover:bg-accent transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={async () => {
-                    setMicStatus("prompt");
-                    const ok = await requestMicrophonePermission();
-                    if (ok) {
-                      setShowMicPrompt(false);
-                      await beginPractice();
-                    }
-                  }}
-                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
-                  Allow
-                </button>
+              {/* Permission Denied State */}
+              {micStatus === "denied" && (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                    <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+                      <MicOff size={16} className="text-amber-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                        Permission Dismissed
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        You dismissed the permission prompt. Click &quot;Try Again&quot; to request permission.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Permission Blocked State - Shows Browser Instructions */}
+              {micStatus === "blocked" && (
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
+                    <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+                      <MicOff size={16} className="text-red-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                        Microphone Access Blocked
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Your browser has blocked microphone access for this site. 
+                        Follow the steps below to enable it.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-accent/50 rounded-xl p-4 space-y-3">
+                    <p className="text-sm font-semibold text-foreground">
+                      {browserInstructions.title}
+                    </p>
+                    <ol className="space-y-2">
+                      {browserInstructions.steps.map((step, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <span className="w-5 h-5 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center shrink-0 mt-0.5">
+                            {idx + 1}
+                          </span>
+                          {step}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+              )}
+
+              {/* Custom Error State */}
+              {sttError && (
+                <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
+                  <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+                    <XCircle size={16} className="text-red-500" />
+                  </div>
+                  <p className="text-sm text-red-600 dark:text-red-400">{sttError}</p>
+                </div>
+              )}
+
+              {/* Checking State */}
+              {micStatus === "checking" && (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 size={24} className="animate-spin text-primary" />
+                  <span className="ml-2 text-sm text-muted-foreground">Requesting permission...</span>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2 pt-2">
+                {/* Primary Actions */}
+                <div className="flex items-center justify-end gap-2">
+                  {(micStatus === "prompt" || micStatus === "checking") && (
+                    <>
+                      <button
+                        onClick={() => setShowMicPrompt(false)}
+                        className="px-4 py-2 rounded-lg border border-border text-foreground hover:bg-accent transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={async () => {
+                          const ok = await requestMicrophonePermission();
+                          if (ok) {
+                            setShowMicPrompt(false);
+                            await beginPractice();
+                          }
+                        }}
+                        disabled={micStatus === "checking"}
+                        className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {micStatus === "checking" ? (
+                          <>
+                            <Loader2 size={16} className="animate-spin" />
+                            Checking...
+                          </>
+                        ) : (
+                          <>
+                            <Mic size={16} />
+                            Allow
+                          </>
+                        )}
+                      </button>
+                    </>
+                  )}
+
+                  {micStatus === "denied" && (
+                    <>
+                      <button
+                        onClick={switchToTextMode}
+                        className="px-4 py-2 rounded-lg border border-border text-foreground hover:bg-accent transition-colors"
+                      >
+                        Use Text Mode
+                      </button>
+                      <button
+                        onClick={async () => {
+                          setSttError(null);
+                          const ok = await requestMicrophonePermission();
+                          if (ok) {
+                            setShowMicPrompt(false);
+                            await beginPractice();
+                          }
+                        }}
+                        className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors flex items-center gap-2"
+                      >
+                        <RefreshCw size={16} />
+                        Try Again
+                      </button>
+                    </>
+                  )}
+
+                  {micStatus === "blocked" && (
+                    <>
+                      <button
+                        onClick={switchToTextMode}
+                        className="px-4 py-2 rounded-lg border border-border text-foreground hover:bg-accent transition-colors flex items-center gap-2"
+                      >
+                        <MessageCircle size={16} />
+                        Use Text Mode Instead
+                      </button>
+                      <button
+                        onClick={() => window.location.reload()}
+                        className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors flex items-center gap-2"
+                      >
+                        <RefreshCw size={16} />
+                        Refresh Page
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Text Mode Fallback Info */}
+                {(micStatus === "denied" || micStatus === "blocked") && (
+                  <p className="text-xs text-center text-muted-foreground pt-2">
+                    You can still practice with text mode - type your answers instead of speaking.
+                  </p>
+                )}
               </div>
             </div>
           </div>

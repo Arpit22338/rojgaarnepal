@@ -60,7 +60,7 @@ export default function CVCoursePage() {
 
   if (showCertificate) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-8">
+      <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 py-8">
         <div className="max-w-5xl mx-auto px-4">
           <Link href="/courses" className="inline-flex items-center text-gray-400 hover:text-cyan-400 mb-8 transition-colors">
             <ArrowLeft size={20} className="mr-2" /> Back to Classroom
@@ -88,9 +88,9 @@ export default function CVCoursePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900">
       {/* Hero Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 py-16">
+      <div className="relative overflow-hidden bg-linear-to-r from-cyan-600 via-blue-600 to-purple-600 py-16">
         <div className="absolute inset-0 bg-black/30" />
         <div className="relative max-w-5xl mx-auto px-4">
           <Link href="/courses" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
@@ -127,7 +127,7 @@ export default function CVCoursePage() {
             <span className="text-sm font-bold text-cyan-400">{Math.round(progress)}%</span>
           </div>
           <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+            <div className="h-full bg-linear-to-r from-cyan-500 to-blue-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
         </div>
       </div>
@@ -380,11 +380,11 @@ export default function CVCoursePage() {
               <button onClick={()=>{const i=LESSONS.findIndex(l=>l.id===activeLesson);if(i>0){setActiveLesson(LESSONS[i-1].id);window.scrollTo({top:0,behavior:'smooth'})}}}
                 disabled={activeLesson===LESSONS[0].id} className="px-6 py-3 rounded-xl border border-slate-600 text-gray-400 hover:bg-slate-700 disabled:opacity-50">← Previous</button>
               {activeLesson===LESSONS[LESSONS.length-1].id ? (
-                <button onClick={handleComplete} className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-xl flex items-center gap-2">
+                <button onClick={handleComplete} className="px-8 py-3 bg-linear-to-r from-green-500 to-emerald-500 text-white font-bold rounded-xl flex items-center gap-2">
                   <CheckCircle size={20} /> Complete & Get Certificate
                 </button>
               ) : (
-                <button onClick={nextLesson} className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl flex items-center gap-2">
+                <button onClick={nextLesson} className="px-6 py-3 bg-linear-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl flex items-center gap-2">
                   Next Lesson <ChevronRight size={20} />
                 </button>
               )}

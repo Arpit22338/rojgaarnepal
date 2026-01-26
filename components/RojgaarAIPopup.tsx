@@ -162,7 +162,7 @@ export default function RojgaarAIPopup() {
   return (
     <>
       {/* Floating Button with Cloud Bubble */}
-      <div ref={popupRef} className="fixed bottom-6 right-6 z-50 hidden md:block">
+      <div ref={popupRef} className="fixed bottom-20 right-6 z-30 hidden md:block">
         {/* Cloud Tip Bubble */}
         {showBubble && !isOpen && (
           <div 
@@ -253,7 +253,7 @@ export default function RojgaarAIPopup() {
 
         {/* Chat Window */}
         {isOpen && (
-          <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-50 hidden md:flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="fixed bottom-36 right-6 w-96 h-[500px] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-50 hidden md:flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-300">
             {/* Header */}
             <div className="p-4 border-b border-border bg-linear-to-r from-primary/10 to-primary/5 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">

@@ -134,7 +134,7 @@ export default function AIToolsPage() {
           <div className="text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium text-sm">
               <Sparkles size={16} className="animate-pulse" />
-              Powered by Advanced AI
+              Powered by Rojgaar AI
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-foreground">
               <span className="text-primary">AI</span> Career Tools

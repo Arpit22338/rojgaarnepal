@@ -42,7 +42,7 @@ export default function Navbar() {
 
   const getLinkClass = (path: string) => {
     const isActive = path === "/" ? pathname === "/" : pathname.startsWith(path);
-    return `flex items-center gap-1.5 ${isActive ? "text-primary font-semibold" : "text-foreground/70 hover:text-primary"} text-[13px] transition-colors`;
+    return `flex items-center gap-1.5 ${isActive ? "text-primary font-semibold" : "text-foreground/90 hover:text-primary"} text-[13px] transition-colors`;
   };
 
   const router = useRouter();
@@ -148,10 +148,7 @@ export default function Navbar() {
 
             {/* Center: Desktop Menu */}
             <div className="hidden lg:flex items-center gap-1">
-              <Link href="/" className={`${getLinkClass("/")} px-3 py-1.5 rounded-lg hover:bg-accent/50`}>
-                <i className="bx bx-home-alt text-base"></i>
-                Home
-              </Link>
+
               <Link href="/jobs" className={`${getLinkClass("/jobs")} px-3 py-1.5 rounded-lg hover:bg-accent/50`}>
                 <i className="bx bx-briefcase text-base"></i>
                 Jobs
@@ -558,7 +555,7 @@ function DesktopBottomNav() {
   const isActive = (path: string) => pathname === path || (path !== "/" && pathname.startsWith(path));
 
   const navItems = [
-    { href: "/jobs", icon: "bx-briefcase", label: "Jobs" },
+    { href: "/", icon: "bx-home-alt", label: "Home" },
     { href: "/my-certificates", icon: "bx-award", label: "Certs" },
     { href: "/saved-jobs", icon: "bx-bookmark", label: "Saved" },
     { href: "/my-applications", icon: "bx-file", label: "Applications" },

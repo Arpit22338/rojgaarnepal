@@ -42,9 +42,9 @@ interface GroqResponse {
 async function callGroqWithKey(
   apiKey: string,
   messages: GroqMessage[],
-  options: { temperature?: number; maxTokens?: number }
+  options: { temperature?: number; maxTokens?: number; jsonMode?: boolean }
 ): Promise<{ success: boolean; data?: string; isRateLimit?: boolean; error?: string }> {
-  const { temperature = 0.7, maxTokens = 4096 } = options;
+  const { temperature = 0.7, maxTokens = 4096, jsonMode = false } = options;
 
   try {
     const response = await fetch(GROQ_API_URL, {
@@ -58,6 +58,7 @@ async function callGroqWithKey(
         messages,
         temperature,
         max_tokens: maxTokens,
+        response_format: jsonMode ? { type: "json_object" } : undefined,
       }),
     });
 
@@ -83,6 +84,7 @@ export async function callGroqAI(
   options: {
     temperature?: number;
     maxTokens?: number;
+    jsonMode?: boolean;
   } = {}
 ): Promise<string> {
   if (GROQ_API_KEYS.length === 0) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { callGroqAI, AI_PROMPTS } from "@/lib/groq";
+import { smartAICall, parseAIJSON } from "@/lib/ai/smart-client";
 import * as z from "zod";
 
 // OWASP: Input validation schema
@@ -99,140 +99,73 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     // OWASP A03: Input validation
     const validatedData = resumeSchema.parse(body);
-    
+
+    // Destructure for prompt clarity
     const {
-      personalInfo,
-      summary,
-      hasWorkExperience,
-      experience,
-      education,
-      skills,
-      hasProjects,
-      projects,
-      hasVolunteer,
-      volunteer,
-      hasAwards,
-      awards,
-      publications,
-      hobbies
+      personalInfo, summary, hasWorkExperience, experience, education, skills,
+      hasProjects, projects, hasVolunteer, volunteer, hasAwards, awards,
+      publications, hobbies
     } = validatedData;
 
-    // Build the prompt with user data
-    const userDataPrompt = `
-Generate a professional, ATS-optimized resume with the following information:
+    // Detect languages provided by user
+    const userProvidedLanguages = skills.languages && skills.languages.length > 0
+      ? skills.languages.map(l => `${l.language} (${l.proficiency})`).join(', ')
+      : "None provided";
 
-PERSONAL INFORMATION:
-- Full Name: ${personalInfo.fullName}
-- Email: ${personalInfo.email}
-- Phone: ${personalInfo.phone}
-- Location: ${personalInfo.location}
-${personalInfo.linkedin ? `- LinkedIn: ${personalInfo.linkedin}` : ''}
-${personalInfo.portfolio ? `- Portfolio: ${personalInfo.portfolio}` : ''}
+    const systemPrompt = `You are an expert ATS (Applicant Tracking System) Resume Optimizer.
+Your goal is to generate a JSON resume structure that is readable by machines and humans.
 
-PROFESSIONAL SUMMARY:
-${summary}
+CRITICAL RULES:
+1. **LANGUAGES**: If the user provided languages (${userProvidedLanguages}), you MUST include them in the 'skills.languages' array. Do NOT omit them.
+2. **ATS OPTIMIZATION**: Use standard headings and Action Verbs (Achieved, Led, Developed).
+3. **FORMAT**: Return ONLY valid JSON matching the schema below.
+4. **CONTENT**: Polish the descriptions to be professional and impact-oriented.
 
-${hasWorkExperience && experience && experience.length > 0 ? `
-WORK EXPERIENCE:
-${experience.map((exp: any, i: number) => `
-Experience ${i + 1}:
-- Job Title: ${exp.title}
-- Company: ${exp.company}
-- Location: ${exp.location || 'N/A'}
-- Duration: ${exp.startDate} to ${exp.current ? 'Present' : exp.endDate}
-- Responsibilities/Achievements:
-${exp.responsibilities}
-`).join('\n')}
-` : 'No work experience yet - focus on education, skills, and projects.'}
+JSON STRUCTURE:
+{
+  "header": { "name": "", "email": "", "phone": "", "location": "", "linkedin": "", "portfolio": "" },
+  "summary": "Compelling professional summary...",
+  "experience": [{ "title": "", "company": "", "location": "", "startDate": "", "endDate": "", "current": boolean, "responsibilities": ["bullet 1", "bullet 2"] }],
+  "education": [{ "degree": "", "institution": "", "field": "", "graduationYear": "", "gpa": "" }],
+  "skills": { 
+    "technical": ["skill1", "skill2"], 
+    "soft": ["skill1", "skill2"], 
+    "tools": ["tool1", "tool2"],
+    "languages": [{ "language": "Name", "proficiency": "Level" }]
+  },
+  "projects": [{ "title": "", "description": "", "technologies": ["tech1"], "link": "" }],
+  "certifications": ["cert1", "cert2"],
+  "volunteer": [{ "role": "", "organization": "", "duration": "", "description": "" }],
+  "awards": [{ "title": "", "issuer": "", "date": "" }]
+}`;
 
-EDUCATION:
-${education.map((edu: any, i: number) => `
-Education ${i + 1}:
-- Degree: ${edu.degree}${edu.field ? ` in ${edu.field}` : ''}
-- Institution: ${edu.institution}
-- Graduation Year: ${edu.graduationYear}
-${edu.gpa ? `- GPA: ${edu.gpa}` : ''}
-${edu.coursework ? `- Relevant Coursework: ${edu.coursework}` : ''}
-${edu.achievements ? `- Academic Achievements: ${edu.achievements}` : ''}
-`).join('\n')}
-
-SKILLS:
-- Technical Skills: ${skills.technical}
-${skills.soft ? `- Soft Skills: ${skills.soft}` : ''}
-${skills.languages && skills.languages.length > 0 ? `- Languages: ${skills.languages.map((l: any) => `${l.language} (${l.proficiency})`).join(', ')}` : ''}
-${skills.tools ? `- Tools & Technologies: ${skills.tools}` : ''}
-${skills.certifications ? `- Certifications: ${skills.certifications}` : ''}
-
-${hasProjects && projects && projects.length > 0 ? `
-PROJECTS:
-${projects.map((proj: any, i: number) => `
-Project ${i + 1}:
-- Title: ${proj.title}
-- Description: ${proj.description}
-- Technologies: ${proj.technologies}
-${proj.link ? `- Link: ${proj.link}` : ''}
-${proj.duration ? `- Duration: ${proj.duration}` : ''}
-`).join('\n')}
-` : ''}
-
-${hasVolunteer && volunteer && volunteer.length > 0 ? `
-VOLUNTEER WORK:
-${volunteer.map((vol: any, i: number) => `
-Volunteer ${i + 1}:
-- Organization: ${vol.organization}
-- Role: ${vol.role}
-- Duration: ${vol.duration}
-- Description: ${vol.description}
-`).join('\n')}
-` : ''}
-
-${hasAwards && awards && awards.length > 0 ? `
-AWARDS & ACHIEVEMENTS:
-${awards.map((award: any) => `
-- ${award.title}${award.issuer ? ` from ${award.issuer}` : ''}${award.date ? ` (${award.date})` : ''}
-`).join('\n')}
-` : ''}
-
-${publications ? `
-PUBLICATIONS:
-${publications}
-` : ''}
-
-${hobbies ? `
-INTERESTS:
-${hobbies}
-` : ''}
-
-IMPORTANT: 
-- Create a clean, ATS-friendly format
-- Use strong action verbs
-- Quantify achievements where possible
-- If no work experience, emphasize education, projects, and skills
-- Make the summary compelling and tailored to job searching
-`;
-
-    const messages = [
-      { role: "system" as const, content: AI_PROMPTS.resumeBuilder },
-      { role: "user" as const, content: userDataPrompt }
-    ];
-
-    const result = await callGroqAI(messages, { temperature: 0.6, maxTokens: 4096 });
+    const userPrompt = `Generate a resume for:
+    Name: ${personalInfo.fullName}
+    Location: ${personalInfo.location}
+    Summary: ${summary}
+    Languages: ${userProvidedLanguages}
+    Technical Skills: ${skills.technical}
     
-    // Try to parse as JSON, or return as text
-    let parsedResult;
-    try {
-      // Extract JSON from the response
-      const jsonMatch = result.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        parsedResult = JSON.parse(jsonMatch[0]);
-      } else {
-        parsedResult = { rawText: result };
-      }
-    } catch {
-      parsedResult = { rawText: result };
-    }
+    Experience: ${JSON.stringify(experience || [])}
+    Education: ${JSON.stringify(education || [])}
+    Projects: ${JSON.stringify(projects || [])}
+    Awards: ${JSON.stringify(awards || [])}
+    `;
 
-    return NextResponse.json({ success: true, resume: parsedResult });
+    // Use Smart Client (DeepSeek R1 preferred for strong logic/formatting)
+    const result = await smartAICall([
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt }
+    ], {
+      modelType: "reasoner", // Use DeepSeek R1 for reasoning about ATS rules
+      temperature: 0.3,
+      jsonMode: true
+    });
+
+    const parsedResume = parseAIJSON(result);
+
+    return NextResponse.json({ success: true, resume: parsedResume });
+
   } catch (error) {
     console.error("Resume generation error:", error);
     return NextResponse.json(

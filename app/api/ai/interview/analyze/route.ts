@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { callGroqAI } from "@/lib/groq";
+import { smartAICall, parseAIJSON } from "@/lib/ai/smart-client";
 import * as z from "zod";
 
 // OWASP A03: Input validation schema
@@ -29,23 +29,6 @@ function checkRateLimit(userId: string): boolean {
   return true;
 }
 
-// Helper function to safely parse JSON from AI response
-function parseAIResponse(result: string) {
-  // Remove markdown code blocks if present
-  const cleaned = result
-    .replace(/```json\s*/gi, "")
-    .replace(/```\s*/gi, "")
-    .trim();
-  
-  // Try to find JSON object
-  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    return JSON.parse(jsonMatch[0]);
-  }
-  
-  throw new Error("No valid JSON found in response");
-}
-
 export async function POST(req: NextRequest) {
   try {
     // OWASP A01: Authentication check
@@ -62,7 +45,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     // OWASP A03: Input validation
     const validatedData = analyzeSchema.parse(body);
-    
+
     const { questions, answers, jobTitle, experienceLevel } = validatedData;
 
     if (questions.length === 0) {
@@ -113,32 +96,35 @@ Return in this exact JSON format:
   "strengths": ["strength 1", "strength 2", "strength 3"],
   "improvements": ["area 1", "area 2", "area 3"],
   "recommendations": ["tip 1", "tip 2", "tip 3"],
-  "hireRecommendation": "Hire",
+  "hireRecommendation": "Hire|No Hire|Maybe",
   "keyTakeaways": "2-3 sentence summary of most important points"
 }
 
 Be fair but constructive in your assessment. Focus on specific, actionable feedback.
 `;
 
-    const messages = [
-      { 
-        role: "system" as const, 
-        content: `You are an expert interview coach and hiring manager. 
+    // Use Smart Client (DeepSeek R1 for logic and scoring)
+    const result = await smartAICall([
+      {
+        role: "system",
+        content: `You are an expert interview coach and hiring manager using DeepSeek reasoning. 
 Analyze interview responses objectively and provide detailed, constructive feedback.
 IMPORTANT: Always return ONLY valid JSON without markdown code blocks or any other text.
-Be specific and actionable in your feedback.` 
+Be specific, actionable, and STRICT with scoring (don't inflate scores).`
       },
-      { role: "user" as const, content: prompt }
-    ];
-
-    const result = await callGroqAI(messages, { temperature: 0.5, maxTokens: 3000 });
+      { role: "user", content: prompt }
+    ], {
+      modelType: "reasoner",
+      temperature: 0.3,
+      jsonMode: true
+    });
 
     // Parse JSON response
-    let analysis;
+    let analysis: any;
     try {
-      analysis = parseAIResponse(result);
-      
-      // Ensure required fields exist with proper types
+      analysis = parseAIJSON<any>(result);
+
+      // Ensure required fields exist with proper types (Defensive programming)
       analysis = {
         overallScore: analysis.overallScore || 60,
         summary: analysis.summary || "Analysis completed.",
@@ -158,32 +144,22 @@ Be specific and actionable in your feedback.`
       };
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      // Provide default analysis structure
+      // Fallback only if JSON fails completely
       analysis = {
-        overallScore: 60,
-        summary: "Analysis completed. Please review your responses.",
-        categoryScores: {
-          technical: 60,
-          behavioral: 60,
-          communication: 60,
-          problemSolving: 60,
-          cultureFit: 60,
-        },
-        questionScores: qaPairs.map((qa: any, i: number) => ({
-          questionNumber: i + 1,
-          question: qa.question,
-          score: 6,
-          feedback: "Good attempt. Consider providing more specific examples.",
-        })),
-        strengths: ["Completed the interview", "Attempted all questions"],
-        improvements: ["Provide more detailed examples", "Use the STAR method"],
-        recommendations: ["Practice common behavioral questions", "Prepare specific examples from your experience"],
+        overallScore: 50,
+        summary: "Analysis failed to parse instructions.",
+        categoryScores: { technical: 50, behavioral: 50, communication: 50, problemSolving: 50, cultureFit: 50 },
+        questionScores: [],
+        strengths: ["Attempted interview"],
+        improvements: ["Try again"],
+        recommendations: ["System analyzer temporary failure"],
         hireRecommendation: "Maybe",
-        keyTakeaways: "Continue practicing to improve your interview skills.",
+        keyTakeaways: "Please retry the analysis."
       };
     }
 
     return NextResponse.json({ success: true, analysis });
+
   } catch (error) {
     console.error("Interview analysis error:", error);
     return NextResponse.json(

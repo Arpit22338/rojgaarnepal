@@ -8,16 +8,16 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const limit = rateLimitMap.get(userId);
-  
+
   if (!limit || now > limit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + 60000 });
     return true;
   }
-  
+
   if (limit.count >= 5) { // 5 analyses per minute
     return false;
   }
-  
+
   limit.count++;
   return true;
 }
@@ -119,34 +119,73 @@ Analyze this interview and provide detailed feedback.`;
       maxTokens: 4096
     });
 
-    // Parse JSON response
+    // Parse JSON response with improved handling
     let analysis;
     try {
-      // Extract JSON from response (handle markdown code blocks)
-      let jsonStr = response;
-      const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (jsonMatch) {
-        jsonStr = jsonMatch[1];
+      // Extract JSON from response (handle multiple formats)
+      let jsonStr = response.trim();
+
+      // Try markdown code block first
+      const codeBlockMatch = response.match(/```(?:json)?[\s\n]*(\{[\s\S]*?\})[\s\n]*```/);
+      if (codeBlockMatch) {
+        jsonStr = codeBlockMatch[1];
+      } else {
+        // Try to find JSON object directly
+        const jsonObjectMatch = response.match(/\{[\s\S]*\}/);
+        if (jsonObjectMatch) {
+          jsonStr = jsonObjectMatch[0];
+        }
       }
+
       analysis = JSON.parse(jsonStr);
-    } catch {
-      console.error("Failed to parse analysis:", response);
-      // Return a default structure if parsing fails
+
+      // Validate and ensure required fields exist with proper types
       analysis = {
-        overallScore: 50,
+        overallScore: typeof analysis.overallScore === 'number' ? analysis.overallScore : 60,
+        summary: analysis.summary || "Interview analysis completed.",
+        hireRecommendation: analysis.hireRecommendation || "Maybe",
+        categoryScores: {
+          technical: typeof analysis.categoryScores?.technical === 'number' ? analysis.categoryScores.technical : 6,
+          behavioral: typeof analysis.categoryScores?.behavioral === 'number' ? analysis.categoryScores.behavioral : 6,
+          communication: typeof analysis.categoryScores?.communication === 'number' ? analysis.categoryScores.communication : 6,
+          problemSolving: typeof analysis.categoryScores?.problemSolving === 'number' ? analysis.categoryScores.problemSolving : 6,
+          cultureFit: typeof analysis.categoryScores?.cultureFit === 'number' ? analysis.categoryScores.cultureFit : 6,
+        },
+        questionScores: Array.isArray(analysis.questionScores) ? analysis.questionScores.map((q: { questionIndex?: number; score?: number; feedback?: string }, i: number) => ({
+          questionIndex: typeof q.questionIndex === 'number' ? q.questionIndex : i,
+          score: typeof q.score === 'number' ? q.score : 6,
+          feedback: q.feedback || "Answer evaluated."
+        })) : sanitizedAnswers.map((_, i) => ({
+          questionIndex: i,
+          score: 6,
+          feedback: "Answer evaluated."
+        })),
+        strengths: Array.isArray(analysis.strengths) ? analysis.strengths : ["Completed the interview"],
+        improvements: Array.isArray(analysis.improvements) ? analysis.improvements : ["Continue practicing"],
+        recommendations: Array.isArray(analysis.recommendations) ? analysis.recommendations : ["Practice with more mock interviews"],
+        keyTakeaways: analysis.keyTakeaways || "Continue practicing to improve interview performance."
+      };
+
+      console.log("Interview analysis parsed successfully:", JSON.stringify(analysis.categoryScores));
+    } catch (parseError) {
+      console.error("Failed to parse analysis. Raw response:", response.substring(0, 500));
+      console.error("Parse error:", parseError);
+      // Return a default structure if parsing fails completely
+      analysis = {
+        overallScore: 55,
         summary: "Interview analysis completed. Please review individual responses.",
         hireRecommendation: "Maybe",
         categoryScores: {
-          technical: 5,
-          behavioral: 5,
-          communication: 5,
-          problemSolving: 5,
-          cultureFit: 5
+          technical: 5.5,
+          behavioral: 5.5,
+          communication: 5.5,
+          problemSolving: 5.5,
+          cultureFit: 5.5
         },
         questionScores: sanitizedAnswers.map((_, i) => ({
           questionIndex: i,
-          score: 5,
-          feedback: "Answer recorded."
+          score: 5.5,
+          feedback: "Answer recorded. Unable to provide detailed analysis."
         })),
         strengths: ["Completed the interview", "Showed willingness to participate"],
         improvements: ["Provide more detailed answers", "Use the STAR method"],

@@ -73,18 +73,17 @@ export default function CoursesList({ courses }: { courses: Course[] }) {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <i className={`bx ${iconConfig.icon} text-7xl text-white/90 group-hover:scale-110 transition-transform duration-500`}></i>
                   </div>
-                  
+
                   {/* Decorative elements */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full translate-y-12 -translate-x-12"></div>
 
                   {/* Badge */}
                   {course.price > 0 ? (
-                    <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide flex items-center backdrop-blur-sm ${
-                      course.isUnlocked
-                        ? "bg-green-500/90 text-white"
-                        : "bg-white/20 text-white"
-                    }`}>
+                    <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide flex items-center backdrop-blur-sm ${course.isUnlocked
+                      ? "bg-green-500/90 text-white"
+                      : "bg-white/20 text-white"
+                      }`}>
                       {course.isUnlocked ? <Unlock size={10} className="mr-1" /> : <Lock size={10} className="mr-1" />}
                       {course.isUnlocked ? "Unlocked" : "Premium"}
                     </div>
@@ -127,11 +126,10 @@ export default function CoursesList({ courses }: { courses: Course[] }) {
 
                       <button
                         onClick={() => handleEnroll(course)}
-                        className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                          course.isUnlocked || course.price === 0
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                            : "bg-accent text-foreground hover:bg-accent/80"
-                        }`}
+                        className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${course.isUnlocked || course.price === 0
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "bg-accent text-foreground hover:bg-accent/80"
+                          }`}
                       >
                         {course.isUnlocked || course.price === 0 ? (
                           <>

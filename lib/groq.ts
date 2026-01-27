@@ -1,19 +1,24 @@
-// OpenAI Configuration
-export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
-export const OPENAI_MODEL = "gpt-4o-mini";
-export const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+// Groq AI Configuration with Fallback Support
+const GROQ_API_KEYS = [
+  process.env.GROQ_API_KEY || "",
+  process.env.GROQ_API_KEY_2 || "",
+].filter(key => key !== "");
 
-// Legacy exports for backward compatibility
-export const GROQ_API_KEY = OPENAI_API_KEY;
-export const GROQ_MODEL = OPENAI_MODEL;
-export const GROQ_API_URL = OPENAI_API_URL;
+export const GROQ_API_KEY = GROQ_API_KEYS[0] || "";
+export const GROQ_MODEL = "llama-3.3-70b-versatile";
+export const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-interface OpenAIMessage {
+// Track which key to use (rotates on rate limit)
+let currentKeyIndex = 0;
+let lastKeyRotation = 0;
+const KEY_ROTATION_COOLDOWN = 60000; // 1 minute cooldown before rotating back
+
+interface GroqMessage {
   role: "system" | "user" | "assistant";
   content: string;
 }
 
-interface OpenAIResponse {
+interface GroqResponse {
   id: string;
   object: string;
   created: number;
@@ -33,36 +38,93 @@ interface OpenAIResponse {
   };
 }
 
+// Internal function to call GROQ with a specific key
+async function callGroqWithKey(
+  apiKey: string,
+  messages: GroqMessage[],
+  options: { temperature?: number; maxTokens?: number }
+): Promise<{ success: boolean; data?: string; isRateLimit?: boolean; error?: string }> {
+  const { temperature = 0.7, maxTokens = 4096 } = options;
+
+  try {
+    const response = await fetch(GROQ_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages,
+        temperature,
+        max_tokens: maxTokens,
+      }),
+    });
+
+    if (response.status === 429) {
+      return { success: false, isRateLimit: true, error: "Rate limit exceeded" };
+    }
+
+    if (!response.ok) {
+      const error = await response.text();
+      return { success: false, error: `Groq API error: ${response.status} - ${error}` };
+    }
+
+    const data: GroqResponse = await response.json();
+    return { success: true, data: data.choices[0]?.message?.content || "" };
+  } catch (error) {
+    return { success: false, error: String(error) };
+  }
+}
+
+// Main function with automatic key rotation on rate limit
 export async function callGroqAI(
-  messages: OpenAIMessage[],
+  messages: GroqMessage[],
   options: {
     temperature?: number;
     maxTokens?: number;
   } = {}
 ): Promise<string> {
-  const { temperature = 0.7, maxTokens = 4096 } = options;
-
-  const response = await fetch(OPENAI_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: OPENAI_MODEL,
-      messages,
-      temperature,
-      max_tokens: maxTokens,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+  if (GROQ_API_KEYS.length === 0) {
+    throw new Error("No GROQ API keys configured");
   }
 
-  const data: OpenAIResponse = await response.json();
-  return data.choices[0]?.message?.content || "";
+  // Reset key index after cooldown period
+  const now = Date.now();
+  if (now - lastKeyRotation > KEY_ROTATION_COOLDOWN && currentKeyIndex !== 0) {
+    currentKeyIndex = 0;
+  }
+
+  // Try current key first
+  const firstResult = await callGroqWithKey(GROQ_API_KEYS[currentKeyIndex], messages, options);
+
+  if (firstResult.success) {
+    return firstResult.data!;
+  }
+
+  // If rate limited and we have more keys, try the next one
+  if (firstResult.isRateLimit && GROQ_API_KEYS.length > 1) {
+    const nextKeyIndex = (currentKeyIndex + 1) % GROQ_API_KEYS.length;
+    console.log(`GROQ rate limit hit, rotating to key ${nextKeyIndex + 1}`);
+
+    const secondResult = await callGroqWithKey(GROQ_API_KEYS[nextKeyIndex], messages, options);
+
+    if (secondResult.success) {
+      // Remember the working key
+      currentKeyIndex = nextKeyIndex;
+      lastKeyRotation = now;
+      return secondResult.data!;
+    }
+
+    // Both keys rate limited
+    if (secondResult.isRateLimit) {
+      throw new Error("All GROQ API keys are rate limited. Please wait a moment and try again.");
+    }
+
+    throw new Error(secondResult.error || "GROQ API error");
+  }
+
+  throw new Error(firstResult.error || "GROQ API error");
 }
 
 // Specialized AI function prompts

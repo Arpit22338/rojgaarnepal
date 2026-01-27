@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { 
-  User, Briefcase, GraduationCap, 
-  Wrench, FolderOpen, Heart, Award, FileText, Plus, Trash2, ChevronDown, 
+import {
+  User, Briefcase, GraduationCap,
+  Wrench, FolderOpen, Heart, Award, FileText, Plus, Trash2, ChevronDown,
   ChevronUp, Sparkles, Download, Image as ImageIcon, Edit3, Check
 } from "lucide-react";
 
@@ -237,7 +237,7 @@ export default function ResumeBuilderPage() {
       };
       localStorage.setItem("resumeBuilderData", JSON.stringify(data));
     };
-    
+
     const interval = setInterval(saveData, 30000);
     return () => clearInterval(interval);
   }, [personalInfo, summary, hasWorkExperience, experience, education, skills, hasProjects, projects, hasVolunteer, volunteer, hasAwards, awards, publications, hobbies]);
@@ -256,45 +256,45 @@ export default function ResumeBuilderPage() {
   const calculateProgress = () => {
     let filled = 0;
     let total = 0;
-    
+
     // Personal info (required: name, email, phone, location)
     total += 4;
     if (personalInfo.fullName) filled++;
     if (personalInfo.email) filled++;
     if (personalInfo.phone) filled++;
     if (personalInfo.location) filled++;
-    
+
     // Summary
     total += 1;
     if (summary) filled++;
-    
+
     // Education (at least one complete entry)
     total += 1;
     if (education.some(e => e.degree && e.institution && e.field)) filled++;
-    
+
     // Skills
     total += 1;
     if (skills.technical) filled++;
-    
+
     return Math.round((filled / total) * 100);
   };
 
   // Add/remove array items
   const addExperience = () => setExperience([...experience, { id: Date.now().toString(), title: "", company: "", location: "", startDate: "", endDate: "", current: false, responsibilities: "" }]);
   const removeExperience = (id: string) => setExperience(experience.filter(e => e.id !== id));
-  
+
   const addEducation = () => setEducation([...education, { id: Date.now().toString(), degree: "", institution: "", field: "", graduationYear: "", gpa: "", noGpa: false, coursework: "", achievements: "" }]);
   const removeEducation = (id: string) => setEducation(education.filter(e => e.id !== id));
-  
+
   const addLanguage = () => setSkills({ ...skills, languages: [...skills.languages, { language: "", proficiency: "Fluent" }] });
   const removeLanguage = (index: number) => setSkills({ ...skills, languages: skills.languages.filter((_, i) => i !== index) });
-  
+
   const addProject = () => setProjects([...projects, { id: Date.now().toString(), title: "", description: "", technologies: "", link: "", duration: "" }]);
   const removeProject = (id: string) => setProjects(projects.filter(p => p.id !== id));
-  
+
   const addVolunteer = () => setVolunteer([...volunteer, { id: Date.now().toString(), organization: "", role: "", duration: "", description: "" }]);
   const removeVolunteer = (id: string) => setVolunteer(volunteer.filter(v => v.id !== id));
-  
+
   const addAward = () => setAwards([...awards, { id: Date.now().toString(), title: "", issuer: "", date: "" }]);
   const removeAward = (id: string) => setAwards(awards.filter(a => a.id !== id));
 
@@ -326,7 +326,7 @@ export default function ResumeBuilderPage() {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setGeneratedResume(data.resume);
         setShowPreview(true);
@@ -344,12 +344,12 @@ export default function ResumeBuilderPage() {
   // Download as PDF
   const downloadPDF = async () => {
     if (!resumeRef.current) return;
-    
+
     const { jsPDF } = await import("jspdf");
     const html2canvas = (await import("html2canvas")).default;
-    
+
     // High quality settings for crisp PDF output
-    const canvas = await html2canvas(resumeRef.current, { 
+    const canvas = await html2canvas(resumeRef.current, {
       scale: 4, // Higher scale for sharper text
       useCORS: true,
       backgroundColor: "#ffffff",
@@ -358,11 +358,11 @@ export default function ResumeBuilderPage() {
       imageTimeout: 0
     });
     const imgData = canvas.toDataURL("image/png", 1.0); // Maximum quality
-    
+
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    
+
     // Add image with compression set to NONE for best quality
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight, undefined, "NONE");
     pdf.save(`Resume_${personalInfo.fullName.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.pdf`);
@@ -371,11 +371,11 @@ export default function ResumeBuilderPage() {
   // Download as Image
   const downloadImage = async () => {
     if (!resumeRef.current) return;
-    
+
     const html2canvas = (await import("html2canvas")).default;
-    
+
     // High quality settings for crisp image output
-    const canvas = await html2canvas(resumeRef.current, { 
+    const canvas = await html2canvas(resumeRef.current, {
       scale: 4, // Higher scale for sharper text (4x resolution)
       useCORS: true,
       backgroundColor: "#ffffff",
@@ -383,7 +383,7 @@ export default function ResumeBuilderPage() {
       allowTaint: true,
       imageTimeout: 0
     });
-    
+
     const link = document.createElement("a");
     link.download = `Resume_${personalInfo.fullName.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.png`;
     link.href = canvas.toDataURL("image/png", 1.0); // Maximum quality PNG
@@ -445,7 +445,7 @@ export default function ResumeBuilderPage() {
         </div>
 
         {/* Resume Preview - ATS-friendly format */}
-        <div 
+        <div
           ref={resumeRef}
           className="bg-white p-12 shadow-2xl mx-auto max-w-[800px] font-['Times_New_Roman',serif]"
           style={{ minHeight: "1100px", color: "#000000" }}
@@ -546,7 +546,10 @@ export default function ResumeBuilderPage() {
                   <p><strong>Tools:</strong> {Array.isArray(generatedResume.skills.tools) ? generatedResume.skills.tools.join(", ") : generatedResume.skills.tools}</p>
                 )}
                 {generatedResume.skills.languages && generatedResume.skills.languages.length > 0 && (
-                  <p><strong>Languages:</strong> {generatedResume.skills.languages.map(l => `${l.language} (${l.proficiency})`).join(", ")}</p>
+                  <p><strong>Languages:</strong> {generatedResume.skills.languages
+                    .filter((l: { language?: string; proficiency?: string }) => l?.language)
+                    .map((l: { language?: string; proficiency?: string }) => l.proficiency ? `${l.language} (${l.proficiency})` : l.language)
+                    .join(", ") || "Not specified"}</p>
                 )}
               </div>
             </section>
@@ -635,7 +638,7 @@ export default function ResumeBuilderPage() {
           <span className="text-sm font-bold text-primary">{calculateProgress()}% Complete</span>
         </div>
         <div className="h-2 bg-accent rounded-full overflow-hidden">
-          <div 
+          <div
             className="h-full bg-primary rounded-full transition-all duration-500"
             style={{ width: `${calculateProgress()}%` }}
           />
@@ -668,13 +671,12 @@ export default function ResumeBuilderPage() {
               <div key={step.id} className="flex items-center">
                 <button
                   onClick={() => setCurrentStep(step.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                    currentStep === step.id 
-                      ? "bg-primary text-primary-foreground" 
-                      : isStepValid(step.id) 
-                        ? "bg-primary/10 text-primary" 
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${currentStep === step.id
+                      ? "bg-primary text-primary-foreground"
+                      : isStepValid(step.id)
+                        ? "bg-primary/10 text-primary"
                         : "bg-accent text-muted-foreground hover:bg-accent/80"
-                  }`}
+                    }`}
                 >
                   <step.icon size={18} />
                   <span className="hidden md:inline font-medium">{step.title}</span>
@@ -696,7 +698,7 @@ export default function ResumeBuilderPage() {
             <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
               <User className="text-primary" size={24} /> Personal Information
             </h2>
-            
+
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Full Name *</label>

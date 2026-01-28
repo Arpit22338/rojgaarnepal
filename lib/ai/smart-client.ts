@@ -1,5 +1,7 @@
 import { callDeepSeekReasoner, callDeepSeekChat } from "@/lib/openrouter";
 import { callGroqAI } from "@/lib/groq";
+import { callCerebrasAI } from "@/lib/ai/cerebras";
+import { callPublicAI } from "@/lib/ai/publicai";
 
 export interface SmartAIOptions {
     temperature?: number;
@@ -9,9 +11,9 @@ export interface SmartAIOptions {
 }
 
 /**
- * Smart AI Client
- * Prioritizes DeepSeek R1 (OpenRouter) for high-quality reasoning.
- * Falls back to Groq (Llama 3 70B) for speed/redundancy if DeepSeek fails/rate-limits.
+ * Smart AI Client - Production Ready
+ * Robust fallback chain: DeepSeek → Groq → Cerebras → PublicAI
+ * Ensures AI features always work even if individual providers fail.
  */
 export async function smartAICall(
     messages: { role: "system" | "user" | "assistant"; content: string }[],
@@ -26,13 +28,12 @@ export async function smartAICall(
 
     console.log(`🧠 SmartAI Request: [${modelType}] with ${messages.length} messages`);
 
-    // 1. Try DeepSeek (R1 or V3)
+    // Provider 1: DeepSeek (Primary - Best for reasoning)
     try {
         const deepSeekPromise = modelType === "reasoner"
             ? callDeepSeekReasoner(messages, { temperature, maxTokens })
             : callDeepSeekChat(messages, { temperature, maxTokens });
 
-        // Timeout DeepSeek after 45s (it can be slow)
         const result = await Promise.race([
             deepSeekPromise,
             new Promise<string>((_, reject) =>
@@ -43,24 +44,58 @@ export async function smartAICall(
         console.log("✅ DeepSeek Success");
         return result;
 
-    } catch (error: any) {
-        console.warn("⚠️ DeepSeek Failed/Timeout, falling back to Groq:", error.message);
-
-        // 2. Fallback to Groq (Llama 3 70B)
-        // Llama 3 70B is an excellent fallback for R1
-        try {
-            const result = await callGroqAI(messages, {
-                temperature,
-                maxTokens,
-                jsonMode
-            });
-            console.log("✅ Groq Fallback Success");
-            return result;
-        } catch (groqError: any) {
-            console.error("❌ All AI Providers Failed:", groqError.message);
-            throw new Error("AI Service Unavailable. Please try again later.");
-        }
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.warn("⚠️ DeepSeek Failed:", errorMessage);
     }
+
+    // Provider 2: Groq (Fast - Llama 3 70B)
+    try {
+        const result = await Promise.race([
+            callGroqAI(messages, { temperature, maxTokens, jsonMode }),
+            new Promise<string>((_, reject) =>
+                setTimeout(() => reject(new Error("Groq Timeout")), 30000)
+            )
+        ]);
+        console.log("✅ Groq Fallback Success");
+        return result;
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.warn("⚠️ Groq Failed:", errorMessage);
+    }
+
+    // Provider 3: Cerebras (Ultra-fast inference)
+    try {
+        const result = await Promise.race([
+            callCerebrasAI(messages, { temperature, maxTokens }),
+            new Promise<string>((_, reject) =>
+                setTimeout(() => reject(new Error("Cerebras Timeout")), 30000)
+            )
+        ]);
+        console.log("✅ Cerebras Fallback Success");
+        return result;
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.warn("⚠️ Cerebras Failed:", errorMessage);
+    }
+
+    // Provider 4: PublicAI (Final fallback)
+    try {
+        const result = await Promise.race([
+            callPublicAI(messages, { temperature, maxTokens }),
+            new Promise<string>((_, reject) =>
+                setTimeout(() => reject(new Error("PublicAI Timeout")), 30000)
+            )
+        ]);
+        console.log("✅ PublicAI Fallback Success");
+        return result;
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.error("❌ All AI Providers Failed:", errorMessage);
+    }
+
+    // All providers failed
+    throw new Error("AI Service Unavailable. All providers failed. Please try again later.");
 }
 
 /**

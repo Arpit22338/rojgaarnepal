@@ -1,12 +1,13 @@
 // OpenRouter API Configuration for DeepSeek models
 // Used for chat and resume builder features to reduce GROQ rate limiting
+// Production-ready with improved model selection
 
 export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 export const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-// DeepSeek models available through OpenRouter
-export const DEEPSEEK_V3_MODEL = "deepseek/deepseek-chat"; // Fast, cost-effective
-export const DEEPSEEK_R1_MODEL = "deepseek/deepseek-reasoner"; // Better reasoning for resume
+// DeepSeek models available through OpenRouter - optimized for rate limit efficiency
+export const DEEPSEEK_V3_MODEL = "deepseek/deepseek-chat"; // Fast, cost-effective for general chat
+export const DEEPSEEK_R1_MODEL = "deepseek/deepseek-r1"; // Better reasoning for resume/complex tasks
 
 interface OpenRouterMessage {
     role: "system" | "user" | "assistant";

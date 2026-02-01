@@ -136,6 +136,7 @@ export default function InterviewPrepPage() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [sttError, setSttError] = useState<string | null>(null);
   const [browserType, setBrowserType] = useState<"chrome" | "safari" | "firefox" | "edge" | "other">("other");
+  const [showLockedToast, setShowLockedToast] = useState(false);
 
   // Timer state
   const [, setTimeLimit] = useState(0);
@@ -1171,22 +1172,22 @@ export default function InterviewPrepPage() {
           overallScore: data.overallScore || 0,
           summary: data.summary || "",
           categoryScores: data.categoryScores || {
-            technical: 5,
-            behavioral: 5,
-            communication: 5,
-            problemSolving: 5,
-            cultureFit: 5,
+            technical: 0,
+            behavioral: 0,
+            communication: 0,
+            problemSolving: 0,
+            cultureFit: 0,
           },
           questionScores: (data.questionScores || []).map((q: { questionIndex?: number; score?: number; feedback?: string }, i: number) => ({
             questionNumber: (q.questionIndex ?? i) + 1,
             question: questions[q.questionIndex ?? i]?.question || "",
-            score: q.score || 5,
+            score: q.score ?? 0,
             feedback: q.feedback || "",
           })),
           strengths: data.strengths || [],
           improvements: data.improvements || [],
           recommendations: data.recommendations || [],
-          hireRecommendation: data.hireRecommendation || "Maybe",
+          hireRecommendation: data.hireRecommendation || "Pending",
           keyTakeaways: data.keyTakeaways || "",
         });
         setStep("results");
@@ -1245,6 +1246,31 @@ export default function InterviewPrepPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 pb-24">
+      {/* Locked Feature Toast */}
+      {showLockedToast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="bg-card border border-primary/30 rounded-2xl shadow-2xl p-5 max-w-sm w-full mx-4">
+            <div className="flex items-start gap-3">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
+                <i className="bx bx-lock text-primary text-2xl"></i>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-foreground font-semibold text-base">Feature Locked</h3>
+                <p className="text-muted-foreground text-sm mt-0.5">
+                  Voice interview is not available right now. Stay tuned for updates!
+                </p>
+              </div>
+              <button onClick={() => setShowLockedToast(false)} className="text-muted-foreground hover:text-foreground">
+                <i className="bx bx-x text-xl"></i>
+              </button>
+            </div>
+            <div className="mt-4 h-0.5 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-primary rounded-full animate-pulse" style={{ width: '100%' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showMicPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-card rounded-2xl shadow-2xl border border-border max-w-md w-full overflow-hidden">
@@ -1456,7 +1482,7 @@ export default function InterviewPrepPage() {
           <span className="text-primary">AI</span> Interview Prep
         </h1>
         <p className="text-muted-foreground">
-          Practice with AI voice interviewer and get instant feedback
+          Practice with AI interviewer and get instant feedback
         </p>
 
         {/* Navigation Tabs */}
@@ -1586,27 +1612,27 @@ export default function InterviewPrepPage() {
                   onClick={() => {
                     setMicStatus("prompt");
                     setShowMicPrompt(false);
-                    setInterviewMode("voice");
+                    setShowLockedToast(true);
+                    setTimeout(() => setShowLockedToast(false), 4000);
                   }}
-                  className={`p-4 rounded-xl border text-left transition-all ${interviewMode === "voice"
-                    ? "bg-primary/10 border-primary"
-                    : "border-border hover:border-primary/50"
-                    }`}
+                  className="p-4 rounded-xl border border-border text-left transition-all opacity-60 hover:opacity-80 cursor-pointer"
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <Mic
                       size={24}
-                      className={
-                        interviewMode === "voice"
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                      }
+                      className="text-muted-foreground"
                     />
-                    <span className="font-semibold">🎤 Voice Interview</span>
+                    <span className="font-semibold text-muted-foreground flex items-center gap-2">
+                      🎤 Voice Interview
+                      <i className="bx bx-lock text-sm"></i>
+                    </span>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Speak your answers with AI asking questions
+                    Coming soon - Speak your answers
                   </p>
+                  <span className="inline-block mt-2 text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
+                    <i className="bx bx-lock text-xs mr-1"></i>Locked
+                  </span>
                 </button>
               </div>
             </div>
@@ -2213,27 +2239,27 @@ export default function InterviewPrepPage() {
                         data={[
                           {
                             subject: "Technical",
-                            value: analysis.categoryScores.technical,
+                            value: Math.round((analysis.categoryScores.technical || 0) * 10),
                             fullMark: 100,
                           },
                           {
                             subject: "Behavioral",
-                            value: analysis.categoryScores.behavioral,
+                            value: Math.round((analysis.categoryScores.behavioral || 0) * 10),
                             fullMark: 100,
                           },
                           {
                             subject: "Communication",
-                            value: analysis.categoryScores.communication,
+                            value: Math.round((analysis.categoryScores.communication || 0) * 10),
                             fullMark: 100,
                           },
                           {
                             subject: "Problem Solving",
-                            value: analysis.categoryScores.problemSolving,
+                            value: Math.round((analysis.categoryScores.problemSolving || 0) * 10),
                             fullMark: 100,
                           },
                           {
                             subject: "Culture Fit",
-                            value: analysis.categoryScores.cultureFit,
+                            value: Math.round((analysis.categoryScores.cultureFit || 0) * 10),
                             fullMark: 100,
                           },
                         ]}
@@ -2266,23 +2292,23 @@ export default function InterviewPrepPage() {
                           data={[
                             {
                               name: "Technical",
-                              value: analysis.categoryScores.technical,
+                              value: Math.round((analysis.categoryScores.technical || 0) * 10),
                             },
                             {
                               name: "Behavioral",
-                              value: analysis.categoryScores.behavioral,
+                              value: Math.round((analysis.categoryScores.behavioral || 0) * 10),
                             },
                             {
                               name: "Communication",
-                              value: analysis.categoryScores.communication,
+                              value: Math.round((analysis.categoryScores.communication || 0) * 10),
                             },
                             {
                               name: "Problem Solving",
-                              value: analysis.categoryScores.problemSolving,
+                              value: Math.round((analysis.categoryScores.problemSolving || 0) * 10),
                             },
                             {
                               name: "Culture Fit",
-                              value: analysis.categoryScores.cultureFit,
+                              value: Math.round((analysis.categoryScores.cultureFit || 0) * 10),
                             },
                           ]}
                           cx="50%"
@@ -2299,7 +2325,7 @@ export default function InterviewPrepPage() {
                           ))}
                         </Pie>
                         <Tooltip
-                          formatter={(value) => [`${Math.round((value as number) <= 10 ? (value as number) * 10 : (value as number))}%`, "Score"]}
+                          formatter={(value) => [`${value}%`, "Score"]}
                           contentStyle={{
                             backgroundColor: 'hsl(var(--card))',
                             border: '1px solid hsl(var(--border))',

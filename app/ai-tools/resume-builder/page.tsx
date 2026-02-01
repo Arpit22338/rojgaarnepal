@@ -553,12 +553,29 @@ export default function ResumeBuilderPage() {
                 {generatedResume.skills.tools && generatedResume.skills.tools.length > 0 && (
                   <p><strong>Tools:</strong> {Array.isArray(generatedResume.skills.tools) ? generatedResume.skills.tools.join(", ") : generatedResume.skills.tools}</p>
                 )}
-                {generatedResume.skills.languages && generatedResume.skills.languages.length > 0 && (
-                  <p><strong>Languages:</strong> {generatedResume.skills.languages
-                    .filter((l: { language?: string; proficiency?: string }) => l?.language)
-                    .map((l: { language?: string; proficiency?: string }) => l.proficiency ? `${l.language} (${l.proficiency})` : l.language)
-                    .join(", ") || "Not specified"}</p>
-                )}
+                {generatedResume.skills.languages && generatedResume.skills.languages.length > 0 && (() => {
+                  const validLanguages = generatedResume.skills.languages
+                    .filter((l: { language?: string; proficiency?: string } | string) => {
+                      // Handle both object format and string format from AI
+                      if (typeof l === 'string') return l && l.trim() !== '' && l !== 'undefined' && !l.includes('undefined');
+                      return l?.language && l.language.trim() !== '' && l.language !== 'undefined' && !l.language.includes('undefined');
+                    })
+                    .map((l: { language?: string; proficiency?: string } | string) => {
+                      if (typeof l === 'string') return l.trim();
+                      const lang = (l.language || '').trim();
+                      const prof = (l.proficiency || '').trim();
+                      // Only add proficiency if it's valid and not undefined
+                      if (prof && prof !== 'undefined' && !prof.includes('undefined') && prof !== '') {
+                        return `${lang} (${prof})`;
+                      }
+                      return lang;
+                    })
+                    .filter((s: string) => s && s.length > 0); // Final filter to remove any empty strings
+                  
+                  return validLanguages.length > 0 ? (
+                    <p><strong>Languages:</strong> {validLanguages.join(", ")}</p>
+                  ) : null;
+                })()}
               </div>
             </section>
           )}

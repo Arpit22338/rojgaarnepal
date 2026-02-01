@@ -40,11 +40,21 @@ export default function RegisterPage() {
     },
   });
   useEffect(() => {
-    const interval = setInterval(() => {
-      getSetting("teacher_login_enabled").then((val) => {
+    // Initial fetch with error handling
+    const fetchSetting = async () => {
+      try {
+        const val = await getSetting("teacher_login_enabled");
         setTeacherLoginEnabled(val !== "false");
-      });
-    }, 2000);
+      } catch (error) {
+        // Silently handle error - keep default value
+        console.error("Failed to fetch teacher login setting:", error);
+      }
+    };
+    
+    fetchSetting();
+    
+    // Poll less frequently (10 seconds instead of 2)
+    const interval = setInterval(fetchSetting, 10000);
     return () => clearInterval(interval);
   }, []);
 

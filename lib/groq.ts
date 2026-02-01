@@ -1,4 +1,5 @@
-// Groq AI Configuration with Fallback Support
+// Groq AI Configuration with Dual API Key Fallback Support
+// Automatically rotates between keys when rate limited
 const GROQ_API_KEYS = [
   process.env.GROQ_API_KEY || "",
   process.env.GROQ_API_KEY_2 || "",
@@ -8,10 +9,10 @@ export const GROQ_API_KEY = GROQ_API_KEYS[0] || "";
 export const GROQ_MODEL = "llama-3.3-70b-versatile";
 export const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-// Track which key to use (rotates on rate limit)
+// Track which key to use (rotates on rate limit) with improved cooldown
 let currentKeyIndex = 0;
 let lastKeyRotation = 0;
-const KEY_ROTATION_COOLDOWN = 60000; // 1 minute cooldown before rotating back
+const KEY_ROTATION_COOLDOWN = 120000; // 2 minutes cooldown before rotating back
 
 interface GroqMessage {
   role: "system" | "user" | "assistant";

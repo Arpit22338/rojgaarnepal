@@ -8,10 +8,41 @@ export interface SmartAIOptions {
     maxTokens?: number;
     jsonMode?: boolean;
     modelType?: "reasoner" | "chat"; // reasoner = DeepSeek R1, chat = V3/Llama
+    useCache?: boolean; // Enable caching for repeated requests
+}
+
+// Simple in-memory cache for AI responses (reduces rate limiting)
+const responseCache = new Map<string, { response: string; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minute cache TTL
+
+function getCacheKey(messages: { role: string; content: string }[], modelType: string): string {
+    const contentHash = messages.map(m => `${m.role}:${m.content.substring(0, 100)}`).join("|");
+    return `${modelType}:${contentHash}`;
+}
+
+function getCachedResponse(key: string): string | null {
+    const cached = responseCache.get(key);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        console.log("📦 Cache hit");
+        return cached.response;
+    }
+    if (cached) {
+        responseCache.delete(key); // Remove expired
+    }
+    return null;
+}
+
+function setCachedResponse(key: string, response: string): void {
+    // Limit cache size to prevent memory issues
+    if (responseCache.size > 100) {
+        const firstKey = responseCache.keys().next().value;
+        if (firstKey) responseCache.delete(firstKey);
+    }
+    responseCache.set(key, { response, timestamp: Date.now() });
 }
 
 /**
- * Smart AI Client - Production Ready
+ * Smart AI Client - Production Ready with Caching
  * Robust fallback chain: DeepSeek → Groq → Cerebras → PublicAI
  * Ensures AI features always work even if individual providers fail.
  */
@@ -23,8 +54,18 @@ export async function smartAICall(
         temperature = 0.7,
         maxTokens = 4096,
         jsonMode = false,
-        modelType = "chat"
+        modelType = "chat",
+        useCache = true
     } = options;
+
+    // Check cache first
+    if (useCache) {
+        const cacheKey = getCacheKey(messages, modelType);
+        const cachedResponse = getCachedResponse(cacheKey);
+        if (cachedResponse) {
+            return cachedResponse;
+        }
+    }
 
     console.log(`🧠 SmartAI Request: [${modelType}] with ${messages.length} messages`);
 

@@ -148,7 +148,7 @@ const BASE_URL = "https://www.rojgaarnepal.com";
 const PLATFORM_FEATURES = {
   aiTools: [
     { name: "Resume Builder", description: "Create ATS-optimized resumes with AI assistance", path: `${BASE_URL}/ai-tools/resume-builder` },
-    { name: "Interview Prep", description: "Practice interviews with voice/video and get AI feedback", path: `${BASE_URL}/ai-tools/interview-prep` },
+    { name: "Interview Prep", description: "Practice interviews with AI and get instant feedback", path: `${BASE_URL}/ai-tools/interview-prep` },
     { name: "Job Matcher", description: "Find jobs matching your skills and experience", path: `${BASE_URL}/ai-tools/job-matcher` },
     { name: "Skills Gap Analysis", description: "Identify skills to learn for your career goals", path: `${BASE_URL}/ai-tools/skills-gap` },
   ],
@@ -162,7 +162,7 @@ const PLATFORM_FEATURES = {
   ],
   recentUpdates: [
     "Dark mode support across the platform",
-    "Voice and video interview practice",
+    "AI-powered interview practice",
     "Enhanced mobile experience",
     "New AI-powered tools",
     "Improved job matching algorithm",
@@ -468,7 +468,7 @@ export async function GET() {
     const tips = [
       ...PLATFORM_FEATURES.tips,
       `Try our AI Resume Builder for an ATS-optimized resume!`,
-      `Practice interviews with voice and video in Interview Prep`,
+      `Practice interviews with AI in Interview Prep`,
       `Check Job Matcher to find jobs that fit your skills`,
       userData && userData.skillPercentage < 70
         ? `Your profile is ${userData.skillPercentage}% complete. Add more skills!`

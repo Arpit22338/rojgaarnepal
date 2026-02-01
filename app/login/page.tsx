@@ -7,7 +7,6 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-// ...existing code...
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -19,7 +18,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  // Removed teacherLoginEnabled state since role dropdown is not used
   const {
     register,
     handleSubmit,
@@ -27,21 +25,37 @@ export default function LoginPage() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
-  // Removed teacherLoginEnabled effect since state is not used
 
   const onSubmit = async (data: LoginFormValues) => {
     setError(null);
-    const result = await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-    });
+    
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
 
-    if (result?.error) {
-      setError("Invalid email or password");
-    } else {
-      router.push("/");
-      router.refresh();
+      if (result?.error) {
+        // Handle specific error messages
+        if (result.error.includes("not verified")) {
+          setError("Please verify your email first. Check your inbox.");
+        } else if (result.error.includes("disabled")) {
+          setError(result.error);
+        } else {
+          setError("Invalid email or password");
+        }
+      } else if (result?.ok) {
+        // Small delay to ensure session is updated
+        await new Promise(resolve => setTimeout(resolve, 100));
+        router.push("/");
+        router.refresh();
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Network error. Please check your connection and try again.");
     }
   };
 

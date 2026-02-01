@@ -151,20 +151,23 @@ export async function POST(req: NextRequest) {
       : "";
 
     const systemPrompt = `You are an expert ATS (Applicant Tracking System) Resume Writer.
-Your task is to create a professional, personalized resume in JSON format.
+Your task is to create a professional, polished resume in JSON format.
 
 CRITICAL RULES - FOLLOW EXACTLY:
-1. **USE ONLY PROVIDED DATA**: Use ONLY the information the user provided. Do NOT invent or assume anything.
-2. **FIRST PERSON SUMMARY**: Write the summary in FIRST PERSON ("I am", "I have", "My goal is"). Do NOT use third person ("He is", "Arpit is"). Example: "I am a dedicated computer science student with experience in..."
-3. **NO EXPERIENCE HANDLING**: If they have no work experience, make PROJECTS and EDUCATION prominent. Write summary focusing on education, projects, and skills.
-4. **INCLUDE EVERYTHING**: Include ALL certifications, languages, skills, projects that user provided.
-5. **ATS-FRIENDLY**: Use clear section headings, action verbs, and standard formatting.
-6. **POLISH BUT STAY HONEST**: Enhance wording professionally but do not add fake achievements or skills.
+1. **USE ONLY PROVIDED DATA**: Use ONLY the information provided. Do NOT invent fake jobs, skills, or achievements.
+2. **FIRST PERSON SUMMARY**: Write a compelling 2-3 sentence summary in FIRST PERSON ("I am", "I have"). 
+   - For students/freshers: Focus on education, eagerness to learn, and any projects/skills
+   - Example: "I am a motivated computer science student at Arniko College, currently pursuing my +2 in Computer Science. I am passionate about technology and eager to apply my knowledge in a professional setting."
+3. **ENHANCE PROFESSIONALLY**: Even with minimal info, write professionally. Transform basic education into compelling content.
+4. **NO EXPERIENCE = FOCUS ON POTENTIAL**: For freshers, emphasize education quality, learning goals, and transferable skills.
+5. **INCLUDE ALL PROVIDED INFO**: Include ALL languages, skills, projects, etc. that user provided.
+6. **ATS-FRIENDLY FORMAT**: Use clear headings, action verbs, standard formatting.
+7. **NEVER LEAVE SUMMARY EMPTY**: Always generate a thoughtful summary based on available info.
 
 RETURN FORMAT - VALID JSON ONLY:
 {
   "header": { "name": "", "email": "", "phone": "", "location": "", "linkedin": "", "portfolio": "" },
-  "summary": "2-3 sentences in FIRST PERSON (I am, I have) about their actual background",
+  "summary": "2-3 compelling sentences in FIRST PERSON about their background and goals",
   "experience": [{ "title": "", "company": "", "location": "", "startDate": "", "endDate": "", "current": boolean, "responsibilities": ["bullet1", "bullet2"] }],
   "education": [{ "degree": "", "institution": "", "field": "", "graduationYear": "", "gpa": "", "coursework": [], "achievements": [] }],
   "skills": { 

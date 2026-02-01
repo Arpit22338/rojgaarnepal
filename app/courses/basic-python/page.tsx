@@ -9,7 +9,6 @@ import {
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import ReactMarkdown from "react-markdown";
-import { PaymentModal } from "@/components/PaymentModal";
 import CertificateTemplate from "@/components/CertificateTemplate";
 import PythonPlayground from "@/components/PythonPlayground";
 import { COURSE_MODULES, FINAL_EXAM_DATA } from "./data";
@@ -20,7 +19,6 @@ export default function PythonCoursePage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [quizScore, setQuizScore] = useState<number | null>(null);
   const [examPassed, setExamPassed] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [enrollmentStatus, setEnrollmentStatus] = useState<"NONE" | "PENDING" | "APPROVED">("NONE");
   const [loading, setLoading] = useState(true);
   
@@ -52,6 +50,34 @@ export default function PythonCoursePage() {
   const markLessonComplete = (lessonId: string) => {
     if (!completedLessons.includes(lessonId)) {
       setCompletedLessons(prev => [...prev, lessonId]);
+    }
+  };
+
+  // Free enrollment handler
+  const handleFreeEnroll = async () => {
+    if (!session) {
+      window.location.href = "/login";
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const res = await fetch("/api/courses/enroll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId: "basic-python" })
+      });
+      
+      if (res.ok) {
+        setEnrollmentStatus("APPROVED"); // Auto-approve for free courses
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to enroll. Please try again.");
+      }
+    } catch {
+      alert("Failed to enroll. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -646,11 +672,11 @@ export default function PythonCoursePage() {
                         </button>
                       ) : (
                         <button 
-                          onClick={() => setShowPaymentModal(true)}
+                          onClick={handleFreeEnroll}
                           className="bg-white text-amber-600 px-10 py-4 rounded-full font-bold text-lg flex items-center gap-3 shadow-xl transition-all hover:scale-105 hover:-translate-y-1"
                         >
                           <Rocket size={24} />
-                          Enroll Now - Rs. 299
+                          Enroll Now - FREE
                         </button>
                       )}
                     </div>
@@ -717,17 +743,6 @@ export default function PythonCoursePage() {
           {activeTab === "certificate" && renderCertificate()}
         </>
       )}
-
-      <PaymentModal 
-        isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
-        planName="Basic Python Programming"
-        amount={299}
-        onSuccess={() => {
-          setShowPaymentModal(false);
-          setEnrollmentStatus("PENDING");
-        }}
-      />
     </>
   );
 }

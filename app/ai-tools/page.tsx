@@ -57,21 +57,21 @@ const aiTools = [
     icon: Mic,
     color: "from-green-500 to-emerald-500",
     bgColor: "bg-green-500/10",
-    description: "Practice interviews with AI voice feedback and timed sessions.",
+    description: "Practice interviews with AI feedback and timed sessions.",
     features: [
       "AI-generated interview questions",
-      "Voice mode with speech recognition",
       "Timed responses like real interviews",
       "Instant AI feedback on answers",
-      "Video recording option",
-      "Performance analysis and scoring"
+      "Performance analysis and scoring",
+      "Multiple difficulty levels",
+      "Category-based questions"
     ],
     howToUse: [
       "Enter your target job title",
       "Select experience level and question count",
-      "Choose text or voice mode",
       "Answer questions within the time limit",
-      "Get detailed feedback and improvement tips"
+      "Get detailed feedback and improvement tips",
+      "Review your performance analysis"
     ]
   },
   {

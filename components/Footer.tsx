@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, ArrowUpRight, Briefcase, Users, GraduationCap, Heart, Sparkles } from "lucide-react";
+import { Mail, MapPin, ArrowUpRight, Briefcase, Users, GraduationCap, Heart, Sparkles } from "lucide-react";
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
@@ -19,13 +19,6 @@ export default function Footer() {
         { href: "/contact", label: "Contact" },
         { href: "/privacy", label: "Privacy" },
         { href: "/terms", label: "Terms" },
-    ];
-
-    const socialLinks = [
-        { href: "https://facebook.com/rojgaarnepal", icon: Facebook, label: "Facebook" },
-        { href: "https://twitter.com/rojgaarnepal", icon: Twitter, label: "Twitter" },
-        { href: "https://linkedin.com/company/rojgaarnepal", icon: Linkedin, label: "LinkedIn" },
-        { href: "https://instagram.com/rojgaarnepal", icon: Instagram, label: "Instagram" },
     ];
 
     return (
@@ -50,29 +43,8 @@ export default function Footer() {
                             </div>
                         </Link>
                         <p className="text-muted-foreground leading-relaxed max-w-md text-lg">
-                            Empowering Nepal's digital workforce by connecting talented individuals with visionary employers.
+                            Empowering Nepal&apos;s digital workforce by connecting talented individuals with visionary employers. Find jobs, hire talent, and learn new skills.
                         </p>
-
-                        {/* Social Links */}
-                        {/* Social Links - Temporarily Disabled
-                        <div className="flex items-center gap-3 pt-2">
-                            {socialLinks.map((social) => {
-                                const Icon = social.icon;
-                                return (
-                                    <a
-                                        key={social.label}
-                                        href={social.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group size-11 rounded-xl bg-accent/30 hover:bg-primary flex items-center justify-center text-muted-foreground hover:text-primary-foreground transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/25"
-                                        aria-label={social.label}
-                                    >
-                                        <Icon size={18} />
-                                    </a>
-                                );
-                            })}
-                        </div>
-                        */}
                     </div>
 
                     {/* Quick Links */}

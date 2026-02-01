@@ -69,17 +69,26 @@ export default function RegisterPage() {
         body: JSON.stringify(data),
       });
 
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Registration failed");
+        throw new Error(responseData.message || responseData.error || "Registration failed");
       }
 
+      // Success - redirect to verify email
       router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
+        // Handle specific error types
+        if (err.message.includes("already exists") || err.message.includes("already registered")) {
+          setError("This email is already registered. Please login instead.");
+        } else if (err.message.includes("network") || err.message.includes("fetch")) {
+          setError("Network error. Please check your connection and try again.");
+        } else {
+          setError(err.message);
+        }
       } else {
-        setError("An unexpected error occurred");
+        setError("An unexpected error occurred. Please try again.");
       }
     }
   };

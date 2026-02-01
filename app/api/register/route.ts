@@ -58,12 +58,18 @@ export async function POST(req: Request) {
       where: { email },
     });
 
-    // SECURITY: Generic response to prevent user enumeration
-    if (existingUser) {
+    // If user already exists and is verified, tell them to login
+    if (existingUser && existingUser.isVerified) {
       return NextResponse.json(
-        { message: "If this email is available, you will receive a verification code." },
-        { status: 200 }
+        { message: "An account with this email already exists. Please login instead." },
+        { status: 409 }
       );
+    }
+    
+    // If user exists but not verified, allow re-registration (they'll get a new OTP)
+    if (existingUser && !existingUser.isVerified) {
+      // Delete the unverified user to allow fresh registration
+      await prisma.user.delete({ where: { email } });
     }
 
     const hashedPassword = await hash(password, 12); // Increased rounds for better security

@@ -33,7 +33,7 @@ export async function POST(req: Request) {
             id: "basic-python",
             title: "Basic Python Programming",
             description: "Master the fundamentals of Python programming.",
-            priceNpr: 299,
+            priceNpr: 0,
             isPublished: true,
             thumbnailUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg",
           }

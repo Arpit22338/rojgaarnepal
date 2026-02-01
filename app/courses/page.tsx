@@ -5,9 +5,28 @@ import { authOptions } from "@/lib/auth";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Professional Skill Courses in Nepal",
-  description: "Master Python, Digital Marketing, and CV building with our certified courses. Boost your employability with Rojgaar Nepal's career-focused education.",
-  keywords: ["python basic course in nepal", "skill development", "online courses nepal", "get certified nepal"],
+  title: "Free Online Courses in Nepal - Python, CV Building & More",
+  description: "Learn Python programming for FREE! Master CV building, digital marketing with certified courses. Get job-ready skills with Rojgaar Nepal's career-focused education.",
+  keywords: [
+    "free python course nepal",
+    "python course nepal",
+    "online courses nepal",
+    "free online courses nepal",
+    "cv building course",
+    "resume writing course nepal",
+    "skill development nepal",
+    "programming course nepal",
+    "python tutorial nepali",
+    "learn coding nepal",
+    "certificate courses nepal",
+    "career courses nepal"
+  ],
+  openGraph: {
+    title: "Free Courses - Learn Python, CV Building | Rojgaar Nepal",
+    description: "Get certified with free professional courses. Learn Python programming, CV building & more. Start your career journey today!",
+    url: "https://rojgaarnepal.com/courses",
+    type: "website",
+  },
 };
 
 export const dynamic = "force-dynamic";
@@ -47,7 +66,7 @@ export default async function CoursesPage() {
     id: "basic-python",
     title: "Basic Python Programming",
     description: "Master the fundamentals of Python programming. Includes certificate.",
-    price: 299,
+    price: 0,
     instructor: "RojgaarNepal Team",
     duration: "2 Hours",
     thumbnail: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg",

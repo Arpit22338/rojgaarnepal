@@ -113,8 +113,9 @@ export default function InterviewPrepPage() {
   const [experienceLevel, setExperienceLevel] = useState("Mid-Level");
   const [numQuestions, setNumQuestions] = useState(10);
   const [interviewMode, setInterviewMode] = useState<InterviewMode>("text");
-  const [enableAIVoice, setEnableAIVoice] = useState(true);
-  const [enableVideoRecording, setEnableVideoRecording] = useState(false);
+  // Voice mode config - kept for future feature
+  const [enableAIVoice] = useState(true);
+  const [enableVideoRecording] = useState(false);
 
   // Questions & Answers
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -1579,108 +1580,26 @@ export default function InterviewPrepPage() {
               </div>
             </div>
 
-            {/* Interview Mode */}
+            {/* Interview Mode - Text Only (Voice Coming Soon) */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Interview Mode *
+                Interview Mode
               </label>
-              <div className="grid md:grid-cols-2 gap-3">
-                <button
-                  onClick={() => setInterviewMode("text")}
-                  className={`p-4 rounded-xl border text-left transition-all ${interviewMode === "text"
-                    ? "bg-primary/10 border-primary"
-                    : "border-border hover:border-primary/50"
-                    }`}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <MessageCircle
-                      size={24}
-                      className={
-                        interviewMode === "text"
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                      }
-                    />
-                    <span className="font-semibold">Text Interview</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Type your answers in text format
-                  </p>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setMicStatus("prompt");
-                    setShowMicPrompt(false);
-                    setShowLockedToast(true);
-                    setTimeout(() => setShowLockedToast(false), 4000);
-                  }}
-                  className="p-4 rounded-xl border border-border text-left transition-all opacity-60 hover:opacity-80 cursor-pointer"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Mic
-                      size={24}
-                      className="text-muted-foreground"
-                    />
-                    <span className="font-semibold text-muted-foreground flex items-center gap-2">
-                      🎤 Voice Interview
-                      <i className="bx bx-lock text-sm"></i>
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Coming soon - Speak your answers
-                  </p>
-                  <span className="inline-block mt-2 text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                    <i className="bx bx-lock text-xs mr-1"></i>Locked
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            {/* Voice Interview Options */}
-            {interviewMode === "voice" && (
-              <div className="p-4 rounded-xl bg-accent/50 border border-border space-y-3">
-                <h3 className="font-semibold text-foreground mb-3">
-                  Voice Interview Options
-                </h3>
-
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={enableAIVoice}
-                    onChange={(e) => setEnableAIVoice(e.target.checked)}
-                    className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
-                  />
-                  <div>
-                    <span className="font-medium">AI Voice Interviewer</span>
-                    <p className="text-sm text-muted-foreground">
-                      AI speaks questions using text-to-speech
-                    </p>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={enableVideoRecording}
-                    onChange={(e) => setEnableVideoRecording(e.target.checked)}
-                    className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
-                  />
-                  <div>
-                    <span className="font-medium">📹 Record My Interview</span>
-                    <p className="text-sm text-muted-foreground">
-                      Save video to local browser storage
-                    </p>
-                  </div>
-                </label>
-
-                <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                  <i className="bx bx-lock-alt"></i>
-                  Your video is saved only on your device, not uploaded to any
-                  server.
+              <div className="p-4 rounded-xl border border-primary bg-primary/10">
+                <div className="flex items-center gap-3 mb-2">
+                  <MessageCircle size={24} className="text-primary" />
+                  <span className="font-semibold">Text Interview</span>
+                  <span className="ml-auto text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">Active</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Type your answers and get instant AI feedback
                 </p>
               </div>
-            )}
+              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                <i className="bx bx-info-circle"></i>
+                Voice interview mode coming soon!
+              </p>
+            </div>
 
             {/* Generate Button */}
             <button
@@ -1716,8 +1635,7 @@ export default function InterviewPrepPage() {
                   Your Interview Questions
                 </h2>
                 <p className="text-muted-foreground">
-                  {questions.length} questions for {jobTitle} •{" "}
-                  {interviewMode === "voice" ? "🎤 Voice" : "📝 Text"} Mode
+                  {questions.length} questions for {jobTitle}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -1771,15 +1689,7 @@ export default function InterviewPrepPage() {
             onClick={startPractice}
             className="w-full py-4 bg-linear-to-r from-primary to-cyan-400 text-primary-foreground font-bold text-lg rounded-xl shadow-lg shadow-primary/30 hover:shadow-xl transition-all flex items-center justify-center gap-3"
           >
-            {interviewMode === "voice" ? (
-              <>
-                <Mic size={24} /> Start Voice Interview
-              </>
-            ) : (
-              <>
-                <MessageCircle size={24} /> Start Practice
-              </>
-            )}
+            <MessageCircle size={24} /> Start Interview Practice
           </button>
         </div>
       )}

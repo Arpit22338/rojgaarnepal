@@ -295,7 +295,7 @@ export default function RojgaarAIChatPage() {
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      a: ({ node, ...props }) => (
+                      a: ({ ...props }) => (
                         <a
                           {...props}
                           target="_blank"
@@ -303,9 +303,9 @@ export default function RojgaarAIChatPage() {
                           className="text-primary hover:underline font-medium"
                         />
                       ),
-                      p: ({ node, ...props }) => <p {...props} className="mb-1 last:mb-0" />,
-                      ul: ({ node, ...props }) => <ul {...props} className="list-disc pl-4 mb-2 space-y-1" />,
-                      ol: ({ node, ...props }) => <ol {...props} className="list-decimal pl-4 mb-2 space-y-1" />,
+                      p: ({ ...props }) => <p {...props} className="mb-1 last:mb-0" />,
+                      ul: ({ ...props }) => <ul {...props} className="list-disc pl-4 mb-2 space-y-1" />,
+                      ol: ({ ...props }) => <ol {...props} className="list-decimal pl-4 mb-2 space-y-1" />,
                     }}
                   >
                     {msg.content}

@@ -1,7 +1,12 @@
 /**
  * Cerebras AI Client
- * Fast inference with Cerebras models
+ * Fast inference with Cerebras models - up to 2000 tokens/second
  * API Docs: https://inference-docs.cerebras.ai/
+ * 
+ * Available models:
+ * - llama-4-scout-17b-16e-instruct (Fast Llama 4 Scout)
+ * - llama3.1-8b (Fast, lightweight)
+ * - llama3.1-70b (More capable)
  */
 
 const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY || "";
@@ -28,7 +33,7 @@ export async function callCerebrasAI(
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            model: "llama-4-scout-17b-16e-instruct", // Fast Llama model on Cerebras
+            model: "llama3.1-70b", // Best quality Llama model on Cerebras
             messages,
             temperature,
             max_tokens: maxTokens,

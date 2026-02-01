@@ -1,5 +1,17 @@
 import React from "react";
 import { Target, Heart, Globe, Award, Users } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "About Rojgaar Nepal - Nepal's Leading Job & Freelancing Platform",
+    description: "Learn about Rojgaar Nepal's mission to bridge the gap between talent and opportunity in Nepal. We're building Nepal's future by empowering job seekers and employers.",
+    openGraph: {
+        title: "About Us | Rojgaar Nepal",
+        description: "Discover how Rojgaar Nepal is transforming careers and connecting talent with opportunities across Nepal.",
+        url: "https://rojgaarnepal.com/about",
+        type: "website",
+    },
+};
 
 export default function AboutPage() {
     return (

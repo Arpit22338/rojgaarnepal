@@ -90,17 +90,22 @@ export default function CertificateTemplate({
       el.style.transform = "none";
       el.style.margin = "0";
 
+      // Create a clone and sanitize CSS to remove unsupported color functions
       const canvas = await html2canvas(el, {
         scale: 4, // Ultra high quality
-        logging: true, // Enable logging for debugging
+        logging: false, // Disable logging in production
         backgroundColor: '#FFFAF0',
         useCORS: true,
-        allowTaint: false, // Changed to false to prevent tainted canvas
+        allowTaint: false,
         width: 800,
         height: 600,
         windowWidth: 800,
         windowHeight: 600,
-        imageTimeout: 15000, // Wait longer for images
+        imageTimeout: 15000,
+        ignoreElements: (element) => {
+          // Ignore elements that might have unsupported CSS
+          return element.classList?.contains('particles-canvas') || false;
+        },
         onclone: (doc) => {
           // Ensure fonts and styles are loaded in the clone
           const clonedEl = doc.querySelector('[data-certificate="true"]') as HTMLElement;
@@ -108,6 +113,25 @@ export default function CertificateTemplate({
             clonedEl.style.transform = "none";
             clonedEl.style.margin = "0";
           }
+          
+          // Remove any elements with unsupported color functions
+          // Replace oklch/lab colors with fallback hex colors
+          const allElements = doc.querySelectorAll('*');
+          allElements.forEach((element) => {
+            const el = element as HTMLElement;
+            const computedStyle = window.getComputedStyle(el);
+            
+            // Check and replace problematic colors
+            if (computedStyle.color.includes('lab') || computedStyle.color.includes('oklch')) {
+              el.style.color = '#1e293b'; // slate-800 fallback
+            }
+            if (computedStyle.backgroundColor.includes('lab') || computedStyle.backgroundColor.includes('oklch')) {
+              el.style.backgroundColor = '#ffffff'; // white fallback
+            }
+            if (computedStyle.borderColor.includes('lab') || computedStyle.borderColor.includes('oklch')) {
+              el.style.borderColor = '#e2e8f0'; // slate-200 fallback
+            }
+          });
         }
       });
 

@@ -23,43 +23,131 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://rojgaarnepal.com"),
   title: {
-    default: "Rojgaar Nepal - Top Job & Freelancing Site in Nepal",
-    template: "%s | Rojgaar Nepal"
+    default: "Rojgaar Nepal - #1 Job Portal & Freelancing Site in Nepal | Find Jobs, Hire Talent",
+    template: "%s | Rojgaar Nepal - Jobs in Nepal"
   },
-  description: "Rojgaar Nepal is the #1 platform for finding jobs in Nepal, freelancing opportunities, and professional skill courses. Hire experts or find your dream career today.",
+  description: "Rojgaar Nepal is Nepal's leading job portal and freelancing platform. Find jobs in Nepal, hire skilled freelancers, learn Python, CV building courses, and use AI career tools. 100% free job posting for employers.",
   keywords: [
     "job in nepal",
+    "jobs in nepal",
+    "nepal jobs",
     "freelancing in nepal",
     "freelancing site in nepal",
-    "hire experts nepal",
-    "rojgar",
-    "rojgarnepal",
+    "freelance jobs nepal",
+    "hire freelancers nepal",
+    "rojgar nepal",
     "rojgaarnepal",
-    "python basic course in nepal",
-    "nepal job portal",
-    "online jobs nepal"
+    "python course nepal",
+    "free python course",
+    "cv building course",
+    "resume builder nepal",
+    "job portal nepal",
+    "online jobs nepal",
+    "remote jobs nepal",
+    "kathmandu jobs",
+    "IT jobs nepal",
+    "software developer jobs nepal",
+    "career in nepal",
+    "hire experts nepal",
+    "talent hiring nepal"
   ],
   authors: [{ name: "Rojgaar Nepal Team" }],
   creator: "Rojgaar Nepal",
+  publisher: "RojgaarNepal",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://rojgaarnepal.com",
+  },
   openGraph: {
     type: "website",
     locale: "en_NP",
     url: "https://rojgaarnepal.com",
     siteName: "Rojgaar Nepal",
-    title: "Rojgaar Nepal - Jobs, Freelancing & Courses",
-    description: "Connect with the best opportunities in Nepal. Find jobs, hire talent, and learn new skills.",
-    images: ["/og-image.png"],
+    title: "Rojgaar Nepal - Find Jobs, Hire Talent, Learn Skills",
+    description: "Nepal's #1 platform for jobs, freelancing, and professional skill courses. Free job posting, AI resume builder, and verified talent pool.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Rojgaar Nepal - Jobs and Freelancing Platform",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rojgaar Nepal - Career Opportunities Waiting",
-    description: "Launch your career or find the best talent in Nepal.",
+    title: "Rojgaar Nepal - Jobs, Freelancing & Courses in Nepal",
+    description: "Find your dream job or hire top talent in Nepal. Free courses, AI tools, and verified opportunities.",
     images: ["/og-image.png"],
+  },
+  verification: {
+    google: "google-site-verification-code", // Add your Google Search Console verification
   },
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
   },
+  category: "Jobs & Careers",
+};
+
+// JSON-LD structured data for SEO
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://rojgaarnepal.com/#website",
+      "url": "https://rojgaarnepal.com",
+      "name": "Rojgaar Nepal",
+      "description": "Nepal's #1 Job Portal and Freelancing Platform",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://rojgaarnepal.com/jobs?search={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://rojgaarnepal.com/#organization",
+      "name": "Rojgaar Nepal",
+      "url": "https://rojgaarnepal.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://rojgaarnepal.com/logo.png",
+        "width": 512,
+        "height": 512
+      },
+      "sameAs": [],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "support@rojgaarnepal.com",
+        "availableLanguage": ["English", "Nepali"]
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://rojgaarnepal.com/#webpage",
+      "url": "https://rojgaarnepal.com",
+      "name": "Rojgaar Nepal - Find Jobs, Hire Talent, Learn Skills",
+      "isPartOf": { "@id": "https://rojgaarnepal.com/#website" },
+      "about": { "@id": "https://rojgaarnepal.com/#organization" },
+      "description": "Find jobs in Nepal, hire freelancers, and learn professional skills with free courses."
+    }
+  ]
 };
 
 export default function RootLayout({
@@ -71,6 +159,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `

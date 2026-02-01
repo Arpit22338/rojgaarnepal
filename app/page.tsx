@@ -86,11 +86,12 @@ export default async function Home() {
           </div>
 
           <div className="lg:col-span-2 relative hidden lg:block animate-in fade-in slide-in-from-right-5 duration-700">
-            <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/50 dark:border-white/10 aspect-4/5">
+            <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/50 dark:border-white/10 aspect-[4/5] min-h-[400px]">
               <Image
                 src="/premium-workspace.jpg"
                 alt="Professional Workspace in Nepal"
                 fill
+                sizes="(min-width: 1024px) 40vw, 100vw"
                 className="object-cover"
                 priority
               />

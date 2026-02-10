@@ -155,29 +155,38 @@ Your task is to create a professional, polished resume in JSON format.
 
 CRITICAL RULES - FOLLOW EXACTLY:
 1. **USE ONLY PROVIDED DATA**: Use ONLY the information provided. Do NOT invent fake jobs, skills, or achievements.
-2. **FIRST PERSON SUMMARY**: Write a compelling 2-3 sentence summary in FIRST PERSON ("I am", "I have"). 
-   - For students/freshers: Focus on education, eagerness to learn, and any projects/skills
-   - Example: "I am a motivated computer science student at Arniko College, currently pursuing my +2 in Computer Science. I am passionate about technology and eager to apply my knowledge in a professional setting."
-3. **ENHANCE PROFESSIONALLY**: Even with minimal info, write professionally. Transform basic education into compelling content.
-4. **NO EXPERIENCE = FOCUS ON POTENTIAL**: For freshers, emphasize education quality, learning goals, and transferable skills.
-5. **INCLUDE ALL PROVIDED INFO**: Include ALL languages, skills, projects, etc. that user provided.
-6. **ATS-FRIENDLY FORMAT**: Use clear headings, action verbs, standard formatting.
-7. **NEVER LEAVE SUMMARY EMPTY**: Always generate a thoughtful summary based on available info.
+2. **PROFESSIONAL SUMMARY MUST**:
+   - Mention their ACTUAL skills (ALL of them)
+   - Mention their ACTUAL certifications by name (e.g. "Cyber Security Career Starter (CCSC) or "Google Data Analytics Certificate etc.")
+   - Mention their ACTUAL career interests and goals
+   - Reference their education level and field
+   - Be SPECIFIC to the person, NOT generic
+   - Be written in THIRD PERSON (e.g. "Computer Science student with expertise in...")
+   - Be 2-3 sentences maximum
+3. **BAD SUMMARY** (too generic, DO NOT write like this):
+   "I am a dedicated web developer with a passion for creating things."
+4. **GOOD SUMMARY** (specific, mentions real data):
+   "Computer Science student specializing in front-end development and cybersecurity. Proficient in HTML, CSS, JavaScript, and React with hands-on experience using Git and Linux. Holds Cyber Security Career Starter (CCSC) certification."
+5. **LANGUAGES FORMAT**: Return languages as simple objects with language name only. Do NOT include proficiency levels unless user specifically provided them.
+6. **NO EXPERIENCE = FOCUS ON POTENTIAL**: For freshers, emphasize education, certifications, projects, and skills heavily.
+7. **INCLUDE ALL PROVIDED INFO**: Include ALL languages, skills, certifications, projects, tools exactly as provided.
+8. **ATS-FRIENDLY FORMAT**: Use clear headings, action verbs, standard formatting.
+9. **NEVER LEAVE SUMMARY EMPTY**: Always generate a specific, detailed summary based on available info.
 
 RETURN FORMAT - VALID JSON ONLY:
 {
   "header": { "name": "", "email": "", "phone": "", "location": "", "linkedin": "", "portfolio": "" },
-  "summary": "2-3 compelling sentences in FIRST PERSON about their background and goals",
+  "summary": "2-3 SPECIFIC sentences mentioning their actual skills, certifications, education, and career interests",
   "experience": [{ "title": "", "company": "", "location": "", "startDate": "", "endDate": "", "current": boolean, "responsibilities": ["bullet1", "bullet2"] }],
   "education": [{ "degree": "", "institution": "", "field": "", "graduationYear": "", "gpa": "", "coursework": [], "achievements": [] }],
   "skills": { 
     "technical": ["skill1", "skill2"], 
     "soft": ["skill1", "skill2"], 
     "tools": ["tool1", "tool2"],
-    "languages": [{ "language": "Name", "proficiency": "Level" }]
+    "languages": [{ "language": "English" }, { "language": "Nepali" }]
   },
   "projects": [{ "title": "", "description": "", "technologies": ["tech1"], "link": "" }],
-  "certifications": ["cert1", "cert2"],
+  "certifications": ["Full Certification Name 1"],
   "volunteer": [{ "role": "", "organization": "", "duration": "", "description": "" }],
   "awards": [{ "title": "", "issuer": "", "date": "" }]
 }`;
@@ -221,11 +230,13 @@ ${publications ? `=== PUBLICATIONS ===\n${publications}` : ''}
 ${hobbies ? `=== INTERESTS/HOBBIES ===\n${hobbies}` : ''}
 
 IMPORTANT INSTRUCTIONS:
-1. Write a PERSONALIZED summary using their actual name, education, skills, and any projects/certifications
-2. If they have NO work experience, emphasize their projects, education, and certifications
-3. Include ALL their skills, languages, and certifications exactly as provided
-4. Polish the descriptions professionally but keep them accurate to what they provided
-5. Return ONLY valid JSON, no markdown, no extra text`;
+1. Write a SPECIFIC summary in THIRD PERSON. Mention their ACTUAL skills by name, ACTUAL certifications by full name, education, and career interests/hobbies
+2. If they have NO work experience, emphasize their projects, education, certifications, and skills heavily in the summary
+3. Include ALL their skills, languages, and certifications EXACTLY as provided - do not skip any
+4. Languages should be returned as simple objects: [{ "language": "English" }, { "language": "Nepali" }] - NO proficiency levels
+5. Polish the descriptions professionally but keep them accurate to what they provided
+6. Return ONLY valid JSON, no markdown, no extra text
+7. The summary must be UNIQUE to this person - it should NOT be reusable for anyone else`;
 
     // Use Smart Client (DeepSeek R1 preferred for strong logic/formatting)
     const result = await smartAICall([

@@ -369,10 +369,23 @@ export default function ResumeBuilderPage() {
 
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const pdfPageHeight = pdf.internal.pageSize.getHeight();
+    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    // Add image with compression set to NONE for best quality
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight, undefined, "NONE");
+    // Handle multi-page: if content exceeds one A4 page, split across pages
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight, undefined, "NONE");
+    heightLeft -= pdfPageHeight;
+
+    while (heightLeft > 0) {
+      position -= pdfPageHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight, undefined, "NONE");
+      heightLeft -= pdfPageHeight;
+    }
+
     pdf.save(`Resume_${personalInfo.fullName.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
@@ -456,7 +469,7 @@ export default function ResumeBuilderPage() {
         <div
           ref={resumeRef}
           className="bg-white p-6 sm:p-8 md:p-12 shadow-2xl mx-auto max-w-[800px] font-['Times_New_Roman',serif]"
-          style={{ minHeight: "1100px", color: "#000000" }}
+          style={{ color: "#000000" }}
         >
           {/* Header */}
           <div className="text-center border-b-2 border-black pb-4 mb-6">
@@ -556,24 +569,24 @@ export default function ResumeBuilderPage() {
                 {generatedResume.skills.languages && generatedResume.skills.languages.length > 0 && (() => {
                   const validLanguages = generatedResume.skills.languages
                     .filter((l: { language?: string; proficiency?: string } | string) => {
-                      // Handle both object format and string format from AI
                       if (typeof l === 'string') return l && l.trim() !== '' && l !== 'undefined' && !l.includes('undefined');
                       return l?.language && l.language.trim() !== '' && l.language !== 'undefined' && !l.language.includes('undefined');
                     })
                     .map((l: { language?: string; proficiency?: string } | string) => {
                       if (typeof l === 'string') return l.trim();
-                      const lang = (l.language || '').trim();
-                      const prof = (l.proficiency || '').trim();
-                      // Only add proficiency if it's valid and not undefined
-                      if (prof && prof !== 'undefined' && !prof.includes('undefined') && prof !== '') {
-                        return `${lang} (${prof})`;
-                      }
-                      return lang;
+                      return (l.language || '').trim();
                     })
-                    .filter((s: string) => s && s.length > 0); // Final filter to remove any empty strings
+                    .filter((s: string) => s && s.length > 0);
                   
                   return validLanguages.length > 0 ? (
-                    <p><strong>Languages:</strong> {validLanguages.join(", ")}</p>
+                    <>
+                      <p className="font-bold mt-2">Languages:</p>
+                      <ul className="list-disc ml-6">
+                        {validLanguages.map((lang: string, idx: number) => (
+                          <li key={idx}>{lang}</li>
+                        ))}
+                      </ul>
+                    </>
                   ) : null;
                 })()}
               </div>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { X, Send, Loader2, ChevronRight, Sparkles } from "lucide-react";
+import { Bot, X, Send, Loader2, ChevronRight, Sparkles, MessageCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -173,7 +173,7 @@ export default function RojgaarAIPopup() {
             <div className="absolute -bottom-2 right-6 w-4 h-4 bg-card border-r border-b border-border transform rotate-45" />
             <button type="button" onClick={handleBubbleClick} className="flex w-full items-start gap-3 rounded-2xl p-4 pr-9 text-left transition-transform hover:scale-[1.02]" aria-label="Open RojgaarAI quick links">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <i className="bx bx-bot text-primary text-lg"></i>
+                <Bot size={18} className="text-primary" aria-hidden="true" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-primary mb-1">RojgaarAI</p>
@@ -196,7 +196,7 @@ export default function RojgaarAIPopup() {
           <div className="absolute bottom-16 right-0 w-72 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 fade-in duration-300">
             <div className="p-4 border-b border-border flex items-center justify-between bg-primary/5">
               <div className="flex items-center gap-2">
-                <i className="bx bx-bot text-primary text-xl"></i>
+                <Bot size={20} className="text-primary" aria-hidden="true" />
                 <span className="font-bold text-foreground">Quick links</span>
               </div>
               <button
@@ -233,7 +233,7 @@ export default function RojgaarAIPopup() {
                 onClick={() => { setShowFeatures(false); setIsOpen(true); }}
                 className="w-full py-2 bg-primary text-primary-foreground rounded-xl font-medium text-sm hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                <i className="bx bx-message-dots"></i>
+                <MessageCircle size={17} aria-hidden="true" />
                 Chat with RojgaarAI
               </button>
             </div>
@@ -253,7 +253,7 @@ export default function RojgaarAIPopup() {
           {isOpen ? (
             <X size={24} className="text-white" />
           ) : (
-            <i className="bx bx-bot text-white text-2xl"></i>
+            <Bot size={26} strokeWidth={2.25} className="text-white" aria-hidden="true" />
           )}
         </button>
 

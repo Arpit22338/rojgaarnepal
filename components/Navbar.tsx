@@ -14,6 +14,7 @@ import {
   MessageCircle,
   Search,
   Settings,
+  ShieldCheck,
   User,
   Users,
   X,
@@ -39,6 +40,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
+  const isAdmin = user?.role === "ADMIN";
 
   useEffect(() => {
     const closeAccountMenu = (event: MouseEvent) => {
@@ -90,6 +92,19 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              href="/admin/dashboard"
+              className={`inline-flex min-h-10 items-center gap-2 rounded-full px-3.5 text-sm font-semibold transition-colors ${
+                isActive("/admin")
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              }`}
+            >
+              <ShieldCheck size={16} aria-hidden="true" />
+              Admin
+            </Link>
+          )}
         </div>
 
         <div className="hidden items-center gap-2 lg:flex">
@@ -125,7 +140,11 @@ export default function Navbar() {
                       <p className="truncate text-sm font-semibold">{user?.name}</p>
                       <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
                     </div>
-                    <AccountLink href={dashboardHref} icon={BriefcaseBusiness} label="Dashboard" />
+                    <AccountLink
+                      href={dashboardHref}
+                      icon={isAdmin ? ShieldCheck : BriefcaseBusiness}
+                      label={isAdmin ? "Admin dashboard" : "Dashboard"}
+                    />
                     <AccountLink href="/profile" icon={User} label="Profile" />
                     <AccountLink href="/profile/edit" icon={Settings} label="Settings" />
                     <button
@@ -184,11 +203,22 @@ export default function Navbar() {
                 <Icon size={18} aria-hidden="true" /> {label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold ${
+                  isActive("/admin") ? "bg-primary/10 text-primary" : "hover:bg-accent"
+                }`}
+              >
+                <ShieldCheck size={18} aria-hidden="true" /> Admin
+              </Link>
+            )}
             <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border pt-4">
               {session ? (
                 <>
                   <Link href={dashboardHref} className="rounded-xl border border-border px-4 py-3 text-center text-sm font-semibold">
-                    Dashboard
+                    {isAdmin ? "Admin" : "Dashboard"}
                   </Link>
                   <button
                     type="button"

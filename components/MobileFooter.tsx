@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Bot, BriefcaseBusiness, Home, MessageCircle, User } from "lucide-react";
+import { Bot, BriefcaseBusiness, Home, MessageCircle, ShieldCheck, User } from "lucide-react";
 
 export default function MobileFooter() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "ADMIN";
 
   const items = [
     { href: "/", label: "Home", icon: Home },
@@ -18,7 +19,9 @@ export default function MobileFooter() {
       icon: MessageCircle,
     },
     { href: "/messages/rojgaar-ai", label: "RojgaarAI", icon: Bot },
-    { href: session ? "/profile" : "/login", label: "Profile", icon: User },
+    isAdmin
+      ? { href: "/admin/dashboard", label: "Admin", icon: ShieldCheck }
+      : { href: session ? "/profile" : "/login", label: "Profile", icon: User },
   ];
 
   return (

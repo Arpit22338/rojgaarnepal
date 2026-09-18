@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Users, FileCheck, GraduationCap, HeadphonesIcon, Flag, Settings } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, GraduationCap, HeadphonesIcon, Flag } from "lucide-react";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -12,7 +12,6 @@ const navItems = [
   { href: "/admin/enrollments", label: "Enrollments", icon: GraduationCap },
   { href: "/admin/support", label: "Support", icon: HeadphonesIcon },
   { href: "/admin/reports", label: "Reports", icon: Flag },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export default async function AdminLayout({
@@ -38,7 +37,7 @@ export default async function AdminLayout({
                 <Link 
                   key={item.href}
                   href={item.href} 
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent rounded-xl whitespace-nowrap transition-all"
+                  className="flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
                 >
                   <Icon size={16} />
                   {item.label}

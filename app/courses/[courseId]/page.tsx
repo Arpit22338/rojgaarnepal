@@ -51,7 +51,7 @@ export default async function CoursePage({ params }: Props) {
         "provider": {
             "@type": "Organization",
             "name": "Rojgaar Nepal",
-            "sameAs": "https://rojgaarnepal.com"
+            "sameAs": "https://www.rojgaarnepal.com"
         }
     };
 

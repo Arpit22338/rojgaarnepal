@@ -15,10 +15,11 @@ export const metadata: Metadata = {
     "hire experts nepal",
     "nepal freelance marketplace"
   ],
+  alternates: { canonical: "https://www.rojgaarnepal.com/talent" },
   openGraph: {
     title: "Hire Freelancers in Nepal | Rojgaar Nepal Talent Pool",
-    description: "Browse 1000+ verified freelancer profiles. Find developers, designers, writers & more. Hire the best talent in Nepal!",
-    url: "https://rojgaarnepal.com/talent",
+    description: "Browse public professional profiles and discover developers, designers, writers, marketers, and other talent in Nepal.",
+    url: "https://www.rojgaarnepal.com/talent",
     type: "website",
   },
 };

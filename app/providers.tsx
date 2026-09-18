@@ -1,7 +1,7 @@
 "use client";
 
 import { SessionProvider, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import ProfileCompletionCheck from "@/components/ProfileCompletionCheck";
 import { ToastProvider } from "@/components/Toast";
 import { PushNotificationManager } from "@/components/PushNotificationManager";
@@ -21,11 +21,11 @@ function AuthLoadingSpinner() {
 // Safe wrapper for components that need session
 function SafeSessionComponents({ children }: { children: React.ReactNode }) {
   const { status } = useSession();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
 
   // Show loading while session is loading or not mounted
   if (!mounted || status === "loading") {
@@ -85,4 +85,3 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </SessionProvider>
   );
 }
-

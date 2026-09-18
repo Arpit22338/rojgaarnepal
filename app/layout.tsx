@@ -1,211 +1,139 @@
-import type { Metadata } from "next";
-import { Poppins, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Manrope } from "next/font/google";
+import { DatadogAppRouter } from "@datadog/browser-rum-nextjs";
 import "./globals.css";
 import { Providers } from "./providers";
-import Navbar from "../components/Navbar";
-import MobileFooter from "../components/MobileFooter";
-import Footer from "../components/Footer";
-import CursorGlow from "../components/CursorGlow";
-import ParticlesBackground from "../components/ParticlesBackground";
-import RojgaarAIPopup from "../components/RojgaarAIPopup";
+import Navbar from "@/components/Navbar";
+import MobileFooter from "@/components/MobileFooter";
+import Footer from "@/components/Footer";
+import RojgaarAIPopup from "@/components/RojgaarAIPopup";
 
-const poppins = Poppins({
+const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-sans",
+  display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-bricolage",
+  display: "swap",
 });
+
+const siteUrl = "https://www.rojgaarnepal.com";
+const description =
+  "Find jobs in Nepal, discover skilled local talent, and learn practical career skills on RojgaarNepal.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rojgaarnepal.com"),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "Rojgaar Nepal - #1 Job Portal & Freelancing Site in Nepal | Find Jobs, Hire Talent",
-    template: "%s | Rojgaar Nepal - Jobs in Nepal"
+    default: "Jobs in Nepal & Local Talent | RojgaarNepal",
+    template: "%s | RojgaarNepal",
   },
-  description: "Rojgaar Nepal is Nepal's leading AI-powered job portal and freelancing platform. Find jobs with AI job matcher, build resumes with AI resume builder, practice with AI interview prep, assess skills with AI skills gap analyzer. Plus Python courses, CV building, and 100% free job posting for employers.",
-  keywords: [
-    "job in nepal",
-    "jobs in nepal",
-    "nepal jobs",
-    "AI job portal nepal",
-    "AI resume builder nepal",
-    "AI interview preparation",
-    "AI career tools nepal",
-    "AI job matcher",
-    "AI skills gap analysis",
-    "freelancing in nepal",
-    "freelancing site in nepal",
-    "freelance jobs nepal",
-    "hire freelancers nepal",
-    "rojgar nepal",
-    "rojgaarnepal",
-    "python course nepal",
-    "free python course",
-    "cv building course",
-    "resume builder nepal",
-    "job portal nepal",
-    "online jobs nepal",
-    "remote jobs nepal",
-    "kathmandu jobs",
-    "IT jobs nepal",
-    "software developer jobs nepal",
-    "career in nepal",
-    "hire experts nepal",
-    "talent hiring nepal",
-    "AI powered job search",
-    "artificial intelligence jobs nepal"
-  ],
-  authors: [{ name: "Rojgaar Nepal Team" }],
-  creator: "Rojgaar Nepal",
+  description,
+  applicationName: "RojgaarNepal",
+  authors: [{ name: "RojgaarNepal" }],
+  creator: "RojgaarNepal",
   publisher: "RojgaarNepal",
+  category: "Jobs and careers",
+  keywords: [
+    "jobs in Nepal",
+    "Nepal jobs",
+    "job portal Nepal",
+    "Kathmandu jobs",
+    "remote jobs Nepal",
+    "hire talent Nepal",
+    "freelance jobs Nepal",
+    "career courses Nepal",
+    "Rojgaar Nepal",
+  ],
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
+      "max-video-preview": -1,
     },
-  },
-  alternates: {
-    canonical: "https://rojgaarnepal.com",
   },
   openGraph: {
     type: "website",
     locale: "en_NP",
-    url: "https://rojgaarnepal.com",
-    siteName: "Rojgaar Nepal",
-    title: "Rojgaar Nepal - AI-Powered Job Portal | Find Jobs, Hire Talent",
-    description: "Nepal's #1 AI-powered platform for jobs and freelancing. Features: AI job matcher, AI resume builder, AI interview prep, AI skills gap analyzer. Free job posting and verified talent pool.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Rojgaar Nepal - Jobs and Freelancing Platform",
-      },
-    ],
+    url: siteUrl,
+    siteName: "RojgaarNepal",
+    title: "Jobs in Nepal & Local Talent | RojgaarNepal",
+    description,
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "RojgaarNepal job and talent platform" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rojgaar Nepal - AI-Powered Jobs, Freelancing & Courses",
-    description: "Find your dream job with AI tools: job matcher, resume builder, interview prep, skills gap analyzer. Hire top talent in Nepal. Free courses and verified opportunities.",
+    title: "Jobs in Nepal & Local Talent | RojgaarNepal",
+    description,
     images: ["/og-image.png"],
   },
-  verification: {
-    google: "google-site-verification-code", // Add your Google Search Console verification
-  },
-  icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
-  },
-  category: "Jobs & Careers",
+  icons: { icon: "/logo.png", apple: "/logo.png" },
 };
 
-// JSON-LD structured data for SEO
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1721" },
+  ],
+};
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "WebSite",
-      "@id": "https://rojgaarnepal.com/#website",
-      "url": "https://rojgaarnepal.com",
-      "name": "Rojgaar Nepal",
-      "description": "Nepal's #1 AI-Powered Job Portal and Freelancing Platform with AI Job Matcher, AI Resume Builder, AI Interview Prep, and AI Skills Gap Analyzer",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://rojgaarnepal.com/jobs?search={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      }
-    },
-    {
       "@type": "Organization",
-      "@id": "https://rojgaarnepal.com/#organization",
-      "name": "Rojgaar Nepal",
-      "url": "https://rojgaarnepal.com",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://rojgaarnepal.com/logo.png",
-        "width": 512,
-        "height": 512
-      },
-      "sameAs": [],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "customer support",
-        "email": "support@rojgaarnepal.com",
-        "availableLanguage": ["English", "Nepali"]
-      }
+      "@id": `${siteUrl}/#organization`,
+      name: "RojgaarNepal",
+      url: siteUrl,
+      logo: `${siteUrl}/logo.png`,
+      email: "contact@arpitkafle.com.np",
+      areaServed: { "@type": "Country", name: "Nepal" },
     },
     {
-      "@type": "WebPage",
-      "@id": "https://rojgaarnepal.com/#webpage",
-      "url": "https://rojgaarnepal.com",
-      "name": "Rojgaar Nepal - AI-Powered Job Portal & Freelancing",
-      "isPartOf": { "@id": "https://rojgaarnepal.com/#website" },
-      "about": { "@id": "https://rojgaarnepal.com/#organization" },
-      "description": "Find jobs using AI job matcher, build resumes with AI, practice interviews with AI, and analyze skills gaps. Plus freelancing and free courses."
-    }
-  ]
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      url: siteUrl,
+      name: "RojgaarNepal",
+      description,
+      publisher: { "@id": `${siteUrl}/#organization` },
+      inLanguage: "en-NP",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/jobs?search={search_term_string}` },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en-NP" suppressHydrationWarning>
       <head>
-        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const theme = localStorage.getItem('theme');
-                if (theme === 'dark' || (!theme)) {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-              })()
-            `,
+            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d)}catch(e){}})()`,
           }}
         />
       </head>
-      <body
-        className={`${poppins.variable} ${jetbrainsMono.variable} font-sans antialiased`}
-        suppressHydrationWarning
-      >
+      <body className={`${manrope.variable} ${bricolage.variable} font-sans antialiased`}>
+        <a href="#main-content" className="sr-only z-[200] rounded-lg bg-background px-4 py-3 font-semibold focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
+          Skip to main content
+        </a>
+        <DatadogAppRouter />
         <Providers>
-          <ParticlesBackground />
-          <CursorGlow />
-          <div className="min-h-screen flex flex-col bg-background relative z-20">
+          <div className="min-h-screen bg-background text-foreground">
             <Navbar />
-            <main className="flex-1 container mx-auto px-4 pt-20 pb-24 md:pb-8">
-              {children}
-            </main>
-
-            {/* Static Footer - Desktop only */}
+            <main id="main-content" className="min-h-[70vh] scroll-mt-20 pt-16">{children}</main>
             <Footer />
-
-            {/* Mobile Footer Navigation */}
             <MobileFooter />
-
-            {/* RojgaarAI Floating Chat - Desktop */}
             <RojgaarAIPopup />
           </div>
         </Providers>
@@ -213,4 +141,3 @@ export default function RootLayout({
     </html>
   );
 }
-

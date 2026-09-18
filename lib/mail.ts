@@ -1,5 +1,7 @@
 import nodemailer from "nodemailer";
 
+const DEFAULT_FROM = '"RojgaarNepal" <contact@arpitkafle.com.np>';
+
 export async function sendVerificationEmail(email: string, otp: string) {
   // If no email credentials are provided, log the OTP to console (for development)
   if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD) {
@@ -20,7 +22,7 @@ export async function sendVerificationEmail(email: string, otp: string) {
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
+    from: process.env.EMAIL_FROM || DEFAULT_FROM,
     to: email,
     subject: "Verify your email - RojgaarNepal",
     text: `Your verification code is: ${otp} Don't share this code with anyone. rojgaarnepal.com`,
@@ -33,7 +35,7 @@ export async function sendVerificationEmail(email: string, otp: string) {
         </div>
         <p>This code will expire in 5 minutes.</p>
         <p>If you didn't request this, please ignore this email.</p>
-        <a href="https://rojgaarnepal.com">RojgaarNepal</a>
+        <a href="https://www.rojgaarnepal.com">RojgaarNepal</a>
       </div>
     `,
   });
@@ -58,7 +60,7 @@ export async function sendPasswordResetEmail(email: string, otp: string) {
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
+    from: process.env.EMAIL_FROM || DEFAULT_FROM,
     to: email,
     subject: "Reset Your Password - RojgaarNepal",
     text: `Your password reset code is: ${otp}`,
@@ -92,7 +94,7 @@ export async function sendUntrustEmail(trustedEmail: string, trusterName: string
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
+    from: process.env.EMAIL_FROM || DEFAULT_FROM,
     to: trustedEmail,
     subject: "Trust Update - RojgaarNepal",
     text: `${trusterName} removed their trust.`,
@@ -122,7 +124,7 @@ export async function sendApplicationEmail(employerEmail: string, jobTitle: stri
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
+    from: process.env.EMAIL_FROM || DEFAULT_FROM,
     to: employerEmail,
     subject: `New Application for ${jobTitle}`,
     html: `
@@ -151,7 +153,7 @@ export async function sendApplicationStatusEmail(applicantEmail: string, jobTitl
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
+    from: process.env.EMAIL_FROM || DEFAULT_FROM,
     to: applicantEmail,
     subject: `Application Status Update: ${jobTitle}`,
     html: `
@@ -212,7 +214,7 @@ export async function sendNotificationEmail(
   }
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM || '"RojgaarNepal" <arpitkafle468@gmail.com>',
+    from: process.env.EMAIL_FROM || DEFAULT_FROM,
     to: email,
     subject,
     html: `
@@ -241,4 +243,3 @@ export async function sendNotificationEmail(
     `,
   });
 }
-

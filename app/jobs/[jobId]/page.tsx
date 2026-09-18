@@ -24,9 +24,11 @@ export async function generateMetadata(
   return {
     title: `${job.title} in ${job.location}`,
     description: job.description.substring(0, 160),
+    alternates: { canonical: `https://www.rojgaarnepal.com/jobs/${jobId}` },
     openGraph: {
       title: `${job.title} | Rojgaar Nepal`,
       description: job.description.substring(0, 160),
+      url: `https://www.rojgaarnepal.com/jobs/${jobId}`,
       type: "article",
     },
   };
@@ -121,13 +123,15 @@ export default async function JobDetailsPage({ params }: Props) {
     "@type": "JobPosting",
     "title": job.title,
     "description": job.description,
+    "url": `https://www.rojgaarnepal.com/jobs/${job.id}`,
+    "directApply": true,
     "datePosted": job.createdAt.toISOString(),
     "validThrough": job.expiresAt?.toISOString(),
     "employmentType": job.type,
     "hiringOrganization": {
       "@type": "Organization",
       "name": job.employer.employerProfile?.companyName || "Private Employer",
-      "sameAs": job.employer.employerProfile?.website || "https://rojgaarnepal.com",
+      "sameAs": job.employer.employerProfile?.website || "https://www.rojgaarnepal.com",
     },
     "jobLocation": {
       "@type": "Place",

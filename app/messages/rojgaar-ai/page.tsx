@@ -24,10 +24,10 @@ interface AIFeature {
 const quickActions = [
   { text: "What can you do?", icon: "bx-help-circle" },
   { text: "Help me find a job", icon: "bx-briefcase" },
-  { text: "Show me AI tools", icon: "bx-bot" },
   { text: "Improve my profile", icon: "bx-user" },
-  { text: "Use RojgaarAI CV generator — click here", icon: "bx-file" },
-  { text: "Interview prep", icon: "bx-conversation" },
+  { text: "How should I prepare for an interview?", icon: "bx-conversation" },
+  { text: "Show me courses", icon: "bx-book-open" },
+  { text: "Where are my applications?", icon: "bx-file" },
 ];
 
 export default function RojgaarAIChatPage() {
@@ -149,6 +149,7 @@ export default function RojgaarAIChatPage() {
   };
 
   const clearChat = () => {
+    if (!window.confirm("Clear this RojgaarAI conversation?")) return;
     setMessages([]);
     localStorage.removeItem("rojgaarAI_messages");
   };
@@ -167,6 +168,7 @@ export default function RojgaarAIChatPage() {
       <div className="px-4 py-3 border-b border-border/40 bg-card/80 backdrop-blur-md flex items-center gap-3 sticky top-0 z-10">
         <Link
           href="/messages"
+          aria-label="Back to messages"
           className="md:hidden p-2 hover:bg-accent rounded-xl transition-colors"
         >
           <ArrowLeft size={20} />
@@ -182,14 +184,18 @@ export default function RojgaarAIChatPage() {
           <p className="text-xs text-muted-foreground">Always here to help with your career</p>
         </div>
         <button
+          type="button"
           onClick={() => setShowFeatures(!showFeatures)}
+          aria-label="Open quick links"
           className="p-2 hover:bg-accent rounded-xl transition-colors"
-          title="AI Tools"
+          title="Quick links"
         >
           <Sparkles size={20} className="text-primary" />
         </button>
         <button
+          type="button"
           onClick={clearChat}
+          aria-label="Clear chat"
           className="p-2 hover:bg-accent rounded-xl transition-colors text-muted-foreground"
           title="Clear chat"
         >
@@ -199,10 +205,10 @@ export default function RojgaarAIChatPage() {
 
       {/* Features Panel */}
       {showFeatures && (
-        <div className="absolute top-16 right-4 w-72 bg-card border border-border rounded-2xl shadow-2xl z-20 overflow-hidden animate-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-16 right-4 w-72 overflow-hidden overscroll-contain rounded-2xl border border-border bg-card shadow-2xl z-20 animate-in slide-in-from-top-2 duration-200">
           <div className="p-3 border-b border-border bg-primary/5 flex items-center justify-between">
-            <span className="font-bold text-sm">AI Tools</span>
-            <button onClick={() => setShowFeatures(false)} className="text-muted-foreground hover:text-foreground">
+            <span className="font-bold text-sm">Quick links</span>
+            <button type="button" aria-label="Close quick links" onClick={() => setShowFeatures(false)} className="text-muted-foreground hover:text-foreground">
               <i className="bx bx-x text-lg"></i>
             </button>
           </div>
@@ -228,7 +234,7 @@ export default function RojgaarAIChatPage() {
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" aria-live="polite">
         {messages.length === 0 && (
           <div className="text-center py-12">
             <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary to-primary/70 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary/30">
@@ -236,7 +242,7 @@ export default function RojgaarAIChatPage() {
             </div>
             <h3 className="text-xl font-black text-foreground mb-2">Hi! I&apos;m RojgaarAI 👋</h3>
             <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-              I&apos;m your personal career assistant at RojgaarNepal. I can help you find jobs, improve your profile, and navigate all our AI tools.
+              I&apos;m your career assistant at RojgaarNepal. I can help you find jobs, improve your profile, and plan your next step.
             </p>
 
             {/* Info Box */}
@@ -248,7 +254,7 @@ export default function RojgaarAIChatPage() {
                   <ul className="text-xs text-muted-foreground space-y-1">
                     <li>• Navigate RojgaarNepal features</li>
                     <li>• Career advice and job search tips</li>
-                    <li>• Guide you to our AI tools</li>
+                    <li>• Guide you around RojgaarNepal</li>
                     <li>• Profile improvement suggestions</li>
                   </ul>
                 </div>
@@ -261,7 +267,7 @@ export default function RojgaarAIChatPage() {
                 <button
                   key={i}
                   onClick={() => handleSend(action.text)}
-                  className="px-3 py-2 bg-card border border-border rounded-xl text-sm font-medium hover:bg-accent hover:border-primary/30 transition-all flex items-center gap-2"
+                  className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium transition-[background-color,border-color] hover:border-primary/30 hover:bg-accent"
                 >
                   <i className={`bx ${action.icon} text-primary`}></i>
                   {action.text}
@@ -332,7 +338,7 @@ export default function RojgaarAIChatPage() {
                     <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
                     <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
                   </div>
-                  <span className="text-sm text-muted-foreground">Thinking...</span>
+                  <span className="text-sm text-muted-foreground">Thinking…</span>
                 </div>
               </div>
             </div>
@@ -345,19 +351,25 @@ export default function RojgaarAIChatPage() {
       {/* Input */}
       <div className="p-4 border-t border-border/40 bg-card/80 backdrop-blur-md">
         <div className="flex gap-2 max-w-3xl mx-auto">
+          <label htmlFor="rojgaar-ai-message" className="sr-only">Message RojgaarAI</label>
           <input
+            id="rojgaar-ai-message"
+            name="message"
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask me anything about jobs, your profile, or our AI tools..."
-            className="flex-1 px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            onKeyDown={handleKeyPress}
+            autoComplete="off"
+            placeholder="Ask about jobs, your profile, applications, or courses…"
+            className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-foreground transition-[border-color,box-shadow] focus-visible:ring-2 focus-visible:ring-primary/50"
             maxLength={500}
             disabled={loading}
           />
           <button
+            type="button"
             onClick={() => handleSend()}
+            aria-label="Send message"
             disabled={!input.trim() || loading}
             className="px-4 py-3 bg-primary text-primary-foreground rounded-xl font-bold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
           >

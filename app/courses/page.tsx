@@ -21,10 +21,11 @@ export const metadata: Metadata = {
     "certificate courses nepal",
     "career courses nepal"
   ],
+  alternates: { canonical: "https://www.rojgaarnepal.com/courses" },
   openGraph: {
     title: "Free Courses - Learn Python, CV Building | Rojgaar Nepal",
     description: "Get certified with free professional courses. Learn Python programming, CV building & more. Start your career journey today!",
-    url: "https://rojgaarnepal.com/courses",
+    url: "https://www.rojgaarnepal.com/courses",
     type: "website",
   },
 };

@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Login to Rojgaar Nepal - Access Jobs, AI Tools & Courses",
-  description: "Sign in to your Rojgaar Nepal account. Access thousands of jobs in Nepal, AI career tools, free courses, and connect with top employers. Secure login for job seekers and employers.",
+  title: "Log in to Rojgaar Nepal",
+  description: "Sign in to search jobs, manage applications, learn new skills, and connect with employers on Rojgaar Nepal.",
   keywords: [
     "rojgaar nepal login",
     "job portal login nepal",
@@ -13,12 +13,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Login | Rojgaar Nepal - Nepal's #1 Job Portal",
     description: "Access your Rojgaar Nepal account to find jobs, hire talent, and grow your career.",
-    url: "https://rojgaarnepal.com/login",
+    url: "https://www.rojgaarnepal.com/login",
     type: "website",
   },
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 };
 

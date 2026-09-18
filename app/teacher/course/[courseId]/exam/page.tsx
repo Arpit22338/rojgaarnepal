@@ -5,9 +5,9 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import {
-  Sparkles, ArrowLeft, Loader2, Save, Trash2, Plus, Settings,
+  ArrowLeft, Loader2, Save, Trash2, Plus, Settings,
   BookOpen, CheckCircle, AlertCircle, BarChart3,
-  Edit3, Eye, EyeOff, RefreshCw
+  Edit3, Eye, EyeOff
 } from "lucide-react";
 
 interface Question {
@@ -47,21 +47,11 @@ export default function ExamManagementPage() {
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [generating, setGenerating] = useState(false);
   const [course, setCourse] = useState<any>(null);
   const [exams, setExams] = useState<Exam[]>([]);
   const [activeExam, setActiveExam] = useState<Exam | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [showAiPanel, setShowAiPanel] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<number | null>(null);
-  
-  // AI Generation Settings
-  const [aiSettings, setAiSettings] = useState({
-    questionCount: 10,
-    difficulty: "MIXED" as "EASY" | "MEDIUM" | "HARD" | "MIXED",
-    questionTypes: ["MULTIPLE_CHOICE"] as ("MULTIPLE_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER")[],
-    topics: ""
-  });
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -114,52 +104,6 @@ export default function ExamManagementPage() {
       availableUntil: null,
       questions: []
     });
-    setShowAiPanel(true);
-  };
-
-  const generateWithAI = async () => {
-    if (!course || !activeExam) return;
-    setGenerating(true);
-    
-    try {
-      const response = await fetch("/api/ai/exam", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          courseName: course.title,
-          courseDescription: course.description,
-          topics: aiSettings.topics.split(",").map(t => t.trim()).filter(Boolean),
-          difficulty: aiSettings.difficulty,
-          questionCount: aiSettings.questionCount,
-          questionTypes: aiSettings.questionTypes
-        })
-      });
-
-      const data = await response.json();
-      if (data.success && data.questions) {
-        setActiveExam({
-          ...activeExam,
-          questions: [...activeExam.questions, ...data.questions.map((q: any) => ({
-            questionText: q.questionText,
-            questionType: q.questionType,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            explanation: q.explanation,
-            difficulty: q.difficulty,
-            tags: q.tags || [],
-            points: 1
-          }))]
-        });
-        setShowAiPanel(false);
-      } else {
-        alert(data.error || "Failed to generate questions");
-      }
-    } catch (error) {
-      console.error("Error generating:", error);
-      alert("Failed to generate questions");
-    } finally {
-      setGenerating(false);
-    }
   };
 
   const saveExam = async () => {
@@ -248,30 +192,6 @@ export default function ExamManagementPage() {
       ...activeExam,
       questions: activeExam.questions.filter((_, i) => i !== index)
     });
-  };
-
-  const regenerateQuestion = async (index: number) => {
-    if (!activeExam || !course) return;
-    const question = activeExam.questions[index];
-
-    try {
-      const response = await fetch("/api/ai/exam", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          originalQuestion: question,
-          courseName: course.title,
-          feedback: "Generate a different question on the same topic"
-        })
-      });
-
-      const data = await response.json();
-      if (data.success && data.question) {
-        updateQuestion(index, data.question);
-      }
-    } catch (error) {
-      console.error("Error regenerating:", error);
-    }
   };
 
   if (loading) {
@@ -364,10 +284,10 @@ export default function ExamManagementPage() {
         <div className="lg:col-span-3">
           {!activeExam ? (
             <div className="bg-card rounded-2xl border border-border p-12 text-center">
-              <Sparkles size={64} className="mx-auto text-muted-foreground mb-6" />
+              <BookOpen size={64} className="mx-auto text-muted-foreground mb-6" />
               <h3 className="text-xl font-bold text-foreground mb-2">Create an Exam</h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Create exams with AI-generated questions. Students can take exams and earn certificates upon passing.
+                Create questions manually, publish the exam, and let students earn certificates after passing.
               </p>
               <button
                 onClick={createNewExam}
@@ -403,12 +323,6 @@ export default function ExamManagementPage() {
                       className="p-2 border border-border rounded-lg hover:bg-accent transition-colors"
                     >
                       <Settings size={20} />
-                    </button>
-                    <button
-                      onClick={() => setShowAiPanel(!showAiPanel)}
-                      className="px-4 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-primary/10 flex items-center gap-2 transition-colors"
-                    >
-                      <Sparkles size={18} /> AI Generate
                     </button>
                     <button
                       onClick={saveExam}
@@ -507,80 +421,6 @@ export default function ExamManagementPage() {
                   </div>
                 )}
 
-                {/* AI Generation Panel */}
-                {showAiPanel && (
-                  <div className="mt-6 pt-6 border-t border-border">
-                    <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-                      <Sparkles className="text-primary" size={18} /> AI Question Generator
-                    </h3>
-                    <div className="grid md:grid-cols-4 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Questions</label>
-                        <select
-                          value={aiSettings.questionCount}
-                          onChange={(e) => setAiSettings({ ...aiSettings, questionCount: parseInt(e.target.value) })}
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-background"
-                        >
-                          {[5, 10, 15, 20, 25].map(n => (
-                            <option key={n} value={n}>{n} questions</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Difficulty</label>
-                        <select
-                          value={aiSettings.difficulty}
-                          onChange={(e) => setAiSettings({ ...aiSettings, difficulty: e.target.value as any })}
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-background"
-                        >
-                          <option value="EASY">Easy</option>
-                          <option value="MEDIUM">Medium</option>
-                          <option value="HARD">Hard</option>
-                          <option value="MIXED">Mixed</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Question Types</label>
-                        <select
-                          value={aiSettings.questionTypes[0]}
-                          onChange={(e) => setAiSettings({ ...aiSettings, questionTypes: [e.target.value as any] })}
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-background"
-                        >
-                          <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-                          <option value="TRUE_FALSE">True/False</option>
-                          <option value="SHORT_ANSWER">Short Answer</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Topics (optional)</label>
-                        <input
-                          type="text"
-                          value={aiSettings.topics}
-                          onChange={(e) => setAiSettings({ ...aiSettings, topics: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-background"
-                          placeholder="e.g., Variables, Loops"
-                        />
-                      </div>
-                    </div>
-                    <button
-                      onClick={generateWithAI}
-                      disabled={generating}
-                      className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 transition-colors"
-                    >
-                      {generating ? (
-                        <>
-                          <Loader2 className="animate-spin" size={18} />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles size={18} />
-                          Generate Questions
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* Questions List */}
@@ -600,7 +440,7 @@ export default function ExamManagementPage() {
                 {activeExam.questions.length === 0 ? (
                   <div className="bg-card rounded-xl border border-border p-12 text-center">
                     <AlertCircle size={48} className="mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">No questions yet. Use AI to generate or add manually.</p>
+                    <p className="text-muted-foreground">No questions yet. Add the first question manually.</p>
                   </div>
                 ) : (
                   activeExam.questions.map((question, index) => (
@@ -771,13 +611,6 @@ export default function ExamManagementPage() {
                             className="p-2 hover:bg-accent rounded-lg transition-colors"
                           >
                             <Edit3 size={18} />
-                          </button>
-                          <button
-                            onClick={() => regenerateQuestion(index)}
-                            className="p-2 hover:bg-accent rounded-lg transition-colors"
-                            title="Regenerate with AI"
-                          >
-                            <RefreshCw size={18} />
                           </button>
                           <button
                             onClick={() => removeQuestion(index)}

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Create Free Account - Join Rojgaar Nepal Today",
-  description: "Register on Rojgaar Nepal for FREE. Access thousands of jobs in Nepal, AI resume builder, free Python & CV courses, and connect with top employers. Join Nepal's #1 job portal.",
+  description: "Create a free Rojgaar Nepal account to find jobs, publish your professional profile, explore courses, and connect with employers.",
   keywords: [
     "rojgaar nepal register",
     "create account job portal nepal",
@@ -13,13 +13,13 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Join Rojgaar Nepal Free | Create Your Account",
-    description: "Sign up for Nepal's leading job portal. Free access to jobs, AI tools, and courses. Start your career journey today!",
-    url: "https://rojgaarnepal.com/register",
+    description: "Sign up for Rojgaar Nepal to find jobs, hire talent, and build practical career skills.",
+    url: "https://www.rojgaarnepal.com/register",
     type: "website",
   },
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 };
 

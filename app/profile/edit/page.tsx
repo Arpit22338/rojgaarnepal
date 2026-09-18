@@ -28,12 +28,6 @@ interface Skill {
   level: number;
 }
 
-interface BioVariations {
-  professional: string;
-  casual: string;
-  creative: string;
-}
-
 interface ProfileFormData {
   image: string;
   name: string;
@@ -108,12 +102,6 @@ const industries = ["Tech", "Health", "Fin", "Edu", "Creative", "Mkt", "Mfg", "R
 const jobTypes = ["FT", "PT", "Cont", "Free", "Intern"];
 const commonSkills = ["JavaScript", "TypeScript", "React", "Node.js", "Python", "Java", "SQL", "MongoDB", "AWS", "Docker", "Git", "CSS", "HTML", "Figma", "Photoshop", "Excel", "Communication", "Leadership", "Project Management"];
 
-const aiLoadingMessages = [
-  { text: "Analyzing your profile...", duration: 1500 },
-  { text: "Crafting your bio...", duration: 2000 },
-  { text: "Creating variations...", duration: 1500 }
-];
-
 // Employer form data
 interface EmployerFormData {
   image: string;
@@ -169,20 +157,6 @@ export default function EditProfilePage() {
   const [showSkillSuggestions, setShowSkillSuggestions] = useState(false);
   const [expertiseInput, setExpertiseInput] = useState("");
   
-  // AI Bio Generator
-  const [showAIModal, setShowAIModal] = useState(false);
-  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
-  const [aiLoadingStep, setAiLoadingStep] = useState(0);
-  const [bioVariations, setBioVariations] = useState<BioVariations | null>(null);
-  const [selectedBioStyle, setSelectedBioStyle] = useState<"professional" | "casual" | "creative">("professional");
-  const [customAiData, setCustomAiData] = useState({
-    name: "",
-    title: "",
-    skills: [] as string[],
-    experience: "",
-    achievement: ""
-  });
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -256,14 +230,6 @@ export default function EditProfilePage() {
             privacyLevel: extendedData.privacyLevel || "public",
           });
           
-          // Pre-fill AI data
-          setCustomAiData({
-            name: session?.user?.name || "",
-            title: extendedData.jobTitle || "",
-            skills: parsedSkills.map(s => s.name).slice(0, 5),
-            experience: extendedData.yearsExperience || "",
-            achievement: ""
-          });
         }
         setLoading(false);
       } catch (error) {
@@ -368,59 +334,6 @@ export default function EditProfilePage() {
       updateField("preferredJobTypes", formData.preferredJobTypes.filter(t => t !== type));
     } else {
       updateField("preferredJobTypes", [...formData.preferredJobTypes, type]);
-    }
-  };
-
-  // AI Bio Generation
-  const generateBioWithAI = async () => {
-    setIsGeneratingBio(true);
-    setAiLoadingStep(0);
-    setBioVariations(null);
-
-    for (let i = 0; i < aiLoadingMessages.length; i++) {
-      setAiLoadingStep(i);
-      await new Promise(resolve => setTimeout(resolve, aiLoadingMessages[i].duration));
-    }
-
-    try {
-      const payload = {
-        mode: "custom",
-        style: selectedBioStyle,
-        manualData: {
-          name: customAiData.name || formData.name,
-          title: customAiData.title || formData.jobTitle,
-          skills: customAiData.skills.length > 0 ? customAiData.skills : formData.skills.map(s => s.name).slice(0, 5),
-          experience: customAiData.experience || formData.yearsExperience,
-          achievement: customAiData.achievement,
-          industry: formData.preferredIndustries[0] || ""
-        }
-      };
-
-      const response = await fetch("/api/ai/bio", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      if (data.success && data.bios) {
-        setBioVariations(data.bios);
-      } else {
-        throw new Error(data.error || "Failed to generate bio");
-      }
-    } catch (error) {
-      console.error("Error generating bio:", error);
-      alert("Failed to generate bio. Please try again.");
-    } finally {
-      setIsGeneratingBio(false);
-    }
-  };
-
-  const selectBioVariation = (style: "professional" | "casual" | "creative") => {
-    if (bioVariations) {
-      updateField("bio", bioVariations[style]);
-      setShowAIModal(false);
-      setBioVariations(null);
     }
   };
 
@@ -691,13 +604,9 @@ export default function EditProfilePage() {
                 </div>
               </div>
               
-              {/* Professional Bio with AI Generator */}
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-sm font-medium text-foreground">Professional Bio <span className="text-muted-foreground text-xs">({formData.bio.length}/500)</span></label>
-                  <button type="button" onClick={() => setShowAIModal(true)} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-linear-to-r from-primary to-primary/80 text-primary-foreground rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all">
-                    <i className="bx bx-star text-sm"></i> Generate with AI
-                  </button>
                 </div>
                 <textarea value={formData.bio} onChange={(e) => updateField("bio", e.target.value.slice(0, 500))} rows={4} className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/50 resize-none" placeholder="Tell employers about yourself, your experience, and what makes you unique..." />
               </div>
@@ -1007,102 +916,6 @@ export default function EditProfilePage() {
         </div>
       </div>
 
-      {/* AI Bio Generator Modal */}
-      {showAIModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-card rounded-2xl shadow-2xl border border-border max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-card border-b border-border p-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-foreground flex items-center gap-2"><i className="bx bx-star text-primary"></i> AI Bio Generator</h2>
-              <button onClick={() => { setShowAIModal(false); setBioVariations(null); }} className="p-2 hover:bg-accent rounded-full"><i className="bx bx-x text-2xl"></i></button>
-            </div>
-            
-            <div className="p-6 space-y-6">
-              {!bioVariations ? (
-                <>
-                  <div className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Your Name</label>
-                        <input type="text" value={customAiData.name} onChange={(e) => setCustomAiData({ ...customAiData, name: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/50" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Job Title</label>
-                        <input type="text" value={customAiData.title} onChange={(e) => setCustomAiData({ ...customAiData, title: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/50" placeholder="e.g. Full Stack Developer" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">Top Skills (3-5)</label>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {customAiData.skills.map(skill => (<span key={skill} className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">{skill}<button type="button" onClick={() => setCustomAiData({ ...customAiData, skills: customAiData.skills.filter(s => s !== skill) })}><i className="bx bx-x"></i></button></span>))}
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {formData.skills.filter(s => !customAiData.skills.includes(s.name)).slice(0, 6).map(skill => (
-                          <button key={skill.name} type="button" onClick={() => setCustomAiData({ ...customAiData, skills: [...customAiData.skills, skill.name].slice(0, 5) })} className="px-2 py-1 text-xs bg-accent hover:bg-accent/80 text-foreground rounded-full">+ {skill.name}</button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Years of Experience</label>
-                        <select value={customAiData.experience} onChange={(e) => setCustomAiData({ ...customAiData, experience: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/50">
-                          <option value="">Select</option>
-                          {yearsOptions.map(y => (<option key={y} value={y}>{y} years</option>))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Key Achievement</label>
-                        <input type="text" value={customAiData.achievement} onChange={(e) => setCustomAiData({ ...customAiData, achievement: e.target.value })} className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/50" placeholder="One notable achievement" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Bio Style Selection */}
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Bio Style</label>
-                    <div className="flex flex-wrap gap-3">
-                      {[
-                        { value: "professional", label: "Professional", desc: "Formal, corporate" },
-                        { value: "casual", label: "Casual", desc: "Friendly, approachable" },
-                        { value: "creative", label: "Creative", desc: "Unique, personality" }
-                      ].map(style => (
-                        <button key={style.value} type="button" onClick={() => setSelectedBioStyle(style.value as "professional" | "casual" | "creative")} className={`flex-1 min-w-[100px] p-3 rounded-xl border transition-all text-left ${selectedBioStyle === style.value ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"}`}>
-                          <div className="font-medium text-foreground">{style.label}</div>
-                          <div className="text-xs text-muted-foreground">{style.desc}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <button type="button" onClick={generateBioWithAI} disabled={isGeneratingBio || !customAiData.name || !customAiData.title} className="w-full py-3 rounded-xl bg-linear-to-r from-primary to-primary/80 text-primary-foreground font-bold hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                    {isGeneratingBio ? (<><div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>{aiLoadingMessages[aiLoadingStep]?.text || "Generating..."}</>) : (<><i className="bx bx-star"></i> Generate Bio</>)}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p className="text-muted-foreground text-center">Choose a bio variation</p>
-                  <div className="space-y-4">
-                    {(["professional", "casual", "creative"] as const).map(style => (
-                      <div key={style} className={`p-4 rounded-xl border ${selectedBioStyle === style ? "border-primary bg-primary/5" : "border-border"} hover:border-primary/50 transition-all`}>
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium text-foreground capitalize">{style}</span>
-                          <button type="button" onClick={() => selectBioVariation(style)} className="px-3 py-1 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">Use This</button>
-                        </div>
-                        <p className="text-muted-foreground text-sm">{bioVariations[style]}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex gap-3">
-                    <button type="button" onClick={() => setBioVariations(null)} className="flex-1 py-2 rounded-lg border border-border text-foreground hover:bg-accent transition-colors flex items-center justify-center gap-1"><i className="bx bx-arrow-back"></i> Back</button>
-                    <button type="button" onClick={generateBioWithAI} disabled={isGeneratingBio} className="flex-1 py-2 rounded-lg bg-accent text-foreground hover:bg-accent/80 transition-colors flex items-center justify-center gap-1">
-                      {isGeneratingBio ? <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div> : <i className="bx bx-refresh"></i>} Try Again
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

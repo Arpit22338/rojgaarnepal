@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { addNextjsError } from "@datadog/browser-rum-nextjs";
 
 export default function GlobalError({
     error,
@@ -11,34 +12,37 @@ export default function GlobalError({
 }) {
     useEffect(() => {
         console.error("Global Error:", error);
+        addNextjsError(error);
     }, [error]);
 
     return (
         <html>
-            <body className="bg-[#0A0E27]">
-                <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center space-y-6">
+            <body className="bg-[#101114]">
+                <main className="flex min-h-screen flex-col items-center justify-center space-y-6 px-6 text-center">
                     <div className="text-6xl mb-2">⚠️</div>
                     <div className="space-y-2">
-                        <h2 className="text-2xl font-bold tracking-tight text-white">Something went wrong</h2>
-                        <p className="text-gray-400 max-w-md">
+                        <h1 className="text-2xl font-bold tracking-tight text-white">Something went wrong</h1>
+                        <p className="max-w-md text-gray-400">
                             We encountered an unexpected error. Please try refreshing the page.
                         </p>
                     </div>
-                    <div className="flex gap-4 pt-4">
+                    <div className="flex flex-wrap justify-center gap-4 pt-4">
                         <button
-                            onClick={() => window.location.href = '/'}
-                            className="px-6 py-2.5 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
+                            type="button"
+                            onClick={() => { window.location.href = "/"; }}
+                            className="rounded-lg border border-gray-600 px-6 py-2.5 text-gray-300 transition-colors hover:bg-gray-800"
                         >
                             Go Home
                         </button>
                         <button
-                            onClick={() => window.location.reload()}
-                            className="px-6 py-2.5 bg-cyan-500 text-white rounded-lg hover:bg-cyan-400 transition-colors font-semibold"
+                            type="button"
+                            onClick={reset}
+                            className="rounded-lg bg-red-600 px-6 py-2.5 font-semibold text-white transition-colors hover:bg-red-500"
                         >
-                            Refresh Page
+                            Try again
                         </button>
                     </div>
-                </div>
+                </main>
             </body>
         </html>
     );

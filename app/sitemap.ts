@@ -1,8 +1,10 @@
 import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://rojgaarnepal.com'
+    const baseUrl = 'https://www.rojgaarnepal.com'
 
     // Fetch all dynamic IDs
     const jobs = await prisma.job.findMany({ select: { id: true, updatedAt: true } })
@@ -47,28 +49,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const staticPages = [
         '',
         '/jobs',
+        '/jobs-in-nepal',
         '/courses',
         '/courses/basic-python',
         '/courses/cv-building',
         '/talent',
-        '/talent-posts',
         '/people',
         '/about',
         '/contact',
-        '/ai-tools',
-        '/ai-tools/resume-builder',
-        '/ai-tools/interview-prep',
-        '/ai-tools/job-matcher',
-        '/ai-tools/skills-gap',
-        '/login',
-        '/register',
         '/privacy',
         '/terms',
     ].map((route) => ({
         url: `${baseUrl}${route}`,
         lastModified: new Date(),
         changeFrequency: route === '' ? 'daily' as const : 'weekly' as const,
-        priority: route === '' ? 1.0 : route.includes('/courses') || route.includes('/ai-tools') ? 0.9 : 0.8,
+        priority: route === '' ? 1.0 : route.includes('/courses') || route === '/jobs' ? 0.9 : 0.8,
     }))
 
     return [...staticPages, ...jobEntries, ...courseEntries, ...talentEntries, ...profileEntries]

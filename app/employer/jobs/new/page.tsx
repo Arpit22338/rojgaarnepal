@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
-  Sparkles, Loader2, X, Check, ChevronDown, ChevronUp,
+  Loader2, X, Check, ChevronDown, ChevronUp,
   Briefcase, MapPin, Clock, GraduationCap, Award,
   Users, Heart, Building2, FileText, Eye, Save, Send,
   Zap, Coffee, Dumbbell, Plane, TrendingUp, Gift
@@ -82,20 +82,11 @@ const commonBenefits = [
   { id: "bonus", label: "Bonus/Incentives", icon: Zap }
 ];
 const commonSkills = ["JavaScript", "TypeScript", "React", "Node.js", "Python", "Java", "SQL", "MongoDB", "AWS", "Docker", "Git", "CSS", "HTML", "Figma", "Excel", "Communication", "Leadership", "Project Management"];
-const aiLoadingMessages = [
-  { text: "Analyzing job requirements...", duration: 2000 },
-  { text: "Crafting engaging description...", duration: 3000 },
-  { text: "Optimizing for candidates...", duration: 2000 },
-  { text: "Finalizing description...", duration: 1000 }
-];
-
 export default function NewJobPage() {
   const { data: session } = useSession();
   const [formData, setFormData] = useState<JobFormData>(defaultFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [aiLoadingStep, setAiLoadingStep] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [createdJobId, setCreatedJobId] = useState<string | null>(null);
@@ -195,36 +186,6 @@ export default function NewJobPage() {
     if (formData.description.length < 100) newErrors.description = "Description must be at least 100 characters";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const canGenerateAI = (): boolean => {
-    return !!(formData.title.trim() && formData.companyName.trim() && formData.industry && formData.location.trim() && formData.type && formData.experienceLevel && formData.requiredSkills.length >= 3 && formData.responsibilities.filter(r => r.trim()).length >= 3);
-  };
-
-  const generateWithAI = async () => {
-    if (!canGenerateAI()) { alert("Please fill in all required fields before generating with AI"); return; }
-    setIsGenerating(true);
-    setAiLoadingStep(0);
-    for (let i = 0; i < aiLoadingMessages.length; i++) {
-      setAiLoadingStep(i);
-      await new Promise(resolve => setTimeout(resolve, aiLoadingMessages[i].duration));
-    }
-    try {
-      const response = await fetch("/api/ai/job-description", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: formData.title, company: formData.companyName, department: formData.department, industry: formData.industry, location: formData.location, employmentMode: formData.employmentMode, type: formData.type, experienceLevel: formData.experienceLevel,
-          salaryRange: formData.salaryMin && formData.salaryMax ? `NPR ${formData.salaryMin} - ${formData.salaryMax}` : null,
-          requirements: formData.requiredSkills, niceToHave: formData.niceToHaveSkills, education: formData.education, yearsExperience: formData.yearsExperience, certifications: formData.noCertifications ? null : formData.certifications,
-          responsibilities: formData.responsibilities.filter(r => r.trim()), benefits: formData.benefits.map(b => commonBenefits.find(cb => cb.id === b)?.label || b), customBenefits: formData.customBenefits, companyCulture: formData.companyCulture, tone: "professional", includeCompanyBenefits: formData.benefits.length > 0 || !!formData.customBenefits
-        }),
-      });
-      const data = await response.json();
-      if (data.success && data.description) updateField("description", data.description);
-      else throw new Error(data.error || "Failed to generate description");
-    } catch (error) { console.error("Error generating description:", error); alert("Failed to generate description. Please try again."); }
-    finally { setIsGenerating(false); }
   };
 
   const saveDraft = () => { localStorage.setItem("jobPostDraft", JSON.stringify(formData)); alert("Draft saved successfully!"); };
@@ -515,16 +476,9 @@ export default function NewJobPage() {
           </button>
           {expandedSections.description && (
             <div className="p-6 pt-0 space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <span className="text-sm text-muted-foreground">{formData.description.length}/5000 characters</span>
-                <button type="button" onClick={generateWithAI} disabled={!canGenerateAI() || isGenerating} className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${canGenerateAI() && !isGenerating ? "bg-linear-to-r from-primary to-primary/80 text-primary-foreground hover:shadow-lg hover:shadow-primary/30" : "bg-muted text-muted-foreground cursor-not-allowed"}`}>
-                  {isGenerating ? (<><Loader2 className="animate-spin" size={18} />{aiLoadingMessages[aiLoadingStep]?.text || "Generating..."}</>) : (<><Sparkles size={18} />Write with AI</>)}
-                </button>
-              </div>
-              {!canGenerateAI() && (<p className="text-sm text-muted-foreground bg-accent/50 p-3 rounded-lg">💡 Fill in all required fields above (title, company, industry, location, type, experience, 3+ skills, and 3+ responsibilities) to enable AI generation</p>)}
+              <span className="text-sm text-muted-foreground">{formData.description.length}/5000 characters</span>
               <textarea value={formData.description} onChange={(e) => updateField("description", e.target.value.slice(0, 5000))} rows={12} className={`w-full px-4 py-3 rounded-xl border ${errors.description ? "border-red-500" : "border-border"} bg-background text-foreground focus:ring-2 focus:ring-primary/50 transition-all resize-none font-mono text-sm`} placeholder="Describe job responsibilities, requirements, benefits, and what makes this opportunity special..." />
               {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
-              {formData.description && (<button type="button" onClick={generateWithAI} disabled={!canGenerateAI() || isGenerating} className="text-sm text-primary hover:underline flex items-center gap-1"><Sparkles size={14} /> Regenerate with AI</button>)}
             </div>
           )}
         </section>

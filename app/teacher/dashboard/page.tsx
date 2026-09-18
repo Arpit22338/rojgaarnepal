@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { BookOpen, Users, DollarSign, Edit, PlusCircle, ArrowRight, CheckCircle, Sparkles } from "lucide-react";
+import { BookOpen, Users, DollarSign, Edit, PlusCircle, ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -67,12 +67,6 @@ export default function TeacherDashboard() {
         </div>
         {course && (
           <div className="flex gap-3">
-            <Link
-              href="/teacher/course/exam-generator"
-              className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary font-bold px-5 py-3 rounded-2xl transition-all"
-            >
-              <Sparkles size={18} /> AI Exam Generator
-            </Link>
             <Link
               href="/teacher/course/edit"
               className="flex items-center gap-2 bg-accent hover:bg-primary/20 text-primary font-black px-6 py-3 rounded-2xl transition-all shadow-sm"

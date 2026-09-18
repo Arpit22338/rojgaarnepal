@@ -7,106 +7,6 @@ import { X, Send, Loader2, ChevronRight, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-// Helper function to parse message content and convert URLs to clickable links
-function parseMessageWithLinks(content: string): React.ReactNode {
-  // Regex for Markdown links: [text](url)
-  const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g;
-
-  // First, check if there are markdown links
-  if (markdownLinkRegex.test(content)) {
-    const parts = [];
-    let lastIndex = 0;
-    let match;
-
-    // Reset regex state
-    markdownLinkRegex.lastIndex = 0;
-
-    while ((match = markdownLinkRegex.exec(content)) !== null) {
-      // Push text before the link
-      if (match.index > lastIndex) {
-        parts.push(content.substring(lastIndex, match.index));
-      }
-
-      // Push the link component
-      parts.push(
-        <a
-          key={match.index}
-          href={match[2]}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary hover:text-primary/80 underline font-medium"
-        >
-          {match[1]}
-        </a>
-      );
-
-      lastIndex = markdownLinkRegex.lastIndex;
-    }
-
-    // Push remaining text
-    if (lastIndex < content.length) {
-      parts.push(content.substring(lastIndex));
-    }
-
-    return <>{parts}</>;
-  }
-
-  // Fallback for raw URLs (existing logic)
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const parts = content.split(urlRegex);
-
-  if (parts.length === 1) {
-    return content;
-  }
-
-  return parts.map((part, index) => {
-    if (part.match(urlRegex)) {
-      try {
-        const url = new URL(part);
-        const path = url.pathname;
-        let displayText = "here";
-
-        // Smart display text generation
-        if (path.includes("resume-builder")) displayText = "Resume Builder";
-        else if (path.includes("interview-prep")) displayText = "Interview Prep";
-        else if (path.includes("skills-gap")) displayText = "Skills Gap Analysis";
-        else if (path.includes("job-matcher")) displayText = "Job Matcher";
-        else if (path.includes("ai-tools")) displayText = "AI Tools";
-        else if (path.includes("jobs")) displayText = "Jobs Portal";
-        else if (path.includes("profile")) displayText = "Your Profile";
-        else if (path.includes("courses")) displayText = "Learning Center";
-        else if (path === "/") displayText = "Home";
-        else displayText = path.split("/").filter(Boolean).pop() || "Link";
-
-        return (
-          <a
-            key={index}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:text-primary/80 underline font-medium"
-          >
-            {displayText}
-          </a>
-        );
-      } catch {
-        return (
-          <a
-            key={index}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:text-primary/80 underline font-medium"
-          >
-            Link
-          </a>
-        );
-      }
-    }
-    return part;
-  });
-}
-
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -162,7 +62,7 @@ export default function RojgaarAIPopup() {
             setFeatures(data.allFeatures || []);
             // Show bubble after 5 seconds
             setTimeout(() => {
-              setBubbleMessage(data.tip || "Try our AI tools!");
+              setBubbleMessage(data.tip || "Ask me about your next career step.");
               setShowBubble(true);
               // Hide bubble after 8 seconds
               setTimeout(() => setShowBubble(false), 15000);
@@ -207,10 +107,11 @@ export default function RojgaarAIPopup() {
     }
   }, [isOpen]);
 
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
+  const handleSend = async (text?: string) => {
+    const nextMessage = text ?? input;
+    if (!nextMessage.trim() || loading) return;
 
-    const userMessage = input.trim();
+    const userMessage = nextMessage.trim();
     setInput("");
     setMessages(prev => [...prev, { role: "user", content: userMessage }]);
     setLoading(true);
@@ -267,13 +168,10 @@ export default function RojgaarAIPopup() {
       <div ref={popupRef} className="fixed bottom-20 right-6 z-[100] hidden md:block">
         {/* Cloud Tip Bubble */}
         {showBubble && !isOpen && (
-          <div
-            onClick={handleBubbleClick}
-            className="absolute bottom-16 right-0 w-64 bg-card border border-border rounded-2xl shadow-2xl p-4 cursor-pointer hover:scale-105 transition-transform animate-in slide-in-from-right-5 fade-in duration-300"
-          >
+          <div className="absolute bottom-16 right-0 w-64 rounded-2xl border border-border bg-card shadow-2xl animate-in slide-in-from-right-5 fade-in duration-300">
             {/* Cloud tail */}
             <div className="absolute -bottom-2 right-6 w-4 h-4 bg-card border-r border-b border-border transform rotate-45" />
-            <div className="flex items-start gap-3">
+            <button type="button" onClick={handleBubbleClick} className="flex w-full items-start gap-3 rounded-2xl p-4 pr-9 text-left transition-transform hover:scale-[1.02]" aria-label="Open RojgaarAI quick links">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                 <i className="bx bx-bot text-primary text-lg"></i>
               </div>
@@ -281,8 +179,10 @@ export default function RojgaarAIPopup() {
                 <p className="text-xs font-semibold text-primary mb-1">RojgaarAI</p>
                 <p className="text-sm text-foreground line-clamp-3">{bubbleMessage}</p>
               </div>
-            </div>
+            </button>
             <button
+              type="button"
+              aria-label="Dismiss tip"
               onClick={(e) => { e.stopPropagation(); setShowBubble(false); }}
               className="absolute top-2 right-2 p-1 rounded-full hover:bg-accent transition-colors"
             >
@@ -297,9 +197,11 @@ export default function RojgaarAIPopup() {
             <div className="p-4 border-b border-border flex items-center justify-between bg-primary/5">
               <div className="flex items-center gap-2">
                 <i className="bx bx-bot text-primary text-xl"></i>
-                <span className="font-bold text-foreground">AI Tools</span>
+                <span className="font-bold text-foreground">Quick links</span>
               </div>
               <button
+                type="button"
+                aria-label="Close quick links"
                 onClick={() => setShowFeatures(false)}
                 className="p-1 rounded-full hover:bg-accent transition-colors"
               >
@@ -327,6 +229,7 @@ export default function RojgaarAIPopup() {
             </div>
             <div className="p-3 border-t border-border">
               <button
+                type="button"
                 onClick={() => { setShowFeatures(false); setIsOpen(true); }}
                 className="w-full py-2 bg-primary text-primary-foreground rounded-xl font-medium text-sm hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
@@ -339,8 +242,10 @@ export default function RojgaarAIPopup() {
 
         {/* Main Floating Button */}
         <button
+          type="button"
+          aria-label={isOpen ? "Close RojgaarAI chat" : "Open RojgaarAI chat"}
           onClick={() => { setIsOpen(!isOpen); setShowBubble(false); setShowFeatures(false); }}
-          className={`w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 ${isOpen
+          className={`w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-[transform,background-color,box-shadow] duration-300 ${isOpen
             ? "bg-red-500 hover:bg-red-600 rotate-90"
             : "bg-linear-to-br from-primary to-primary/80 hover:shadow-primary/40 hover:scale-110"
             }`}
@@ -354,7 +259,7 @@ export default function RojgaarAIPopup() {
 
         {/* Chat Window */}
         {isOpen && (
-          <div className="fixed bottom-36 right-6 w-96 h-[500px] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-50 hidden md:flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div role="dialog" aria-label="RojgaarAI chat" className="fixed bottom-36 right-6 z-50 hidden h-[500px] w-96 flex-col overflow-hidden overscroll-contain rounded-2xl border border-border bg-card shadow-2xl md:flex animate-in slide-in-from-bottom-5 fade-in duration-300">
             {/* Header */}
             <div className="p-4 border-b border-border bg-linear-to-r from-primary/10 to-primary/5 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -365,16 +270,18 @@ export default function RojgaarAIPopup() {
                 <p className="text-xs text-muted-foreground">Your career assistant</p>
               </div>
               <button
+                type="button"
+                aria-label="Open quick links"
                 onClick={() => setShowFeatures(!showFeatures)}
                 className="p-2 rounded-lg hover:bg-accent transition-colors"
-                title="AI Tools"
+                title="Quick links"
               >
                 <Sparkles size={18} className="text-primary" />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4" aria-live="polite">
               {messages.length === 0 && (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
@@ -385,10 +292,11 @@ export default function RojgaarAIPopup() {
                     I can help you navigate RojgaarNepal and boost your career.
                   </p>
                   <div className="flex flex-wrap gap-3 justify-center">
-                    {["What can you do?", "AI Tools", "Help with my profile"].map((q, i) => (
+                    {["What can you do?", "Find jobs", "Help with my profile"].map((q, i) => (
                       <button
+                        type="button"
                         key={i}
-                        onClick={() => { setInput(q); setTimeout(handleSend, 100); }}
+                        onClick={() => handleSend(q)}
                         className="px-3 py-1.5 bg-accent rounded-full text-xs font-medium hover:bg-accent/80 transition-colors"
                       >
                         {q}
@@ -420,7 +328,7 @@ export default function RojgaarAIPopup() {
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
                           components={{
-                            a: ({ node, ...props }) => (
+                            a: ({ ...props }) => (
                               <a
                                 {...props}
                                 target="_blank"
@@ -428,9 +336,9 @@ export default function RojgaarAIPopup() {
                                 className="text-primary hover:underline font-medium"
                               />
                             ),
-                            p: ({ node, ...props }) => <p {...props} className="mb-1 last:mb-0" />,
-                            ul: ({ node, ...props }) => <ul {...props} className="list-disc pl-4 mb-2 space-y-1" />,
-                            ol: ({ node, ...props }) => <ol {...props} className="list-decimal pl-4 mb-2 space-y-1" />,
+                            p: ({ ...props }) => <p {...props} className="mb-1 last:mb-0" />,
+                            ul: ({ ...props }) => <ul {...props} className="list-disc pl-4 mb-2 space-y-1" />,
+                            ol: ({ ...props }) => <ol {...props} className="list-decimal pl-4 mb-2 space-y-1" />,
                           }}
                         >
                           {msg.content}
@@ -448,7 +356,7 @@ export default function RojgaarAIPopup() {
                   <div className="bg-accent rounded-2xl rounded-bl-md px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Loader2 size={16} className="animate-spin text-primary" />
-                      <span className="text-sm text-muted-foreground">Thinking...</span>
+                      <span className="text-sm text-muted-foreground">Thinking…</span>
                     </div>
                   </div>
                 </div>
@@ -459,18 +367,24 @@ export default function RojgaarAIPopup() {
             {/* Input */}
             <div className="p-4 border-t border-border">
               <div className="flex gap-2">
+                <label htmlFor="rojgaar-ai-popup-message" className="sr-only">Message RojgaarAI</label>
                 <input
+                  id="rojgaar-ai-popup-message"
+                  name="message"
                   ref={inputRef}
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask me anything..."
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  onKeyDown={handleKeyPress}
+                  autoComplete="off"
+                  placeholder="Ask about your career…"
+                  className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus-visible:ring-2 focus-visible:ring-primary/50"
                   maxLength={500}
                 />
                 <button
-                  onClick={handleSend}
+                  type="button"
+                  onClick={() => handleSend()}
+                  aria-label="Send message"
                   disabled={!input.trim() || loading}
                   className="p-2.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >

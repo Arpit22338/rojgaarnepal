@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Free Python Programming Course | Rojgaar Nepal",
     description: "Learn Python from scratch with our FREE course. Interactive lessons, coding playground, and get certified! Perfect for beginners.",
-    url: "https://rojgaarnepal.com/courses/basic-python",
+    url: "https://www.rojgaarnepal.com/courses/basic-python",
     type: "website",
   },
 };

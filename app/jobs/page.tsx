@@ -3,13 +3,13 @@ import JobsClient from './JobsClient';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-    title: "Jobs in Nepal 2025 - Latest Job Vacancies & Career Opportunities",
-    description: "Find the latest job vacancies in Nepal. Browse 1000+ jobs in IT, engineering, marketing, freelancing & more. Apply now on Rojgaar Nepal - Nepal's top job portal.",
+    title: "Jobs in Nepal - Latest Vacancies & Career Opportunities",
+    description: "Find current job vacancies in Nepal. Explore opportunities by role, skill, employer, and location on RojgaarNepal.",
     keywords: [
         "jobs in nepal",
         "job in nepal",
         "vacancy nepal",
-        "job vacancy nepal 2025",
+        "latest job vacancy nepal",
         "online jobs nepal",
         "remote jobs nepal",
         "IT jobs kathmandu",
@@ -21,10 +21,11 @@ export const metadata: Metadata = {
         "nepal job portal",
         "apply jobs online nepal"
     ],
+    alternates: { canonical: "https://www.rojgaarnepal.com/jobs" },
     openGraph: {
         title: "Jobs in Nepal - Find Your Dream Career | Rojgaar Nepal",
-        description: "Browse 1000+ job vacancies across Nepal. IT, Engineering, Marketing, Freelancing & more. Free job alerts!",
-        url: "https://rojgaarnepal.com/jobs",
+        description: "Browse current job vacancies across Nepal by role, skill, employer, and location.",
+        url: "https://www.rojgaarnepal.com/jobs",
         type: "website",
     },
 };
